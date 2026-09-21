@@ -1,7 +1,15 @@
 // src/lib/api.ts
 import { getToken, clearSession } from './auth';
 
-const API_BASE_URL = 'http://localhost:4000/api';
+export const API_BASE_URL = (import.meta.env.PUBLIC_API_URL || 'http://localhost:4000/api').replace(/\/$/, '');
+export const SERVER_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, '');
+
+export function getFileUrl(path: string | null | undefined): string {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  const cleanPath = path.replace(/\\/g, '/').replace(/^\//, '');
+  return `${SERVER_BASE_URL}/${cleanPath}`;
+}
 
 interface RequestOptions extends RequestInit {
   isFormData?: boolean;
@@ -426,4 +434,5 @@ export const api = {
         method: 'DELETE',
       }),
   },
+  getFileUrl,
 };

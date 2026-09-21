@@ -697,7 +697,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
                         ${imagenes.length > 0 ? `
                           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 pt-1">
                             ${imagenes.map((img: any) => {
-                              const imgUrl = 'http://localhost:4000/' + (img.archivo_scan ? img.archivo_scan.replace(/\\/g, '/') : '');
+                              const imgUrl = api.getFileUrl(img.archivo_scan);
                               return `
                                 <div class="group relative rounded-xl overflow-hidden border border-slate-200 bg-slate-50 shadow-2xs hover:shadow-md transition-all">
                                   <div class="aspect-video w-full overflow-hidden bg-slate-100 flex items-center justify-center cursor-pointer btn-ampliar-img" data-img-src="${imgUrl}" data-img-titulo="${encodeURIComponent(img.observacion || 'Imagen')}">

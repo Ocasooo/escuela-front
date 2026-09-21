@@ -630,7 +630,7 @@ import MoodleLayout from '../layouts/Moodle-Layout.astro';
                         ${imagenes.length > 0 ? `
                           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 pt-1">
                             ${imagenes.map((img: any) => {
-                              const imgUrl = 'http://localhost:4000/' + (img.archivo_scan ? img.archivo_scan.replace(/\\/g, '/') : '');
+                              const imgUrl = api.getFileUrl(img.archivo_scan);
                               return `
                                 <div class="group relative rounded-xl overflow-hidden border border-slate-200 bg-white shadow-2xs hover:shadow-md transition-all cursor-pointer btn-ampliar-img-moodle" data-img-src="${imgUrl}" data-img-titulo="${encodeURIComponent(img.observacion || 'Imagen Didáctica')}">
                                   <div class="aspect-video w-full overflow-hidden bg-slate-100 flex items-center justify-center">
@@ -1393,7 +1393,7 @@ import MoodleLayout from '../layouts/Moodle-Layout.astro';
         const princEl = document.getElementById('hilo-tema-principal');
         if (princEl) {
           const esAutorDocente = (tema.autor_rol || '').toLowerCase().includes('prof') || (tema.autor_rol || '').toLowerCase().includes('docent') || (tema.autor_rol || '').toLowerCase().includes('admin');
-          const imgUrl = tema.imagen_url ? ('http://localhost:4000/' + tema.imagen_url.replace(/\\/g, '/')) : '';
+          const imgUrl = tema.imagen_url ? api.getFileUrl(tema.imagen_url) : '';
           const permiteEditar = puedeEditarTema(tema);
 
           princEl.innerHTML = `
@@ -1514,7 +1514,7 @@ import MoodleLayout from '../layouts/Moodle-Layout.astro';
 
       function renderizarRespuestaHTML(r: any, esHija = false): string {
         const esAutorDocente = (r.autor_rol || '').toLowerCase().includes('prof') || (r.autor_rol || '').toLowerCase().includes('docent') || (r.autor_rol || '').toLowerCase().includes('admin');
-        const imgUrl = r.imagen_url ? ('http://localhost:4000/' + r.imagen_url.replace(/\\/g, '/')) : '';
+        const imgUrl = r.imagen_url ? api.getFileUrl(r.imagen_url) : '';
         const permiteEditar = puedeEditarRespuesta(r);
 
         const hijas = hijasPorPadre.get(Number(r.id)) || [];
