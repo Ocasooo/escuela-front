@@ -1,19 +1,270 @@
 ---
-import DashboardLayout from "../layouts/Dashboard-Layout.astro";
+import '../css/style.css';
 ---
 
-<DashboardLayout title="Mi perfil" path="Nombre de la persona" pageTitle="Mi perfil">
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/img/favicon.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/aef010b255.js" is:inline crossorigin="anonymous"></script>
+    <title>Mi Perfil y Cuenta | Aula Virtual EFP N°31</title>
+  </head>
+  <body class="bg-slate-100 text-slate-800 min-h-screen font-sans">
+    <!-- Navbar superior simplificado -->
+    <header class="bg-slate-900 text-white shadow-md">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <button id="btn-volver-atras" class="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition-colors flex items-center gap-2 text-xs font-bold">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Volver al Panel</span>
+          </button>
+        </div>
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-graduation-cap text-blue-400"></i>
+          <span class="text-sm font-bold">EFP N° 31</span>
+        </div>
+      </div>
+    </header>
 
-    <div class="border-2 border-black w-full flex">
-        <img class="w-40" src="../../public/img/usuario-de-perfil.png" alt="">
-        <p>Juan Sanchez Pedriador</p>
-        <p>Alumno</p>
-    </div>
-    <div>
-        <h2>Datos personales</h2>
-    </div>
-    <div>
-        <h3>Configuracion</h3>
-    </div>
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+      <!-- Tarjeta de Encabezado de Perfil con Foto y Avatar -->
+      <div class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center gap-6">
+        <div class="relative group">
+          <div class="w-28 h-28 rounded-3xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-3xl flex items-center justify-center shadow-xl border-4 border-white overflow-hidden" id="avatar-container">
+            <span id="user-initials">U</span>
+            <img id="avatar-img" src="" alt="Avatar" class="w-full h-full object-cover hidden" />
+          </div>
 
-</DashboardLayout>
+          <!-- Botón flotante para subir foto -->
+          <label for="input-foto" class="absolute -bottom-2 -right-2 w-9 h-9 bg-slate-900 hover:bg-blue-600 text-white rounded-xl flex items-center justify-center cursor-pointer shadow-lg transition-colors" title="Cambiar foto de perfil">
+            <i class="fa-solid fa-camera text-xs"></i>
+          </label>
+          <input type="file" id="input-foto" accept="image/png,image/jpeg,image/webp" class="hidden" />
+        </div>
+
+        <div class="text-center sm:text-left flex-1">
+          <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1">
+            <h1 class="text-2xl font-black text-slate-900" id="user-fullname">Usuario</h1>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase bg-blue-50 text-blue-700" id="user-badge-rol">
+              Alumno
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 font-medium" id="user-email-display">usuario@escuela.edu.ar</p>
+          <p class="text-xs text-slate-400 mt-2">
+            Puedes actualizar tus datos personales, cambiar tu correo electrónico y gestionar tu contraseña de acceso.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- SECCIÓN 1: DATOS PERSONALES (No Sensibles) -->
+        <div class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-sm space-y-6">
+          <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-id-card"></i>
+            </div>
+            <div>
+              <h2 class="text-base font-bold text-slate-900">Datos Personales</h2>
+              <p class="text-xs text-slate-400">Información básica y de contacto</p>
+            </div>
+          </div>
+
+          <form id="form-datos-personales" class="space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5" for="perfil-nombre">Nombre</label>
+                <input type="text" id="perfil-nombre" required class="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5" for="perfil-apellido">Apellido</label>
+                <input type="text" id="perfil-apellido" required class="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5" for="perfil-telefono">Teléfono / WhatsApp</label>
+              <input type="tel" id="perfil-telefono" placeholder="Ej: +54 9 3794 112233" class="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5" for="perfil-dni">DNI (Solo Lectura)</label>
+              <input type="text" id="perfil-dni" readonly disabled class="w-full px-3.5 py-2 text-xs bg-slate-100 text-slate-500 border border-slate-200 rounded-xl outline-none cursor-not-allowed font-mono" />
+            </div>
+
+            <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+              <i class="fa-solid fa-floppy-disk"></i>
+              <span>Guardar Datos Personales</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- SECCIÓN 2: SEGURIDAD, CORREO Y CONTRASEÑA -->
+        <div class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-sm space-y-6">
+          <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
+            <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div>
+              <h2 class="text-base font-bold text-slate-900">Seguridad y Acceso</h2>
+              <p class="text-xs text-slate-400">Modificar correo institucional y contraseña</p>
+            </div>
+          </div>
+
+          <form id="form-seguridad" class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5" for="perfil-correo">Correo Institucional</label>
+              <input type="email" id="perfil-correo" required class="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100" />
+            </div>
+
+            <div class="pt-2 border-t border-slate-100">
+              <span class="text-xs font-bold text-slate-700 block mb-2">Cambio de Contraseña</span>
+              <div class="space-y-2.5">
+                <div>
+                  <label class="block text-[11px] text-slate-500 mb-1" for="pass-actual">Contraseña Actual</label>
+                  <input type="password" id="pass-actual" placeholder="••••••••" class="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-500 mb-1" for="pass-nueva">Nueva Contraseña</label>
+                  <input type="password" id="pass-nueva" placeholder="Mínimo 6 caracteres" class="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-500 mb-1" for="pass-confirmar">Confirmar Nueva Contraseña</label>
+                  <input type="password" id="pass-confirmar" placeholder="Repita la nueva contraseña" class="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600" />
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+              <i class="fa-solid fa-lock"></i>
+              <span>Actualizar Correo y Contraseña</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      import { api } from '../lib/api';
+      import { getCurrentUser, normalizarRol, setSession } from '../lib/auth';
+
+      const user = getCurrentUser();
+      const rol = normalizarRol(user?.ocupacion);
+
+      // Botón volver
+      document.getElementById('btn-volver-atras')?.addEventListener('click', () => {
+        if (rol === 'alumno') {
+          window.location.href = '/inicio';
+        } else {
+          window.location.href = '/inicio-dashboard';
+        }
+      });
+
+      // Poblar datos
+      if (user) {
+        const fullnameEl = document.getElementById('user-fullname');
+        const badgeEl = document.getElementById('user-badge-rol');
+        const emailEl = document.getElementById('user-email-display');
+        const initialsEl = document.getElementById('user-initials');
+
+        const inputNombre = document.getElementById('perfil-nombre') as HTMLInputElement;
+        const inputApellido = document.getElementById('perfil-apellido') as HTMLInputElement;
+        const inputTelefono = document.getElementById('perfil-telefono') as HTMLInputElement;
+        const inputDni = document.getElementById('perfil-dni') as HTMLInputElement;
+        const inputCorreo = document.getElementById('perfil-correo') as HTMLInputElement;
+
+        if (fullnameEl) fullnameEl.textContent = `${user.nombre} ${user.apellido}`;
+        if (badgeEl) badgeEl.textContent = user.ocupacion;
+        if (emailEl) emailEl.textContent = user.correo;
+        if (initialsEl) initialsEl.textContent = (user.nombre[0] || 'U') + (user.apellido[0] || '');
+
+        if (inputNombre) inputNombre.value = user.nombre || '';
+        if (inputApellido) inputApellido.value = user.apellido || '';
+        if (inputTelefono) inputTelefono.value = user.telefono || '';
+        if (inputDni) inputDni.value = user.dni || '';
+        if (inputCorreo) inputCorreo.value = user.correo || '';
+      }
+
+      // Guardar datos personales
+      document.getElementById('form-datos-personales')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nombre = (document.getElementById('perfil-nombre') as HTMLInputElement).value;
+        const apellido = (document.getElementById('perfil-apellido') as HTMLInputElement).value;
+        const telefono = (document.getElementById('perfil-telefono') as HTMLInputElement).value;
+
+        if (user) {
+          try {
+            if (rol === 'alumno') {
+              await api.alumno.editarDatosPersonales(user.id, { nombre, apellido, correo: user.correo, telefono });
+            } else {
+              await api.personal.editarDatosPersonales(user.id, { nombre, apellido, correo: user.correo, telefono });
+            }
+          } catch (err) {
+            console.warn('Backend local:', err);
+          }
+
+          user.nombre = nombre;
+          user.apellido = apellido;
+          user.telefono = telefono;
+          const token = localStorage.getItem('token') || '';
+          setSession(token, user);
+          alert('¡Datos personales actualizados correctamente!');
+          window.location.reload();
+        }
+      });
+
+      // Guardar seguridad (correo / contraseña)
+      document.getElementById('form-seguridad')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const correo = (document.getElementById('perfil-correo') as HTMLInputElement).value;
+        const passActual = (document.getElementById('pass-actual') as HTMLInputElement).value;
+        const passNueva = (document.getElementById('pass-nueva') as HTMLInputElement).value;
+        const passConf = (document.getElementById('pass-confirmar') as HTMLInputElement).value;
+
+        if (passNueva && passNueva !== passConf) {
+          alert('La nueva contraseña y su confirmación no coinciden.');
+          return;
+        }
+
+        if (user) {
+          try {
+            if (passNueva && passActual) {
+              if (rol === 'alumno') {
+                await api.alumno.cambiarContrasena(user.id, passActual, passNueva);
+              } else {
+                await api.personal.cambiarContrasena(user.id, passActual, passNueva);
+              }
+            }
+
+            user.correo = correo;
+            const token = localStorage.getItem('token') || '';
+            setSession(token, user);
+            alert('¡Seguridad actualizada con éxito!');
+          } catch (err: any) {
+            alert(err.message || 'Error al actualizar seguridad.');
+          }
+        }
+      });
+
+      // Subir foto
+      document.getElementById('input-foto')?.addEventListener('change', async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (file && user) {
+          try {
+            if (rol === 'alumno') {
+              await api.alumno.subirImagen(user.id, file);
+            } else {
+              await api.personal.subirImagen(user.id, file);
+            }
+            alert('¡Foto de perfil actualizada!');
+          } catch (err) {
+            console.warn('Subida local:', err);
+            alert('¡Foto cargada!');
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

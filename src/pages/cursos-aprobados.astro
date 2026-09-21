@@ -1,0 +1,330 @@
+---
+import MoodleLayout from '../layouts/Moodle-Layout.astro';
+---
+
+<MoodleLayout title="Cursos Aprobados y Certificados">
+  <div class="space-y-8">
+    <!-- Breadcrumb -->
+    <div class="flex items-center gap-2 text-xs font-semibold text-slate-400 no-print">
+      <a href="/inicio" class="hover:text-blue-600 transition-colors flex items-center gap-1">
+        <i class="fa-solid fa-house text-[10px]"></i>
+        <span>Inicio</span>
+      </a>
+      <span>/</span>
+      <span class="text-slate-700 font-bold">Cursos Aprobados y Certificados</span>
+    </div>
+
+    <!-- Banner Principal de Graduación -->
+    <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden no-print">
+      <div class="relative z-10 max-w-2xl">
+        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-amber-400/20 text-amber-300 backdrop-blur-md mb-3 border border-amber-400/30">
+          <i class="fa-solid fa-award text-amber-400"></i>
+          Certificaciones Oficiales de Egresado
+        </span>
+        <h1 class="text-3xl font-extrabold tracking-tight">Cursos Aprobados y Diplomas</h1>
+        <p class="text-blue-100/90 text-sm mt-2 leading-relaxed">
+          Felicitaciones por completar satisfactoriamente tu formación. Aquí podrás consultar tus calificaciones finales de egreso y descargar o imprimir tus certificados oficiales con validez ministerial.
+        </p>
+      </div>
+      <div class="absolute right-0 bottom-0 translate-x-10 translate-y-10 opacity-10 pointer-events-none text-white text-9xl">
+        <i class="fa-solid fa-award"></i>
+      </div>
+    </div>
+
+    <!-- Tarjeta Resumen del Alumno -->
+    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 no-print">
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-white text-2xl font-black shadow-md shrink-0" id="resumen-alumno-iniciales">
+          U
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-lg font-black text-slate-900" id="resumen-alumno-nombre">Cargando alumno...</h2>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <i class="fa-solid fa-check mr-1"></i>Graduado Oficial
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">
+            D.N.I.: <span class="font-mono font-bold text-slate-700" id="resumen-alumno-dni">---</span> • Escuela de Formación Profesional N° 31
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="px-4 py-2 bg-slate-50 border border-slate-200 rounded-2xl text-center">
+          <span class="block text-[10px] font-bold text-slate-400 uppercase">Cursos Aprobados</span>
+          <span class="text-lg font-black text-amber-600" id="resumen-contador-aprobados">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Catálogo de Cursos Aprobados -->
+    <div class="no-print">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-black text-slate-900">Diplomas y Especialidades Obtenidas</h2>
+          <p class="text-xs text-slate-500">Seleccione un curso para previsualizar o descargar su certificado oficial</p>
+        </div>
+      </div>
+
+      <div id="grid-cursos-aprobados" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Tarjetas dinámicas generadas por JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Previsualización y Descarga/Impresión del Diploma Oficial -->
+  <div id="modal-diploma-aprobado" class="fixed inset-0 bg-slate-900/70 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-3xl w-full p-6 md:p-8 shadow-2xl border border-slate-100 space-y-6 animate-fadeIn my-8">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 no-print">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-award"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Certificado Oficial Ministerial</h3>
+            <p class="text-xs text-slate-500">Listo para descargar en PDF o imprimir en alta resolución.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btn-imprimir-diploma" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-print"></i>
+            <span>Imprimir / Guardar PDF</span>
+          </button>
+          <button id="btn-cerrar-modal-dip" class="text-slate-400 hover:text-slate-600 p-2 cursor-pointer">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- DIPLOMA OFICIAL CONTAINER (Compatible con @media print de style.css) -->
+      <div id="diploma-preview-container" class="diploma-card p-8 md:p-12 text-center text-slate-900 relative bg-[#fffdfa] border-8 border-double border-amber-800/30 rounded-2xl shadow-inner">
+        <div class="space-y-4">
+          <div class="border-b-2 border-amber-600/40 pb-4 inline-block px-12">
+            <h4 class="text-xs font-bold uppercase tracking-widest text-slate-600">Ministerio de Educación • Formación Profesional</h4>
+            <h2 class="text-2xl font-black text-slate-900 mt-1 diploma-title">ESCUELA DE FORMACIÓN PROFESIONAL N° 31</h2>
+            <p class="text-[11px] text-slate-500 italic mt-0.5">Resolución Ministerial N° 1482/19</p>
+          </div>
+
+          <p class="text-xs uppercase tracking-widest font-bold text-amber-700 mt-4">Otorga el presente</p>
+          <h1 class="text-3xl md:text-4xl font-black text-slate-900 diploma-title my-2 tracking-wide font-serif">CERTIFICADO OFICIAL</h1>
+          <p class="text-xs text-slate-600">por haber completado y aprobado satisfactoriamente todos los requisitos curriculares a:</p>
+
+          <h2 class="text-2xl md:text-3xl font-black text-blue-950 tracking-wide mt-2" id="diploma-alumno-nombre">
+            Juan Manuel González
+          </h2>
+          <p class="text-xs text-slate-500 font-mono">D.N.I. N° <span id="diploma-alumno-dni">41.234.567</span></p>
+
+          <div class="my-5 py-3 border-y border-amber-600/30 max-w-xl mx-auto">
+            <p class="text-xs text-slate-600">en el trayecto formativo de:</p>
+            <h3 class="text-lg md:text-xl font-black text-slate-900 mt-0.5" id="diploma-curso-nombre">
+              Electricidad Industrial y Domiciliaria
+            </h3>
+            <p class="text-xs text-slate-600 mt-1">
+              Calificación Final: <b class="text-slate-900" id="diploma-nota">9(nueve)</b> • Ciclo Lectivo <span id="diploma-anio">2024</span>
+            </p>
+          </div>
+
+          <!-- Firmas y Sello Oficial -->
+          <div class="pt-8 flex items-end justify-between px-4 sm:px-8">
+            <div class="text-center w-36 sm:w-44">
+              <div class="border-b border-slate-400 mb-1"></div>
+              <p class="text-[10px] font-bold text-slate-700 uppercase" id="diploma-profesor-nombre">Profesor Instructor</p>
+              <p class="text-[9px] text-slate-400">EFP N° 31</p>
+            </div>
+
+            <!-- Sello dorado -->
+            <div class="w-16 h-16 rounded-full bg-amber-500/20 border-2 border-amber-600 flex items-center justify-center text-white text-xs font-black shadow-md mx-auto">
+              <i class="fa-solid fa-stamp text-xl text-amber-800"></i>
+            </div>
+
+            <div class="text-center w-36 sm:w-44">
+              <div class="border-b border-slate-400 mb-1"></div>
+              <p class="text-[10px] font-bold text-slate-700 uppercase">Dirección de Estudios</p>
+              <p class="text-[9px] text-slate-400">EFP N° 31</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    import { api } from '../lib/api';
+    import { getCurrentUser } from '../lib/auth';
+
+    const user = getCurrentUser();
+    let cursosAprobadosData: any[] = [];
+
+    const grid = document.getElementById('grid-cursos-aprobados');
+    const modalDip = document.getElementById('modal-diploma-aprobado');
+
+    function formatearNotaLetras(notaNum: number | string): string {
+      const num = Number(notaNum);
+      if (isNaN(num)) return String(notaNum);
+      const entero = Math.round(num);
+      const notasLetras: Record<number, string> = {
+        0: 'cero', 1: 'uno', 2: 'dos', 3: 'tres', 4: 'cuatro', 5: 'cinco',
+        6: 'seis', 7: 'siete', 8: 'ocho', 9: 'nueve', 10: 'diez'
+      };
+      const enLetra = notasLetras[entero] || `${entero}`;
+      return `${entero}(${enLetra})`;
+    }
+
+    async function cargarCursosAprobados() {
+      if (!user || !user.id || !grid) return;
+
+      // Resumen del alumno
+      const resNombre = document.getElementById('resumen-alumno-nombre');
+      const resDni = document.getElementById('resumen-alumno-dni');
+      const resInitials = document.getElementById('resumen-alumno-iniciales');
+      const resContador = document.getElementById('resumen-contador-aprobados');
+
+      const fullName = `${user.nombre} ${user.apellido}`;
+      if (resNombre) resNombre.textContent = fullName;
+      if (resDni) resDni.textContent = user.dni || '---';
+      if (resInitials) resInitials.textContent = (user.nombre[0] || 'U') + (user.apellido[0] || '');
+
+      try {
+        const cursos = await api.curso.cursosAprobadosPorAlumno(user.id);
+        cursosAprobadosData = Array.isArray(cursos) ? cursos : [];
+
+        if (resContador) resContador.textContent = String(cursosAprobadosData.length);
+
+        if (cursosAprobadosData.length === 0) {
+          grid.innerHTML = `
+            <div class="col-span-full p-12 text-center text-slate-400 bg-white rounded-3xl border border-slate-200">
+              <i class="fa-solid fa-graduation-cap text-4xl text-slate-300 mb-3 block"></i>
+              <h3 class="font-bold text-slate-700 text-base">Aún no tienes cursos con titulación finalizada</h3>
+              <p class="text-xs text-slate-400 mt-1 max-w-md mx-auto">
+                Tus certificaciones oficiales aparecerán en esta sección una vez que hayas completado todos los requisitos curriculares y la institución registre tu egreso.
+              </p>
+              <a href="/inicio" class="mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all">
+                <i class="fa-solid fa-book-open"></i>
+                <span>Ir a Mis Cursos Activos</span>
+              </a>
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = cursosAprobadosData.map((c, idx) => {
+          const notaNum = Number(c.nota) || 8;
+          const anio = c.anio || new Date().getFullYear();
+          const profesor = c.profesor || 'Cuerpo Docente';
+
+          return `
+            <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+              <div>
+                <div class="p-6 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 text-white relative overflow-hidden">
+                  <div class="flex items-center justify-between mb-2 relative z-10">
+                    <span class="px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-black uppercase tracking-wider backdrop-blur-md">
+                      <i class="fa-solid fa-certificate mr-1"></i>Certificado Oficial
+                    </span>
+                    <span class="text-xs font-bold text-amber-100">
+                      Ciclo ${anio}
+                    </span>
+                  </div>
+                  <h3 class="text-xl font-black leading-snug drop-shadow-sm relative z-10">${c.nombre}</h3>
+                  <div class="absolute -right-4 -bottom-4 text-white/10 text-8xl pointer-events-none">
+                    <i class="fa-solid fa-award"></i>
+                  </div>
+                </div>
+
+                <div class="p-6 space-y-4">
+                  <p class="text-xs text-slate-500 leading-relaxed line-clamp-2">
+                    ${c.descripcion || 'Trayecto de formación profesional con validez ministerial y competencias certificadas.'}
+                  </p>
+
+                  <div class="space-y-2 border-t border-slate-100 pt-3">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="text-slate-400 font-medium">Calificación de Egreso:</span>
+                      <span class="font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200">
+                        ${formatearNotaLetras(notaNum)}
+                      </span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="text-slate-400 font-medium">Instructor / Docente:</span>
+                      <span class="font-bold text-slate-700 truncate max-w-[180px]" title="${profesor}">
+                        ${profesor}
+                      </span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="text-slate-400 font-medium">Estado del Título:</span>
+                      <span class="font-extrabold text-amber-700 flex items-center gap-1">
+                        <i class="fa-solid fa-stamp text-[10px]"></i> Emitido y Registrado
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="p-6 pt-0">
+                <button
+                  type="button"
+                  class="btn-abrir-diploma w-full py-3 px-4 bg-amber-600 hover:bg-amber-700 text-white font-black text-xs rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  data-idx="${idx}"
+                >
+                  <i class="fa-solid fa-award text-sm"></i>
+                  <span>Ver y Descargar Certificado</span>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Escuchar clics en botones de certificado
+        document.querySelectorAll('.btn-abrir-diploma').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const idx = Number(btn.getAttribute('data-idx'));
+            const c = cursosAprobadosData[idx];
+            if (c) abrirDiploma(c);
+          });
+        });
+
+      } catch (err: any) {
+        console.error('Error al cargar cursos aprobados:', err);
+        grid.innerHTML = `<div class="col-span-full p-8 text-center text-red-500">Error al cargar certificaciones: ${err.message}</div>`;
+      }
+    }
+
+    function abrirDiploma(c: any) {
+      const elNombre = document.getElementById('diploma-alumno-nombre');
+      const elDni = document.getElementById('diploma-alumno-dni');
+      const elCurso = document.getElementById('diploma-curso-nombre');
+      const elNota = document.getElementById('diploma-nota');
+      const elAnio = document.getElementById('diploma-anio');
+      const elProf = document.getElementById('diploma-profesor-nombre');
+
+      const alumnoNombre = c.alumno_nombre && c.alumno_apellido 
+        ? `${c.alumno_nombre} ${c.alumno_apellido}` 
+        : `${user?.nombre || ''} ${user?.apellido || ''}`.trim();
+      
+      const alumnoDni = c.alumno_dni || user?.dni || '---';
+      const notaNum = Number(c.nota) || 8;
+
+      if (elNombre) elNombre.textContent = alumnoNombre;
+      if (elDni) elDni.textContent = String(alumnoDni);
+      if (elCurso) elCurso.textContent = c.nombre;
+      if (elNota) elNota.textContent = formatearNotaLetras(notaNum);
+      if (elAnio) elAnio.textContent = String(c.anio || new Date().getFullYear());
+      if (elProf) elProf.textContent = c.profesor || 'Profesor Instructor';
+
+      modalDip?.classList.remove('hidden');
+    }
+
+    const cerrarModal = () => modalDip?.classList.add('hidden');
+    document.getElementById('btn-cerrar-modal-dip')?.addEventListener('click', cerrarModal);
+
+    modalDip?.addEventListener('click', (e) => {
+      if (e.target === modalDip) cerrarModal();
+    });
+
+    document.getElementById('btn-imprimir-diploma')?.addEventListener('click', () => {
+      window.print();
+    });
+
+    // Iniciar
+    cargarCursosAprobados();
+  </script>
+</MoodleLayout>

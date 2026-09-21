@@ -1,63 +1,1908 @@
 ---
 import DashboardLayout from '../layouts/Dashboard-Layout.astro';
-import DropdownButton from '../components/dropdownButton.astro';
 ---
 
-<DashboardLayout title='Gestión de examenes y materias' path='Examenes y materias' pageTitle='Gestión de examenes y materias'>
-      <DropdownButton buttonText='Seleccionar curso' options={["matematicas","carpinteria","programacion"]}></DropdownButton>
-      <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" href="/formulario-cargar-examen">Cargar nota de examen</a>
-      <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" href="/formulario-nota-materia">Cargar nota de materia</a>
-            <!------------------------TABLE-------------------- -->
-            <!------------------------TABLE-------------------- -->
-          <div class="mb-10 mt-5">
-            <div class="xl:w-full px-10">
-              <div class="retive flex flex-col min-w-0 break-words bg-white w-full shadow-lg rounded">
-                <div class="rounded-t mb-0 px-4 py-3 border-0">
-                  <div class="flex flex-wrap items-center">
-                    <div class="relative w-full px-2 flex-grow flex-1">
-                      <h3 class="font-semibold text-base text-blueGray-700">Lista de usuarios</h3>
-                    </div>
-                    <div class="relative flex-grow flex-1 sm:text-right">
-                      <input class="border-2 border-black text-black text-xs font-bold px-7 py-1 rounded-full" type="text" placeholder="Buscar">
-                      <i class="relative md:visible invisible top-0.5 right-48 fa-solid fa-magnifying-glass" style="color: #000000;"></i>
-                    </div>
-                  </div>
-                </div>
-            
-                <div class="block w-full overflow-x-auto">
-                  <table class="items-center bg-transparent w-full border-collapse ">
-                    <thead>
-                      <tr>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">DNI</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Nombre y apellido</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Descripción</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Calificación</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Opciones</th>
-                      </tr>
-                    </thead>
-            
-                    <tbody>
-                      <tr>
-                        <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">
-                          43065607
-                        </th>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          Jorgito Serenito
-                        </td>
-                        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          Descripcion del examen
-                        </td>
-                        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          8.00
-                        </td>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <button class="mr-2 rounded-3xl bg-sky-400 w-6 h-6"><i class="fa-solid fa-pen-to-square" style="color: #000000;"></i></button>
-                          <button class="rounded-3xl bg-red-600 w-6 h-6"><i class="fa-solid fa-xmark" style="color: #000000;"></i></button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+<DashboardLayout title="Contenido del Curso" path="examenes-y-materias" pageTitle="Contenido del Curso">
+  <div class="space-y-6">
+    <!-- Selector de Curso Activo -->
+    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl shrink-0">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Materia / Comisión en Edición</label>
+          <select id="select-curso" class="text-sm font-bold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 outline-none focus:ring-2 focus:ring-blue-100">
+            <option value="">Cargando cursos...</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700">
+          <i class="fa-solid fa-circle-check text-[10px] mr-1"></i> Estado: En Dictado
+        </span>
+        <a id="btn-ver-en-moodle" href="/curso-detalle" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-2">
+          <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+          <span>Ver este Curso en Moodle</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- CONTENEDOR INTEGRAL DE UNIDADES Y EVALUACIONES -->
+    <div class="space-y-6">
+      <div class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-sm space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">Unidades Temáticas, Contenidos y Evaluaciones</h2>
+            <p class="text-xs text-slate-500">Gestione contenidos pedagógicos, documentos didácticos, trabajos prácticos y exámenes organizados por cada unidad.</p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button id="btn-nueva-unidad" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-colors flex items-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-folder-plus"></i>
+              <span>Nueva Unidad</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Lista Dinámica de Unidades (contenedores integrales) -->
+        <div id="unidades-container" class="space-y-6">
+          <p class="text-xs text-slate-400 p-8 text-center">Seleccione un curso para ver sus unidades.</p>
+        </div>
+      </div>
+    </div>
+
+  <!-- Modal Unidad (Crear y Editar) -->
+  <div id="modal-unidad" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-fadeIn">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-base font-bold text-slate-900" id="modal-unidad-titulo">Nueva Unidad Temática</h3>
+        <button id="btn-cerrar-modal-u" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="form-nueva-unidad" class="space-y-4">
+        <input type="hidden" id="unidad-id" value="" />
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nombre / Título de la Unidad</label>
+          <input type="text" id="unidad-nombre" required placeholder="Ej: Unidad 1: Fundamentos de la Corriente Alterna" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600 font-semibold" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Descripción de Contenidos / Temario</label>
+          <textarea id="unidad-desc" rows="4" placeholder="Detalle los temas, fórmulas, normas y conceptos a desarrollar en la unidad..." class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" id="btn-cancelar-u" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
+          <button type="submit" id="btn-submit-unidad" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition-colors">Guardar Unidad</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Subir Documento a Unidad -->
+  <div id="modal-documento" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-fadeIn">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">Subir Documento de Estudio</h3>
+          <p class="text-xs text-slate-500" id="doc-subtitulo-unidad">Asignar material didáctico a la unidad</p>
+        </div>
+        <button id="btn-cerrar-modal-doc" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="form-subir-documento" class="space-y-4">
+        <input type="hidden" id="doc-unidad-id" value="" />
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Unidad de Destino</label>
+          <select id="doc-select-unidad" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none font-bold text-slate-800">
+            <!-- Opciones dinámicas de unidades -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Título / Nombre del Documento</label>
+          <input type="text" id="doc-nombre" required placeholder="Ej: Manual de Normas AEA y Protecciones" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600 font-semibold" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Archivo de Estudio (PDF, DOCX, ZIP)</label>
+          <div id="doc-dropzone" class="border-2 border-dashed border-blue-300 hover:border-blue-500 bg-blue-50/40 hover:bg-blue-50/70 rounded-2xl p-4 text-center cursor-pointer transition-all group">
+            <input type="file" id="doc-file" accept=".pdf,.doc,.docx,.zip" required class="hidden" />
+            <div id="doc-dropzone-prompt" class="space-y-1">
+              <div class="w-10 h-10 mx-auto rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg group-hover:scale-105 transition-transform">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+              </div>
+              <p class="text-xs font-bold text-slate-800">Haz clic para seleccionar el archivo</p>
+              <p class="text-[10px] text-slate-400">PDF, DOCX, DOC o ZIP (Máx. 25MB)</p>
+            </div>
+            <div id="doc-file-selected" class="hidden flex items-center justify-between bg-white p-2.5 rounded-xl border border-blue-200 text-left">
+              <div class="flex items-center gap-2 overflow-hidden">
+                <i class="fa-solid fa-file-pdf text-red-500 text-base shrink-0"></i>
+                <div class="overflow-hidden">
+                  <p id="doc-filename" class="text-xs font-bold text-slate-800 truncate">archivo.pdf</p>
+                  <p id="doc-filesize" class="text-[10px] text-slate-400 font-semibold">0 KB</p>
                 </div>
               </div>
+              <button type="button" id="btn-remover-doc-file" class="text-xs text-blue-600 hover:text-blue-800 font-bold px-2 py-1 hover:bg-blue-50 rounded-lg transition-colors shrink-0">
+                Cambiar
+              </button>
+            </div>
           </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" id="btn-cancelar-doc" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
+          <button type="submit" id="btn-submit-doc" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition-colors">Subir Documento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Crear Trabajo Práctico en Unidad (ZONA CLARA Y PROMINENTE DE SUBIDA) -->
+  <div id="modal-crear-tp" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-fadeIn">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">Crear Trabajo Práctico</h3>
+          <p class="text-xs text-slate-500" id="tp-subtitulo-unidad">Asignar trabajo práctico a la unidad</p>
+        </div>
+        <button id="btn-cerrar-modal-crear-tp" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="form-crear-tp" class="space-y-4">
+        <input type="hidden" id="tp-unidad-id" value="" />
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Unidad de Destino</label>
+          <select id="tp-select-unidad" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none font-bold text-slate-800">
+            <!-- Opciones dinámicas de unidades -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Título del Trabajo Práctico</label>
+          <input type="text" id="tp-nombre" required placeholder="Ej: TP N° 2 - Dimensionamiento de Conductores" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-amber-600 font-semibold" />
+        </div>
+
+        <!-- Fecha y Hora Límite de Entrega -->
+        <div class="bg-amber-50/60 p-3 rounded-2xl border border-amber-200/80 space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="flex items-center gap-1.5 text-xs font-bold text-amber-900 cursor-pointer">
+              <i class="fa-regular fa-clock text-amber-600"></i>
+              <span>Plazo Límite de Entrega</span>
+            </label>
+            <span class="text-[10px] text-amber-700 bg-amber-100/70 px-2 py-0.5 rounded-full font-bold">Opcional</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Fecha de Cierre</label>
+              <input type="date" id="tp-fecha-limite" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-xl outline-none focus:border-amber-600 font-semibold text-slate-800" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Hora de Cierre</label>
+              <input type="time" id="tp-hora-limite" value="23:59" class="w-full px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-xl outline-none focus:border-amber-600 font-semibold text-slate-800" />
+            </div>
+          </div>
+          <p class="text-[10px] text-slate-500 italic">
+            Al cumplirse el plazo, el práctico se marcará como vencido y se archivará automáticamente en el historial.
+          </p>
+        </div>
+
+        <!-- ZONA DE CARGA DESTACADA (DROPZONE CLARO) -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Consigna / Enunciado en Archivo</label>
+          <div id="tp-dropzone" class="border-2 border-dashed border-amber-300 hover:border-amber-500 bg-amber-50/50 hover:bg-amber-50/80 rounded-2xl p-5 text-center cursor-pointer transition-all group">
+            <input type="file" id="tp-file" accept=".pdf,.doc,.docx,.zip" required class="hidden" />
+            <div id="tp-dropzone-prompt" class="space-y-2">
+              <div class="w-12 h-12 mx-auto rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-xs">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+              </div>
+              <div>
+                <p class="text-xs font-black text-slate-800">Haz clic aquí para seleccionar el archivo</p>
+                <p class="text-[11px] text-amber-800 font-medium mt-0.5">o arrastra y suelta tu archivo de consigna</p>
+              </div>
+              <span class="inline-block text-[10px] font-bold text-slate-500 bg-white px-2.5 py-1 rounded-full border border-amber-200">
+                Formatos: PDF, DOCX, DOC o ZIP (Máx. 25MB)
+              </span>
+            </div>
+
+            <div id="tp-file-selected" class="hidden flex items-center justify-between bg-white p-3 rounded-xl border-2 border-amber-400 text-left shadow-xs">
+              <div class="flex items-center gap-3 overflow-hidden">
+                <div class="w-9 h-9 rounded-lg bg-red-50 text-red-500 flex items-center justify-center text-lg shrink-0">
+                  <i class="fa-solid fa-file-pdf"></i>
+                </div>
+                <div class="overflow-hidden">
+                  <p id="tp-filename" class="text-xs font-bold text-slate-900 truncate">archivo.pdf</p>
+                  <p id="tp-filesize" class="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
+                    <i class="fa-solid fa-circle-check"></i> Archivo listo
+                  </p>
+                </div>
+              </div>
+              <button type="button" id="btn-remover-tp-file" class="text-xs text-amber-700 hover:text-amber-900 font-bold px-2.5 py-1 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors shrink-0">
+                Cambiar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" id="btn-cancelar-crear-tp" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
+          <button type="submit" id="btn-submit-tp" class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center gap-1.5">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <span>Subir y Asignar TP</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Contenido Escrito y Enlaces de la Unidad -->
+  <div id="modal-contenido-unidad" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 md:p-8 shadow-2xl border border-slate-100 space-y-5 animate-fadeIn max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
+        <div>
+          <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-pen-to-square text-indigo-600"></i>
+            <span>Contenido Escrito y Enlaces</span>
+          </h3>
+          <p class="text-xs text-slate-500" id="contenido-subtitulo-unidad">Apuntes teóricos y referencias de la unidad</p>
+        </div>
+        <button id="btn-cerrar-modal-contenido" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="form-contenido-unidad" class="space-y-4 flex-1 overflow-y-auto pr-1">
+        <input type="hidden" id="contenido-unidad-id" value="" />
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+            Texto / Apuntes Teóricos de la Unidad
+          </label>
+          <textarea
+            id="unidad-texto-contenido"
+            rows="6"
+            placeholder="Escriba aquí los conceptos fundamentales, fórmulas, explicaciones paso a paso o notas didácticas que los alumnos verán antes de los documentos..."
+            class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-indigo-600 font-medium leading-relaxed"
+          ></textarea>
+        </div>
+
+        <!-- Enlaces / Links Didácticos -->
+        <div class="space-y-3 pt-3 border-t border-slate-100">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+              Enlaces / Links de Interés (Videos, Webs, Docs)
+            </label>
+            <button type="button" id="btn-agregar-link" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-lg transition-colors flex items-center gap-1 cursor-pointer">
+              <i class="fa-solid fa-plus text-[10px]"></i>
+              <span>+ Enlace</span>
+            </button>
+          </div>
+
+          <div id="links-container" class="space-y-2">
+            <!-- Renderizado dinámico de links -->
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-100 shrink-0">
+          <button type="button" id="btn-cancelar-contenido" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center gap-1.5">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>Guardar Contenido</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Subir Imagen Didáctica a la Unidad -->
+  <div id="modal-imagen" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-fadeIn">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-image text-purple-600"></i>
+            <span>Subir Imagen Didáctica</span>
+          </h3>
+          <p class="text-xs text-slate-500" id="img-subtitulo-unidad">Anexar esquema o diagrama a la unidad y al curso</p>
+        </div>
+        <button id="btn-cerrar-modal-img" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="form-subir-imagen" class="space-y-4">
+        <input type="hidden" id="img-unidad-id" value="" />
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Unidad de Destino</label>
+          <select id="img-select-unidad" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none font-bold text-slate-800">
+            <!-- Opciones dinámicas de unidades -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Título / Epígrafe de la Imagen</label>
+          <input type="text" id="img-nombre" required placeholder="Ej: Diagrama de Conexión en Estrella-Triángulo" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-purple-600 font-semibold" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Archivo de Imagen (PNG, JPG, WEBP, GIF)</label>
+          <div id="img-dropzone" class="border-2 border-dashed border-purple-300 hover:border-purple-500 bg-purple-50/40 hover:bg-purple-50/70 rounded-2xl p-4 text-center cursor-pointer transition-all group">
+            <input type="file" id="img-file" accept="image/png,image/jpeg,image/webp,image/gif" required class="hidden" />
+            <div id="img-dropzone-prompt" class="space-y-1">
+              <div class="w-10 h-10 mx-auto rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-lg group-hover:scale-105 transition-transform">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+              </div>
+              <p class="text-xs font-bold text-slate-800">Haz clic para seleccionar la imagen</p>
+              <p class="text-[10px] text-slate-400">PNG, JPG, WEBP o GIF (Máx. 15MB)</p>
+            </div>
+            <div id="img-file-selected" class="hidden flex items-center justify-between bg-white p-2.5 rounded-xl border border-purple-200 text-left">
+              <div class="flex items-center gap-2 overflow-hidden">
+                <i class="fa-solid fa-file-image text-purple-500 text-base shrink-0"></i>
+                <div class="overflow-hidden">
+                  <p id="img-filename" class="text-xs font-bold text-slate-800 truncate">imagen.png</p>
+                  <p id="img-filesize" class="text-[10px] text-slate-400 font-semibold">0 KB</p>
+                </div>
+              </div>
+              <button type="button" id="btn-remover-img-file" class="text-xs text-purple-600 hover:text-purple-800 font-bold px-2 py-1 hover:bg-purple-50 rounded-lg transition-colors shrink-0">
+                Cambiar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" id="btn-cancelar-img" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
+          <button type="submit" id="btn-submit-img" class="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl shadow-md transition-colors">Subir Imagen</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Visor de Imagen (Lightbox) -->
+  <div id="modal-visor-imagen" class="fixed inset-0 bg-slate-950/80 z-50 hidden flex items-center justify-center p-4 backdrop-blur-md">
+    <div class="max-w-4xl w-full bg-white rounded-3xl overflow-hidden shadow-2xl border border-slate-800 animate-fadeIn space-y-3">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/80">
+        <h4 id="visor-img-titulo" class="text-sm font-bold text-slate-900 truncate">Imagen Didáctica</h4>
+        <button id="btn-cerrar-visor-img" class="text-slate-400 hover:text-slate-700 p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+      <div class="p-4 flex items-center justify-center bg-slate-900/5 max-h-[75vh] overflow-auto">
+        <img id="visor-img-src" src="" alt="Imagen ampliada" class="max-h-[70vh] w-auto rounded-2xl shadow-md object-contain" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Constructor Interactivo de Exámenes (DISEÑADOR COMPLETO DE PREGUNTAS) -->
+  <div id="modal-examen" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col p-6 md:p-8 shadow-2xl border border-slate-100 space-y-5 animate-fadeIn">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-pen-ruler text-blue-600"></i>
+            <span>Diseñador de Evaluación en Línea</span>
+          </h3>
+          <p class="text-xs text-slate-500">Configure los datos generales y agregue preguntas con opciones múltiples, selección múltiple o respuesta escrita.</p>
+        </div>
+        <button id="btn-cerrar-examen-modal" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="form-crear-examen" class="flex-1 overflow-y-auto pr-1 space-y-6">
+        <!-- Fila 1: Datos Básicos -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Título de la Evaluación</label>
+            <input type="text" id="examen-titulo" required placeholder="Ej: Primer Parcial: Unidades 1 y 2" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600 font-semibold" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Unidad Temática</label>
+            <select id="examen-select-unidad" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none font-bold text-slate-800">
+              <option value="">General / Todo el curso</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Fila 2: Fecha, Horarios de Habilitación y Tiempo Límite -->
+        <div class="space-y-2">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Fecha del Examen</label>
+              <input type="date" id="examen-fecha" required class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none font-medium focus:bg-white focus:border-blue-600" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Hora Inicio (Habilita)</label>
+              <input type="time" id="examen-hora-inicio" required value="18:00" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none font-medium focus:bg-white focus:border-blue-600" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Hora Cierre (Límite)</label>
+              <input type="time" id="examen-hora-fin" required value="20:00" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none font-medium focus:bg-white focus:border-blue-600" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Tiempo Límite (Minutos)</label>
+              <input type="number" id="examen-duracion" min="5" max="240" value="45" required class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none font-medium focus:bg-white focus:border-blue-600" />
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-500 flex items-center gap-1.5 bg-blue-50/50 p-2 rounded-xl border border-blue-100">
+            <i class="fa-solid fa-circle-info text-blue-600 shrink-0"></i>
+            <span>El examen será visible para todos los alumnos. Antes de la hora de inicio se verá <b>bloqueado</b>, entre inicio y cierre estará <b>habilitado</b>, y luego se <b>cerrará</b> el acceso.</span>
+          </p>
+        </div>
+
+        <!-- SECCIÓN DE PREGUNTAS DINÁMICAS -->
+        <div class="space-y-4 pt-2 border-t border-slate-100">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800">Preguntas del Examen</h4>
+              <span id="badge-preguntas-count" class="text-[11px] font-bold bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">0 Preguntas</span>
+            </div>
+            <button type="button" id="btn-agregar-pregunta" class="px-3.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-plus"></i>
+              <span>+ Agregar Pregunta</span>
+            </button>
+          </div>
+
+          <!-- Contenedor de preguntas -->
+          <div id="preguntas-builder-container" class="space-y-4">
+            <!-- Renderizado dinámico de tarjetas de preguntas -->
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-4 border-t border-slate-100 shrink-0">
+          <button type="button" id="btn-cancelar-examen" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
+          <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center gap-2">
+            <i class="fa-solid fa-check"></i>
+            <span>Guardar y Publicar Examen</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación para Eliminar (Reemplazo de confirm() nativo) -->
+  <div id="modal-confirmar-eliminar" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-fadeIn text-center">
+      <div class="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-xl mx-auto">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-slate-900" id="confirm-eliminar-titulo">¿Confirmar Eliminación?</h3>
+        <p class="text-xs text-slate-500 mt-1" id="confirm-eliminar-mensaje">Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="flex items-center justify-center gap-2 pt-2">
+        <button type="button" id="btn-cancelar-confirm-eliminar" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
+        <button type="button" id="btn-aceptar-confirm-eliminar" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl shadow-md transition-colors">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    import { api } from '../lib/api';
+    import { getCurrentUser } from '../lib/auth';
+
+    const selectCurso = document.getElementById('select-curso') as HTMLSelectElement;
+    const btnVerEnMoodle = document.getElementById('btn-ver-en-moodle') as HTMLAnchorElement;
+    const unidadesContainer = document.getElementById('unidades-container');
+
+    let currentCursoId: number | null = null;
+
+    // Modal de Confirmación Tailwind
+    const modalConfirm = document.getElementById('modal-confirmar-eliminar');
+    const confirmTitulo = document.getElementById('confirm-eliminar-titulo');
+    const confirmMensaje = document.getElementById('confirm-eliminar-mensaje');
+    const btnAceptarConfirm = document.getElementById('btn-aceptar-confirm-eliminar');
+    const btnCancelarConfirm = document.getElementById('btn-cancelar-confirm-eliminar');
+
+    let accionConfirmarCallback: (() => Promise<void>) | null = null;
+
+    function abrirModalConfirmacion(titulo: string, mensaje: string, accion: () => Promise<void>) {
+      if (confirmTitulo) confirmTitulo.textContent = titulo;
+      if (confirmMensaje) confirmMensaje.textContent = mensaje;
+      accionConfirmarCallback = accion;
+      modalConfirm?.classList.remove('hidden');
+    }
+
+    const cerrarModalConfirmacion = () => {
+      modalConfirm?.classList.add('hidden');
+      accionConfirmarCallback = null;
+    };
+
+    btnCancelarConfirm?.addEventListener('click', cerrarModalConfirmacion);
+    btnAceptarConfirm?.addEventListener('click', async () => {
+      if (accionConfirmarCallback) {
+        const callback = accionConfirmarCallback;
+        cerrarModalConfirmacion();
+        await callback();
+      }
+    });
+
+    // Cargar cursos asignados al docente/personal
+    async function inicializarCursos() {
+      try {
+        const user = getCurrentUser();
+        let cursos: any[] = [];
+        if (user?.id) {
+          cursos = await api.curso.cursosPorPersonal(user.id);
+        } else {
+          cursos = await api.curso.todos();
+        }
+
+        if (!cursos || cursos.length === 0) {
+          if (selectCurso) selectCurso.innerHTML = '<option value="">No tienes cursos asignados a tu cargo</option>';
+          if (unidadesContainer) {
+            unidadesContainer.innerHTML = `
+              <div class="p-10 text-center rounded-3xl border border-dashed border-slate-200 bg-slate-50/50 space-y-2">
+                <i class="fa-solid fa-graduation-cap text-3xl text-slate-300"></i>
+                <p class="text-sm font-bold text-slate-700">No tienes cursos asignados a tu cargo actualmente.</p>
+                <p class="text-xs text-slate-400">Comunícate con la administración si crees que esto es un error.</p>
+              </div>
+            `;
+          }
+          return;
+        }
+
+        if (selectCurso) {
+          selectCurso.innerHTML = cursos.map((c: any) => 
+            `<option value="${c.id}">${c.nombre}</option>`
+          ).join('');
+
+          currentCursoId = Number(selectCurso.value);
+          actualizarLinkMoodle();
+          await cargarContenidos(currentCursoId);
+        }
+      } catch (err: any) {
+        console.error('Error al cargar cursos asignados:', err);
+      }
+    }
+
+    function actualizarLinkMoodle() {
+      if (btnVerEnMoodle && currentCursoId) {
+        btnVerEnMoodle.href = `/curso-detalle?id=${currentCursoId}`;
+      }
+    }
+
+    selectCurso?.addEventListener('change', async () => {
+      currentCursoId = Number(selectCurso.value);
+      actualizarLinkMoodle();
+      if (currentCursoId) {
+        await cargarContenidos(currentCursoId);
+      }
+    });
+
+    async function cargarContenidos(cursoId: number) {
+      if (unidadesContainer) unidadesContainer.innerHTML = '<p class="text-xs text-slate-400 p-8 text-center">Cargando unidades y contenidos...</p>';
+
+      try {
+        const [unidades, materiales, examenes] = await Promise.all([
+          api.unidades.todos().catch(() => []),
+          api.material.porCurso(cursoId).catch(() => []),
+          api.examen.porCurso ? api.examen.porCurso(cursoId).catch(() => []) : api.examen.todos().catch(() => [])
+        ]);
+
+        const unidadesCurso = (unidades || []).filter((u: any) => Number(u.curso_id) === cursoId);
+        const materialesCurso = materiales || [];
+        const examenesCurso = (examenes || []).filter((e: any) => Number(e.curso_id) === cursoId);
+
+        // Actualizar opciones en selects de modales
+        actualizarSelectsUnidades(unidadesCurso);
+
+        // Render Unidades Integrales
+        if (unidadesContainer) {
+          if (unidadesCurso.length === 0) {
+            unidadesContainer.innerHTML = `
+              <div class="p-10 text-center rounded-3xl border border-dashed border-slate-200 bg-slate-50/50 space-y-3">
+                <i class="fa-solid fa-folder-open text-4xl text-slate-300"></i>
+                <div class="space-y-1">
+                  <p class="text-sm font-bold text-slate-700">No hay unidades creadas aún para este curso.</p>
+                  <p class="text-xs text-slate-400">Comience creando la primera unidad para subir descripciones, documentos y trabajos prácticos.</p>
+                </div>
+                <button id="btn-empty-nueva-u" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-colors inline-flex items-center gap-2">
+                  <i class="fa-solid fa-plus"></i>
+                  <span>Crear Primera Unidad</span>
+                </button>
+              </div>
+            `;
+            document.getElementById('btn-empty-nueva-u')?.addEventListener('click', () => abrirModalUnidad());
+          } else {
+            let htmlUnidades = unidadesCurso.map((u: any, idx: number) => {
+              const imagenes = materialesCurso.filter((m: any) => Number(m.unidad_id) === Number(u.id) && m.tipo === 'imagen');
+              const docs = materialesCurso.filter((m: any) => Number(m.unidad_id) === Number(u.id) && m.tipo !== 'tp' && m.tipo !== 'imagen');
+              const tps = materialesCurso.filter((m: any) => Number(m.unidad_id) === Number(u.id) && m.tipo === 'tp' && m.estado === 'activo');
+              const examenesUnidad = (examenesCurso || []).filter((e: any) => Number(e.unidad_id) === Number(u.id));
+
+              let linksArray: any[] = [];
+              try {
+                if (u.links) {
+                  linksArray = typeof u.links === 'string' ? JSON.parse(u.links) : u.links;
+                  if (!Array.isArray(linksArray)) linksArray = [];
+                }
+              } catch {
+                linksArray = [];
+              }
+
+              return `
+                <div class="border border-slate-200 rounded-3xl p-6 bg-white space-y-6 shadow-xs hover:shadow-md transition-shadow">
+                  <!-- Cabecera de la Unidad (Sólo Editar / Eliminar Unidad) -->
+                  <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-4 border-b border-slate-100">
+                    <div class="flex items-start gap-3.5">
+                      <div class="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-md shadow-blue-500/20">
+                        U${idx + 1}
+                      </div>
+                      <div class="space-y-1">
+                        <h3 class="text-base font-bold text-slate-900">${u.nombre}</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">${u.descripcion || 'Sin descripción general de la unidad.'}</p>
+                      </div>
+                    </div>
+
+                    <!-- Acciones de Unidad (Editar y Eliminar) -->
+                    <div class="flex items-center gap-1.5 shrink-0 self-start md:self-auto">
+                      <button class="btn-editar-unidad p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors cursor-pointer" data-id="${u.id}" data-nombre="${encodeURIComponent(u.nombre)}" data-desc="${encodeURIComponent(u.descripcion || '')}" title="Editar Unidad">
+                        <i class="fa-solid fa-pen-to-square text-xs"></i>
+                      </button>
+                      <button class="btn-eliminar-unidad p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer" data-id="${u.id}" title="Eliminar Unidad">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- 1. ESPACIO LIBRE: CONTENIDO DOCENTE, ENLACES E IMÁGENES -->
+                  <div class="bg-indigo-50/20 rounded-2xl p-5 border border-indigo-100/80 space-y-4 max-w-full overflow-hidden">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-indigo-100/60 pb-3">
+                      <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-900 flex items-center gap-2">
+                        <i class="fa-solid fa-shapes text-indigo-600"></i>
+                        <span>Espacio libre</span>
+                      </h4>
+                      <div class="flex items-center gap-2">
+                        <span class="text-[11px] font-bold text-indigo-700 bg-white px-2 py-0.5 rounded-full border border-indigo-200">
+                          ${(u.contenido ? 1 : 0) + linksArray.length + imagenes.length} elemento(s)
+                        </span>
+                        <button type="button" class="btn-editar-contenido-u px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer" data-id="${u.id}" data-nombre="${encodeURIComponent(u.nombre)}" data-contenido="${encodeURIComponent(u.contenido || '')}" data-links="${encodeURIComponent(u.links || '')}">
+                          <i class="fa-solid fa-pen-nib"></i>
+                          <span>+ Contenido / Enlaces</span>
+                        </button>
+                        <button type="button" class="btn-subir-img-u px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer" data-unidad-id="${u.id}" data-unidad-nombre="${encodeURIComponent(u.nombre)}">
+                          <i class="fa-solid fa-image"></i>
+                          <span>+ Imagen</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    ${!u.contenido && linksArray.length === 0 && imagenes.length === 0 ? `
+                      <div class="p-4 text-center text-xs text-slate-400 bg-white rounded-xl border border-dashed border-indigo-200/60 space-y-1">
+                        <p class="font-medium text-slate-600">Espacio libre sin contenido cargado aún.</p>
+                        <p class="text-[11px] text-slate-400">Haga clic en "+ Contenido / Enlaces" o "+ Imagen" para agregar texto, enlaces o imágenes.</p>
+                      </div>
+                    ` : `
+                      <div class="bg-white rounded-2xl p-4 sm:p-5 border border-indigo-100/80 shadow-2xs space-y-4 max-w-full overflow-hidden">
+                        <!-- Texto / Escrito con soporte total para saltos de línea y desbordamiento (sin sangría espuria) -->
+                        ${u.contenido ? `<div class="text-xs sm:text-sm text-slate-700 whitespace-pre-wrap leading-relaxed break-words break-all [overflow-wrap:anywhere] max-w-full overflow-hidden">${u.contenido.trim()}</div>` : ''}
+
+                        <!-- Galería de Imágenes en el mismo cuerpo -->
+                        ${imagenes.length > 0 ? `
+                          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 pt-1">
+                            ${imagenes.map((img: any) => {
+                              const imgUrl = 'http://localhost:4000/' + (img.archivo_scan ? img.archivo_scan.replace(/\\/g, '/') : '');
+                              return `
+                                <div class="group relative rounded-xl overflow-hidden border border-slate-200 bg-slate-50 shadow-2xs hover:shadow-md transition-all">
+                                  <div class="aspect-video w-full overflow-hidden bg-slate-100 flex items-center justify-center cursor-pointer btn-ampliar-img" data-img-src="${imgUrl}" data-img-titulo="${encodeURIComponent(img.observacion || 'Imagen')}">
+                                    <img src="${imgUrl}" alt="${img.observacion || 'Imagen'}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                                  </div>
+                                  <div class="p-2 flex items-center justify-between gap-1 bg-white border-t border-slate-100 text-xs">
+                                    <span class="text-[11px] font-bold text-slate-800 truncate" title="${img.observacion || 'Imagen'}">${img.observacion || 'Imagen'}</span>
+                                    <div class="flex items-center gap-1 shrink-0">
+                                      <button type="button" class="btn-ampliar-img p-1 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors cursor-pointer" data-img-src="${imgUrl}" data-img-titulo="${encodeURIComponent(img.observacion || 'Imagen')}" title="Ampliar">
+                                        <i class="fa-solid fa-up-right-and-down-left-from-center text-xs"></i>
+                                      </button>
+                                      <button type="button" class="btn-eliminar-material p-1 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors cursor-pointer" data-id="${img.id}" data-nombre="${img.observacion || 'Imagen'}" title="Eliminar">
+                                        <i class="fa-solid fa-trash-can text-xs"></i>
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              `;
+                            }).join('')}
+                          </div>
+                        ` : ''}
+
+                        <!-- Enlaces en el mismo cuerpo -->
+                        ${linksArray.length > 0 ? `
+                          <div class="flex flex-wrap gap-2 pt-1">
+                            ${linksArray.map((l: any) => `
+                              <a href="${l.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3 py-2 bg-indigo-50/70 hover:bg-indigo-100/70 border border-indigo-200/80 hover:border-indigo-300 rounded-xl text-xs font-semibold text-indigo-700 shadow-2xs transition-all max-w-full group">
+                                <i class="fa-solid fa-arrow-up-right-from-square text-indigo-500 group-hover:text-indigo-700 text-xs shrink-0"></i>
+                                <span class="truncate break-all">${l.titulo || l.url}</span>
+                              </a>
+                            `).join('')}
+                          </div>
+                        ` : ''}
+                      </div>
+                    `}
+                  </div>
+
+                  <!-- 2. DOCUMENTOS DIDÁCTICOS PARA DESCARGAR -->
+                  <div class="bg-slate-50/70 rounded-2xl p-5 border border-slate-200/80 space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/60 pb-3">
+                      <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                        <i class="fa-solid fa-file-pdf text-red-500"></i>
+                        <span>Documentos Didácticos para Descargar</span>
+                      </h4>
+                      <div class="flex items-center gap-2">
+                        <span class="text-[11px] font-bold text-slate-500 bg-white px-2 py-0.5 rounded-full border border-slate-200">${docs.length}</span>
+                        <button type="button" class="btn-subir-doc-u px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer" data-unidad-id="${u.id}" data-unidad-nombre="${encodeURIComponent(u.nombre)}">
+                          <i class="fa-solid fa-cloud-arrow-up"></i>
+                          <span>+ Documento</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    ${docs.length === 0
+                      ? `<div class="p-4 text-center text-xs text-slate-400 bg-white rounded-xl border border-dashed border-slate-200">
+                           No hay documentos cargados aún en esta unidad.
+                         </div>`
+                      : `<div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                           ${docs.map((d: any) => `
+                             <div class="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 text-xs shadow-2xs hover:border-blue-200 transition-colors">
+                               <div class="flex items-center space-x-2.5 truncate mr-2">
+                                 <i class="fa-solid fa-file-lines text-slate-400 text-sm"></i>
+                                 <div class="truncate">
+                                   <p class="font-bold text-slate-800 truncate">${d.observacion || 'Documento'}</p>
+                                   <span class="text-[10px] text-slate-400">${d.fecha_subida ? new Date(d.fecha_subida).toLocaleDateString('es-AR') : 'Reciente'}</span>
+                                 </div>
+                               </div>
+                               <div class="flex items-center gap-1.5 shrink-0">
+                                 <button type="button" class="btn-descargar-archivo px-2.5 py-1 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors flex items-center gap-1 cursor-pointer" data-id="${d.id}" data-nombre="${d.observacion || 'Documento'}">
+                                   <i class="fa-solid fa-download"></i>
+                                   <span>Descargar</span>
+                                 </button>
+                                 <button class="btn-eliminar-material p-1.5 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors cursor-pointer" data-id="${d.id}" data-nombre="${d.observacion || 'Documento'}" title="Eliminar Archivo">
+                                   <i class="fa-solid fa-xmark text-xs"></i>
+                                 </button>
+                               </div>
+                             </div>
+                           `).join('')}
+                         </div>`
+                    }
+                  </div>
+
+                  <!-- 3. TRABAJOS PRÁCTICOS DE LA UNIDAD -->
+                  <div class="bg-amber-50/30 rounded-2xl p-5 border border-amber-200/70 space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200/60 pb-3">
+                      <h4 class="text-xs font-bold uppercase tracking-wider text-amber-900 flex items-center gap-2">
+                        <i class="fa-solid fa-file-signature text-amber-600"></i>
+                        <span>Trabajos Prácticos de la Unidad</span>
+                      </h4>
+                      <div class="flex items-center gap-2">
+                        <span class="text-[11px] font-bold text-amber-700 bg-white px-2 py-0.5 rounded-full border border-amber-200">${tps.length}</span>
+                        <button type="button" class="btn-crear-tp-u px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer" data-unidad-id="${u.id}" data-unidad-nombre="${encodeURIComponent(u.nombre)}">
+                          <i class="fa-solid fa-file-circle-plus"></i>
+                          <span>+ Crear TP</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    ${tps.length === 0
+                      ? `<div class="p-4 text-center text-xs text-slate-400 bg-white rounded-xl border border-dashed border-amber-200">
+                           No hay trabajos prácticos asignados aún en esta unidad.
+                         </div>`
+                      : `<div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                           ${tps.map((tp: any) => `
+                             <div class="p-3.5 rounded-xl bg-white border border-amber-200/80 text-xs shadow-2xs hover:border-amber-300 transition-colors space-y-2.5">
+                               <div class="flex items-center justify-between">
+                                 <div class="flex items-center space-x-2.5 truncate mr-2">
+                                   <i class="fa-solid fa-clipboard-check text-amber-600 text-sm"></i>
+                                   <p class="font-bold text-slate-800 truncate">${tp.observacion || 'Trabajo Práctico'}</p>
+                                 </div>
+                                 <button class="btn-eliminar-material p-1 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors cursor-pointer" data-id="${tp.id}" data-nombre="${tp.observacion || 'Trabajo Práctico'}" title="Eliminar TP">
+                                   <i class="fa-solid fa-xmark text-xs"></i>
+                                 </button>
+                               </div>
+                               <div class="flex items-center justify-between pt-1 border-t border-slate-100 text-[11px]">
+                                 <button type="button" class="btn-descargar-archivo text-blue-600 hover:underline font-bold flex items-center gap-1 cursor-pointer" data-id="${tp.id}" data-nombre="${tp.observacion || 'Consigna_TP'}">
+                                   <i class="fa-solid fa-file-arrow-down"></i>
+                                   <span>Descargar Consigna</span>
+                                 </button>
+                                 <a href="/practicos" class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold rounded-lg transition-colors flex items-center gap-1">
+                                   <i class="fa-solid fa-graduation-cap"></i>
+                                   <span>Ver Entregas / Calificar</span>
+                                 </a>
+                               </div>
+                             </div>
+                           `).join('')}
+                         </div>`
+                    }
+                  </div>
+
+                  <!-- 4. EXÁMENES DE LA UNIDAD -->
+                  <div class="bg-purple-50/30 rounded-2xl p-5 border border-purple-200/70 space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-purple-200/60 pb-3">
+                      <h4 class="text-xs font-bold uppercase tracking-wider text-purple-900 flex items-center gap-2">
+                        <i class="fa-solid fa-pen-ruler text-purple-600"></i>
+                        <span>Exámenes de la Unidad</span>
+                      </h4>
+                      <div class="flex items-center gap-2">
+                        <span class="text-[11px] font-bold text-purple-700 bg-white px-2 py-0.5 rounded-full border border-purple-200">${examenesUnidad.length}</span>
+                        <button type="button" class="btn-crear-examen-u px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-800 font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer" data-unidad-id="${u.id}" data-unidad-nombre="${encodeURIComponent(u.nombre)}">
+                          <i class="fa-solid fa-plus"></i>
+                          <span>+ Crear Examen</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    ${examenesUnidad.length === 0
+                      ? `<div class="p-4 text-center text-xs text-slate-400 bg-white rounded-xl border border-dashed border-purple-200">
+                           No hay exámenes asignados aún en esta unidad.
+                         </div>`
+                      : `<div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                           ${examenesUnidad.map((ex: any) => {
+                             let cantPreguntas = 0;
+                             try {
+                               if (ex.preguntas) {
+                                 const pArr = typeof ex.preguntas === 'string' ? JSON.parse(ex.preguntas) : ex.preguntas;
+                                 if (Array.isArray(pArr)) cantPreguntas = pArr.length;
+                               }
+                             } catch {}
+
+                             return `
+                               <div class="p-3.5 rounded-xl bg-white border border-purple-200/80 text-xs shadow-2xs hover:border-purple-300 transition-colors space-y-2.5">
+                                 <div class="flex items-start justify-between gap-2">
+                                   <div class="space-y-1">
+                                     <div class="flex items-center gap-2">
+                                       <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${ex.estado === 'activo' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'} uppercase">
+                                         ${ex.estado || 'ACTIVO'}
+                                       </span>
+                                       <span class="text-[10px] text-purple-700 font-bold bg-purple-50 px-2 py-0.5 rounded-md">${cantPreguntas} Pregunta(s)</span>
+                                       <span class="text-[10px] text-slate-400"><i class="fa-regular fa-clock mr-1"></i>${ex.duracion_minutos || 45} min</span>
+                                     </div>
+                                     <h4 class="font-bold text-slate-900">${ex.descripcion || 'Evaluación de Unidad'}</h4>
+                                   </div>
+                                   <button type="button" class="btn-eliminar-examen p-1 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors cursor-pointer shrink-0" data-id="${ex.id}" data-titulo="${ex.descripcion || 'Examen'}" title="Eliminar Examen">
+                                     <i class="fa-solid fa-trash-can text-xs"></i>
+                                   </button>
+                                 </div>
+
+                                  <div class="flex items-center justify-between pt-1 border-t border-slate-100 text-[11px]">
+                                    <span class="text-slate-500 font-medium">
+                                      <i class="fa-regular fa-calendar mr-1 text-purple-600"></i>${ex.fecha ? new Date(ex.fecha).toLocaleDateString('es-AR') : 'S/F'} 
+                                      <span class="text-slate-400 ml-1">(${ex.hora_inicio ? ex.hora_inicio.slice(0, 5) : '18:00'} a ${ex.hora_fin ? ex.hora_fin.slice(0, 5) : '20:00'} hs)</span>
+                                    </span>
+                                    <a href="/examen-rendir?id=${ex.id}" class="px-3 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold rounded-lg transition-colors flex items-center gap-1">
+                                      <i class="fa-solid fa-eye"></i>
+                                      <span>Previsualizar</span>
+                                    </a>
+                                  </div>
+                               </div>
+                             `;
+                           }).join('')}
+                         </div>`
+                    }
+                  </div>
+                </div>
+              `;
+            }).join('');
+
+            unidadesContainer.innerHTML = htmlUnidades;
+
+            // Conectar botones de descarga de archivos
+            document.querySelectorAll('.btn-descargar-archivo').forEach((btn) => {
+              btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const id = btn.getAttribute('data-id');
+                const nombre = btn.getAttribute('data-nombre') || 'documento.pdf';
+                if (!id) return;
+                const original = btn.innerHTML;
+                try {
+                  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-blue-600"></i> <span>Descargando...</span>';
+                  await api.material.descargarArchivo(id, nombre);
+                } catch (err: any) {
+                  console.error('Error al descargar:', err);
+                  alert('No se pudo descargar el archivo: ' + err.message);
+                } finally {
+                  btn.innerHTML = original;
+                }
+              });
+            });
+
+            // Conectar botones dinámicos de Unidad
+            document.querySelectorAll('.btn-editar-contenido-u').forEach((btn) => {
+              btn.addEventListener('click', () => {
+                const uId = btn.getAttribute('data-id') || '';
+                const uNom = decodeURIComponent(btn.getAttribute('data-nombre') || '');
+                const uCont = decodeURIComponent(btn.getAttribute('data-contenido') || '');
+                const uLinks = decodeURIComponent(btn.getAttribute('data-links') || '');
+                abrirModalContenido(uId, uNom, uCont, uLinks);
+              });
+            });
+
+            document.querySelectorAll('.btn-subir-img-u').forEach((btn) => {
+              btn.addEventListener('click', () => {
+                const uId = btn.getAttribute('data-unidad-id');
+                const uNom = decodeURIComponent(btn.getAttribute('data-unidad-nombre') || '');
+                abrirModalImagen(uId, uNom);
+              });
+            });
+
+            document.querySelectorAll('.btn-ampliar-img').forEach((btn) => {
+              btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const src = btn.getAttribute('data-img-src') || '';
+                const tit = decodeURIComponent(btn.getAttribute('data-img-titulo') || '');
+                abrirVisorImagen(src, tit);
+              });
+            });
+
+            document.querySelectorAll('.btn-subir-doc-u').forEach((btn) => {
+              btn.addEventListener('click', () => {
+                const uId = btn.getAttribute('data-unidad-id');
+                const uNom = decodeURIComponent(btn.getAttribute('data-unidad-nombre') || '');
+                abrirModalDocumento(uId, uNom);
+              });
+            });
+
+            document.querySelectorAll('.btn-crear-tp-u').forEach((btn) => {
+              btn.addEventListener('click', () => {
+                const uId = btn.getAttribute('data-unidad-id');
+                const uNom = decodeURIComponent(btn.getAttribute('data-unidad-nombre') || '');
+                abrirModalCrearTP(uId, uNom);
+              });
+            });
+
+            document.querySelectorAll('.btn-crear-examen-u').forEach((btn) => {
+              btn.addEventListener('click', () => {
+                const uId = btn.getAttribute('data-unidad-id');
+                const uNom = decodeURIComponent(btn.getAttribute('data-unidad-nombre') || '');
+                abrirModalExamen(uId, uNom);
+              });
+            });
+
+            document.querySelectorAll('.btn-editar-unidad').forEach((btn) => {
+              btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                const nombre = decodeURIComponent(btn.getAttribute('data-nombre') || '');
+                const desc = decodeURIComponent(btn.getAttribute('data-desc') || '');
+                abrirModalUnidad(id, nombre, desc);
+              });
+            });
+
+            document.querySelectorAll('.btn-eliminar-unidad').forEach((btn) => {
+              btn.addEventListener('click', () => {
+                const id = Number(btn.getAttribute('data-id'));
+                abrirModalConfirmacion(
+                  'Eliminar Unidad Temática',
+                  '¿Está seguro de eliminar esta unidad temática y sus contenidos asociados?',
+                  async () => {
+                    try {
+                      await api.unidades.eliminar(id);
+                      if (currentCursoId) await cargarContenidos(currentCursoId);
+                    } catch (err: any) {
+                      alert('Error al eliminar unidad: ' + err.message);
+                    }
+                  }
+                );
+              });
+            });
+
+            document.querySelectorAll('.btn-eliminar-material').forEach((btn) => {
+              btn.addEventListener('click', () => {
+                const id = Number(btn.getAttribute('data-id'));
+                const nombre = btn.getAttribute('data-nombre') || 'este elemento';
+                abrirModalConfirmacion(
+                  'Eliminar Material / TP / Imagen',
+                  `¿Está seguro de eliminar "${nombre}"? Se removerá del dashboard y de la vista de Moodle de los alumnos inmediatamente.`,
+                  async () => {
+                    try {
+                      await api.material.eliminar(id);
+                      if (currentCursoId) await cargarContenidos(currentCursoId);
+                    } catch (err: any) {
+                      alert('Error al eliminar material: ' + err.message);
+                    }
+                  }
+                );
+              });
+            });
+
+            document.querySelectorAll('.btn-eliminar-examen').forEach((btn) => {
+              btn.addEventListener('click', () => {
+                const id = Number(btn.getAttribute('data-id'));
+                const titulo = btn.getAttribute('data-titulo') || 'este examen';
+                abrirModalConfirmacion(
+                  'Eliminar Evaluación',
+                  `¿Está seguro de eliminar "${titulo}"? Se eliminará tanto del dashboard como del aula Moodle de los alumnos.`,
+                  async () => {
+                    try {
+                      await api.examen.eliminar(id);
+                      if (currentCursoId) await cargarContenidos(currentCursoId);
+                    } catch (err: any) {
+                      alert('Error al eliminar examen: ' + err.message);
+                    }
+                  }
+                );
+              });
+            });
+          }
+        }
+      } catch (err: any) {
+        console.error('Error al cargar contenidos del curso:', err);
+      }
+    }
+
+    function actualizarSelectsUnidades(unidades: any[]) {
+      const selectDoc = document.getElementById('doc-select-unidad') as HTMLSelectElement;
+      const selectTP = document.getElementById('tp-select-unidad') as HTMLSelectElement;
+      const selectExamenU = document.getElementById('examen-select-unidad') as HTMLSelectElement;
+      const selectImg = document.getElementById('img-select-unidad') as HTMLSelectElement;
+
+      const options = unidades.map((u: any, idx: number) => `
+        <option value="${u.id}">U${idx + 1}: ${u.nombre}</option>
+      `).join('');
+
+      if (selectDoc) selectDoc.innerHTML = options || '<option value="">No hay unidades</option>';
+      if (selectTP) selectTP.innerHTML = options || '<option value="">No hay unidades</option>';
+      if (selectImg) selectImg.innerHTML = options || '<option value="">No hay unidades</option>';
+      if (selectExamenU) {
+        selectExamenU.innerHTML = '<option value="">General / Todo el curso</option>' + options;
+      }
+    }
+
+    // Modal Unidad (Crear y Editar)
+    const modalU = document.getElementById('modal-unidad');
+    const inputUnidadId = document.getElementById('unidad-id') as HTMLInputElement;
+    const inputUnidadNombre = document.getElementById('unidad-nombre') as HTMLInputElement;
+    const inputUnidadDesc = document.getElementById('unidad-desc') as HTMLTextAreaElement;
+    const modalUnidadTitulo = document.getElementById('modal-unidad-titulo');
+
+    function abrirModalUnidad(id?: string | null, nombre?: string, desc?: string) {
+      if (id) {
+        if (inputUnidadId) inputUnidadId.value = id;
+        if (inputUnidadNombre) inputUnidadNombre.value = nombre || '';
+        if (inputUnidadDesc) inputUnidadDesc.value = desc || '';
+        if (modalUnidadTitulo) modalUnidadTitulo.textContent = 'Editar Unidad Temática';
+      } else {
+        if (inputUnidadId) inputUnidadId.value = '';
+        if (inputUnidadNombre) inputUnidadNombre.value = '';
+        if (inputUnidadDesc) inputUnidadDesc.value = '';
+        if (modalUnidadTitulo) modalUnidadTitulo.textContent = 'Nueva Unidad Temática';
+      }
+      modalU?.classList.remove('hidden');
+    }
+
+    const cerrarModalU = () => modalU?.classList.add('hidden');
+    document.getElementById('btn-nueva-unidad')?.addEventListener('click', () => abrirModalUnidad());
+    document.getElementById('btn-cerrar-modal-u')?.addEventListener('click', cerrarModalU);
+    document.getElementById('btn-cancelar-u')?.addEventListener('click', cerrarModalU);
+
+    document.getElementById('form-nueva-unidad')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentCursoId) return;
+
+      const id = inputUnidadId.value ? Number(inputUnidadId.value) : null;
+      const nombre = inputUnidadNombre.value.trim();
+      const descripcion = inputUnidadDesc.value.trim();
+
+      try {
+        if (id) {
+          await api.unidades.editar(id, { nombre, descripcion });
+        } else {
+          await api.unidades.agregar({
+            curso_id: currentCursoId,
+            nombre,
+            descripcion
+          });
+        }
+        cerrarModalU();
+        await cargarContenidos(currentCursoId);
+      } catch (err: any) {
+        alert('Error al guardar unidad: ' + err.message);
+      }
+    });
+
+    // -----------------------------------------------------------------
+    // Modal Contenido Escrito y Enlaces de la Unidad
+    // -----------------------------------------------------------------
+    interface LinkItem {
+      titulo: string;
+      url: string;
+    }
+    let currentLinks: LinkItem[] = [];
+
+    const modalContenido = document.getElementById('modal-contenido-unidad');
+    const contenidoUnidadId = document.getElementById('contenido-unidad-id') as HTMLInputElement;
+    const contenidoSubtitulo = document.getElementById('contenido-subtitulo-unidad');
+    const unidadTextoContenido = document.getElementById('unidad-texto-contenido') as HTMLTextAreaElement;
+    const linksContainer = document.getElementById('links-container');
+    const btnAgregarLink = document.getElementById('btn-agregar-link');
+    const btnCerrarModalContenido = document.getElementById('btn-cerrar-modal-contenido');
+    const btnCancelarContenido = document.getElementById('btn-cancelar-contenido');
+    const formContenidoUnidad = document.getElementById('form-contenido-unidad');
+
+    function renderLinksBuilder() {
+      if (!linksContainer) return;
+      if (currentLinks.length === 0) {
+        linksContainer.innerHTML = '<p class="text-[11px] text-slate-400 italic p-2 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">No hay enlaces adicionales agregados. Haga clic en "+ Enlace" para añadir videos, tutoriales o lecturas externas.</p>';
+        return;
+      }
+      linksContainer.innerHTML = currentLinks.map((link, idx) => `
+        <div class="flex items-center gap-2">
+          <input 
+            type="text" 
+            value="${link.titulo}" 
+            placeholder="Título del enlace (Ej: Video Explicativo YouTube)..." 
+            class="input-link-titulo flex-1 px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-indigo-600 font-medium" 
+            data-idx="${idx}" 
+          />
+          <input 
+            type="text" 
+            value="${link.url}" 
+            placeholder="Enlace (ej: www.google.com o https://...)" 
+            class="input-link-url flex-1 px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-indigo-600 font-medium" 
+            data-idx="${idx}" 
+          />
+          <button type="button" class="btn-eliminar-link text-slate-400 hover:text-red-600 p-1.5 rounded-lg transition-colors cursor-pointer shrink-0" data-idx="${idx}" title="Eliminar enlace">
+            <i class="fa-solid fa-xmark text-xs"></i>
+          </button>
+        </div>
+      `).join('');
+
+      linksContainer.querySelectorAll('.input-link-titulo').forEach((el) => {
+        el.addEventListener('input', (e) => {
+          const idx = Number((e.target as HTMLElement).getAttribute('data-idx'));
+          currentLinks[idx].titulo = (e.target as HTMLInputElement).value;
+        });
+      });
+
+      linksContainer.querySelectorAll('.input-link-url').forEach((el) => {
+        el.addEventListener('input', (e) => {
+          const idx = Number((e.target as HTMLElement).getAttribute('data-idx'));
+          currentLinks[idx].url = (e.target as HTMLInputElement).value;
+        });
+      });
+
+      linksContainer.querySelectorAll('.btn-eliminar-link').forEach((el) => {
+        el.addEventListener('click', (e) => {
+          const idx = Number((e.currentTarget as HTMLElement).getAttribute('data-idx'));
+          currentLinks.splice(idx, 1);
+          renderLinksBuilder();
+        });
+      });
+    }
+
+    btnAgregarLink?.addEventListener('click', () => {
+      currentLinks.push({ titulo: '', url: '' });
+      renderLinksBuilder();
+    });
+
+    function abrirModalContenido(unidadId: string, unidadNombre: string, contenidoActual?: string, linksActual?: string) {
+      if (contenidoUnidadId) contenidoUnidadId.value = unidadId;
+      if (contenidoSubtitulo) contenidoSubtitulo.textContent = `Apuntes y enlaces para: ${unidadNombre}`;
+      if (unidadTextoContenido) unidadTextoContenido.value = contenidoActual || '';
+      
+      try {
+        currentLinks = linksActual ? JSON.parse(linksActual) : [];
+        if (!Array.isArray(currentLinks)) currentLinks = [];
+      } catch {
+        currentLinks = [];
+      }
+      renderLinksBuilder();
+      modalContenido?.classList.remove('hidden');
+    }
+
+    const cerrarModalContenido = () => modalContenido?.classList.add('hidden');
+    btnCerrarModalContenido?.addEventListener('click', cerrarModalContenido);
+    btnCancelarContenido?.addEventListener('click', cerrarModalContenido);
+
+    formContenidoUnidad?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const uId = contenidoUnidadId.value;
+      if (!uId || !currentCursoId) return;
+
+      const textoContenido = unidadTextoContenido.value.trim();
+      const validLinks = currentLinks
+        .filter(l => l.url && l.url.trim().length > 0)
+        .map(l => {
+          let url = l.url.trim();
+          if (!/^https?:\/\//i.test(url)) {
+            url = 'https://' + url;
+          }
+          return {
+            titulo: l.titulo.trim() || url,
+            url: url
+          };
+        });
+
+      try {
+        await api.unidades.editar(uId, {
+          contenido: textoContenido,
+          links: JSON.stringify(validLinks)
+        });
+        cerrarModalContenido();
+        await cargarContenidos(currentCursoId);
+      } catch (err: any) {
+        alert('Error al guardar contenido: ' + err.message);
+      }
+    });
+
+    // -----------------------------------------------------------------
+    // Modal Subir Imagen Didáctica con Dropzone
+    // -----------------------------------------------------------------
+    const modalImg = document.getElementById('modal-imagen');
+    const imgSelectUnidad = document.getElementById('img-select-unidad') as HTMLSelectElement;
+    const imgSubtitulo = document.getElementById('img-subtitulo-unidad');
+    const imgNombre = document.getElementById('img-nombre') as HTMLInputElement;
+    const imgFile = document.getElementById('img-file') as HTMLInputElement;
+    const imgDropzone = document.getElementById('img-dropzone');
+    const imgDropPrompt = document.getElementById('img-dropzone-prompt');
+    const imgFileSelected = document.getElementById('img-file-selected');
+    const imgFilename = document.getElementById('img-filename');
+    const imgFilesize = document.getElementById('img-filesize');
+    const btnRemoverImgFile = document.getElementById('btn-remover-img-file');
+    const btnCerrarModalImg = document.getElementById('btn-cerrar-modal-img');
+    const btnCancelarImg = document.getElementById('btn-cancelar-img');
+    const formSubirImagen = document.getElementById('form-subir-imagen');
+
+    function abrirModalImagen(unidadId?: string | null, unidadNombre?: string) {
+      if (unidadId && imgSelectUnidad) {
+        imgSelectUnidad.value = unidadId;
+      }
+      if (imgSubtitulo && unidadNombre) {
+        imgSubtitulo.textContent = `Anexar imagen didáctica a: ${unidadNombre}`;
+      } else if (imgSubtitulo) {
+        imgSubtitulo.textContent = 'Anexar esquema o diagrama a la unidad y al curso';
+      }
+      if (imgNombre) imgNombre.value = '';
+      if (imgFile) imgFile.value = '';
+      imgFileSelected?.classList.add('hidden');
+      imgDropPrompt?.classList.remove('hidden');
+      modalImg?.classList.remove('hidden');
+    }
+
+    const cerrarModalImg = () => modalImg?.classList.add('hidden');
+    btnCerrarModalImg?.addEventListener('click', cerrarModalImg);
+    btnCancelarImg?.addEventListener('click', cerrarModalImg);
+
+    formSubirImagen?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentCursoId) return;
+
+      const unidadId = imgSelectUnidad?.value;
+      if (!unidadId) {
+        alert('Debe seleccionar una unidad para esta imagen.');
+        return;
+      }
+
+      if (!imgFile.files || imgFile.files.length === 0) {
+        alert('Seleccione un archivo de imagen.');
+        return;
+      }
+
+      const fd = new FormData();
+      fd.append('observacion', imgNombre.value.trim());
+      fd.append('tipo', 'imagen');
+      fd.append('curso_id', String(currentCursoId));
+      fd.append('unidad_id', String(unidadId));
+      fd.append('carpeta', `unidad-${unidadId}-img`);
+      fd.append('archivo', imgFile.files[0]);
+
+      try {
+        await api.material.subirMaterial(fd);
+        cerrarModalImg();
+        await cargarContenidos(currentCursoId);
+      } catch (err: any) {
+        alert('Error al subir imagen: ' + err.message);
+      }
+    });
+
+    // -----------------------------------------------------------------
+    // Modal Visor de Imagen (Lightbox)
+    // -----------------------------------------------------------------
+    const modalVisorImg = document.getElementById('modal-visor-imagen');
+    const visorImgTitulo = document.getElementById('visor-img-titulo');
+    const visorImgSrc = document.getElementById('visor-img-src') as HTMLImageElement;
+    const btnCerrarVisorImg = document.getElementById('btn-cerrar-visor-img');
+
+    function abrirVisorImagen(src: string, titulo?: string) {
+      if (visorImgSrc) visorImgSrc.src = src;
+      if (visorImgTitulo) visorImgTitulo.textContent = titulo || 'Imagen Didáctica';
+      modalVisorImg?.classList.remove('hidden');
+    }
+
+    const cerrarVisorImg = () => {
+      modalVisorImg?.classList.add('hidden');
+      if (visorImgSrc) visorImgSrc.src = '';
+    };
+
+    btnCerrarVisorImg?.addEventListener('click', cerrarVisorImg);
+    modalVisorImg?.addEventListener('click', (e) => {
+      if (e.target === modalVisorImg) cerrarVisorImg();
+    });
+
+    // -----------------------------------------------------------------
+    // Modal Subir Documento a Unidad con Dropzone
+    // -----------------------------------------------------------------
+    const modalDoc = document.getElementById('modal-documento');
+    const docSelectUnidad = document.getElementById('doc-select-unidad') as HTMLSelectElement;
+    const docSubtitulo = document.getElementById('doc-subtitulo-unidad');
+    const docNombre = document.getElementById('doc-nombre') as HTMLInputElement;
+    const docFile = document.getElementById('doc-file') as HTMLInputElement;
+    const docDropzone = document.getElementById('doc-dropzone');
+    const docDropPrompt = document.getElementById('doc-dropzone-prompt');
+    const docFileSelected = document.getElementById('doc-file-selected');
+    const docFilename = document.getElementById('doc-filename');
+    const docFilesize = document.getElementById('doc-filesize');
+    const btnRemoverDocFile = document.getElementById('btn-remover-doc-file');
+
+    function configurarDropzone(
+      dropzone: HTMLElement | null,
+      fileInput: HTMLInputElement | null,
+      promptEl: HTMLElement | null,
+      selectedEl: HTMLElement | null,
+      nameEl: HTMLElement | null,
+      sizeEl: HTMLElement | null,
+      removerBtn: HTMLElement | null
+    ) {
+      if (!dropzone || !fileInput) return;
+
+      dropzone.addEventListener('click', (e) => {
+        if (e.target === removerBtn || (e.target as HTMLElement)?.closest('button') === removerBtn) return;
+        fileInput.click();
+      });
+
+      fileInput.addEventListener('change', () => {
+        if (fileInput.files && fileInput.files.length > 0) {
+          const file = fileInput.files[0];
+          if (nameEl) nameEl.textContent = file.name;
+          if (sizeEl) {
+            const kb = (file.size / 1024).toFixed(1);
+            const mb = (file.size / (1024 * 1024)).toFixed(2);
+            sizeEl.textContent = file.size > 1024 * 1024 ? `${mb} MB` : `${kb} KB`;
+          }
+          promptEl?.classList.add('hidden');
+          selectedEl?.classList.remove('hidden');
+        }
+      });
+
+      removerBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        fileInput.value = '';
+        selectedEl?.classList.add('hidden');
+        promptEl?.classList.remove('hidden');
+      });
+
+      // Drag & Drop
+      dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.classList.add('border-blue-500', 'bg-blue-100/50');
+      });
+      dropzone.addEventListener('dragleave', () => {
+        dropzone.classList.remove('border-blue-500', 'bg-blue-100/50');
+      });
+      dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('border-blue-500', 'bg-blue-100/50');
+        if (e.dataTransfer && e.dataTransfer.files.length > 0) {
+          fileInput.files = e.dataTransfer.files;
+          fileInput.dispatchEvent(new Event('change'));
+        }
+      });
+    }
+
+    configurarDropzone(docDropzone, docFile, docDropPrompt, docFileSelected, docFilename, docFilesize, btnRemoverDocFile);
+    configurarDropzone(imgDropzone, imgFile, imgDropPrompt, imgFileSelected, imgFilename, imgFilesize, btnRemoverImgFile);
+
+    function abrirModalDocumento(unidadId?: string | null, unidadNombre?: string) {
+      if (unidadId && docSelectUnidad) {
+        docSelectUnidad.value = unidadId;
+      }
+      if (docSubtitulo && unidadNombre) {
+        docSubtitulo.textContent = `Asignar a: ${unidadNombre}`;
+      } else if (docSubtitulo) {
+        docSubtitulo.textContent = 'Asignar material didáctico a la unidad';
+      }
+      if (docNombre) docNombre.value = '';
+      if (docFile) docFile.value = '';
+      docFileSelected?.classList.add('hidden');
+      docDropPrompt?.classList.remove('hidden');
+      modalDoc?.classList.remove('hidden');
+    }
+
+    const cerrarModalDoc = () => modalDoc?.classList.add('hidden');
+    document.getElementById('btn-cerrar-modal-doc')?.addEventListener('click', cerrarModalDoc);
+    document.getElementById('btn-cancelar-doc')?.addEventListener('click', cerrarModalDoc);
+
+    document.getElementById('form-subir-documento')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentCursoId) return;
+
+      const unidadId = docSelectUnidad?.value;
+      if (!unidadId) {
+        alert('Debe seleccionar una unidad para este documento.');
+        return;
+      }
+
+      if (!docFile.files || docFile.files.length === 0) {
+        alert('Seleccione un archivo.');
+        return;
+      }
+
+      const fd = new FormData();
+      fd.append('observacion', docNombre.value.trim());
+      fd.append('tipo', 'guia');
+      fd.append('curso_id', String(currentCursoId));
+      fd.append('unidad_id', String(unidadId));
+      fd.append('carpeta', `unidad-${unidadId}-docs`);
+      fd.append('archivo', docFile.files[0]);
+
+      try {
+        await api.material.subirMaterial(fd);
+        cerrarModalDoc();
+        await cargarContenidos(currentCursoId);
+      } catch (err: any) {
+        alert('Error al subir documento: ' + err.message);
+      }
+    });
+
+    // -----------------------------------------------------------------
+    // Modal Crear TP en Unidad con Dropzone Claro y Prominente
+    // -----------------------------------------------------------------
+    const modalCrearTP = document.getElementById('modal-crear-tp');
+    const tpSelectUnidad = document.getElementById('tp-select-unidad') as HTMLSelectElement;
+    const tpSubtitulo = document.getElementById('tp-subtitulo-unidad');
+    const tpNombre = document.getElementById('tp-nombre') as HTMLInputElement;
+    const tpFile = document.getElementById('tp-file') as HTMLInputElement;
+    const tpDropzone = document.getElementById('tp-dropzone');
+    const tpDropPrompt = document.getElementById('tp-dropzone-prompt');
+    const tpFileSelected = document.getElementById('tp-file-selected');
+    const tpFilename = document.getElementById('tp-filename');
+    const tpFilesize = document.getElementById('tp-filesize');
+    const btnRemoverTpFile = document.getElementById('btn-remover-tp-file');
+
+    configurarDropzone(tpDropzone, tpFile, tpDropPrompt, tpFileSelected, tpFilename, tpFilesize, btnRemoverTpFile);
+
+    function abrirModalCrearTP(unidadId?: string | null, unidadNombre?: string) {
+      if (unidadId && tpSelectUnidad) {
+        tpSelectUnidad.value = unidadId;
+      }
+      if (tpSubtitulo && unidadNombre) {
+        tpSubtitulo.textContent = `Asignar a: ${unidadNombre}`;
+      } else if (tpSubtitulo) {
+        tpSubtitulo.textContent = 'Asignar trabajo práctico a la unidad';
+      }
+      if (tpNombre) tpNombre.value = '';
+      if (tpFile) tpFile.value = '';
+      const fLim = document.getElementById('tp-fecha-limite') as HTMLInputElement;
+      const hLim = document.getElementById('tp-hora-limite') as HTMLInputElement;
+      if (fLim) fLim.value = '';
+      if (hLim) hLim.value = '23:59';
+      tpFileSelected?.classList.add('hidden');
+      tpDropPrompt?.classList.remove('hidden');
+      modalCrearTP?.classList.remove('hidden');
+    }
+
+    const cerrarModalCrearTP = () => modalCrearTP?.classList.add('hidden');
+    document.getElementById('btn-cerrar-modal-crear-tp')?.addEventListener('click', cerrarModalCrearTP);
+    document.getElementById('btn-cancelar-crear-tp')?.addEventListener('click', cerrarModalCrearTP);
+
+    document.getElementById('form-crear-tp')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentCursoId) return;
+
+      const unidadId = tpSelectUnidad?.value;
+      if (!unidadId) {
+        alert('Debe seleccionar una unidad para este trabajo práctico.');
+        return;
+      }
+
+      if (!tpFile.files || tpFile.files.length === 0) {
+        alert('Seleccione un archivo de consigna/enunciado.');
+        return;
+      }
+
+      const fechaLimInput = document.getElementById('tp-fecha-limite') as HTMLInputElement;
+      const horaLimInput = document.getElementById('tp-hora-limite') as HTMLInputElement;
+      let fechaHoraLimite = '';
+      if (fechaLimInput && fechaLimInput.value) {
+        const horaVal = (horaLimInput && horaLimInput.value) ? horaLimInput.value : '23:59';
+        fechaHoraLimite = `${fechaLimInput.value} ${horaVal}:00`;
+      }
+
+      const fd = new FormData();
+      fd.append('observacion', tpNombre.value.trim());
+      fd.append('tipo', 'tp');
+      fd.append('curso_id', String(currentCursoId));
+      fd.append('unidad_id', String(unidadId));
+      fd.append('carpeta', `unidad-${unidadId}-tp`);
+      if (fechaHoraLimite) {
+        fd.append('fecha_limite', fechaHoraLimite);
+      }
+      fd.append('archivo', tpFile.files[0]);
+
+      try {
+        await api.material.subirMaterial(fd);
+        cerrarModalCrearTP();
+        await cargarContenidos(currentCursoId);
+      } catch (err: any) {
+        alert('Error al crear trabajo práctico: ' + err.message);
+      }
+    });
+
+    // -----------------------------------------------------------------
+    // CONSTRUCTOR INTERACTIVO DE EXÁMENES (Preguntas dinámicas)
+    // -----------------------------------------------------------------
+    interface PreguntaExamen {
+      id: string;
+      tipo: 'opcion_unica' | 'seleccion_multiple' | 'desarrollo';
+      enunciado: string;
+      puntos: number;
+      opciones: string[];
+      respuesta_correcta: string | string[];
+    }
+
+    let preguntasExamen: PreguntaExamen[] = [];
+
+    const modalExamen = document.getElementById('modal-examen');
+    const preguntasContainer = document.getElementById('preguntas-builder-container');
+    const badgePreguntasCount = document.getElementById('badge-preguntas-count');
+    const btnAgregarPregunta = document.getElementById('btn-agregar-pregunta');
+    const inputExamenTitulo = document.getElementById('examen-titulo') as HTMLInputElement;
+    const selectExamenUnidad = document.getElementById('examen-select-unidad') as HTMLSelectElement;
+    const inputExamenFecha = document.getElementById('examen-fecha') as HTMLInputElement;
+    const inputExamenHoraInicio = document.getElementById('examen-hora-inicio') as HTMLInputElement;
+    const inputExamenHoraFin = document.getElementById('examen-hora-fin') as HTMLInputElement;
+    const inputExamenDuracion = document.getElementById('examen-duracion') as HTMLInputElement;
+
+    function renderPreguntasBuilder() {
+      if (!preguntasContainer) return;
+
+      if (badgePreguntasCount) {
+        badgePreguntasCount.textContent = `${preguntasExamen.length} Pregunta(s)`;
+      }
+
+      if (preguntasExamen.length === 0) {
+        preguntasContainer.innerHTML = `
+          <div class="p-6 text-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 space-y-2">
+            <i class="fa-solid fa-circle-question text-2xl text-slate-300"></i>
+            <p class="text-xs font-bold text-slate-600">Aún no has agregado preguntas a esta evaluación.</p>
+            <p class="text-[11px] text-slate-400">Haz clic en "+ Agregar Pregunta" para incorporar opciones múltiples, selección múltiple o preguntas a desarrollar.</p>
+          </div>
+        `;
+        return;
+      }
+
+      preguntasContainer.innerHTML = preguntasExamen.map((p, idx) => `
+        <div class="border border-slate-200 rounded-2xl p-5 bg-white space-y-4 shadow-xs hover:border-blue-200 transition-colors" data-pregunta-id="${p.id}">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
+                ${idx + 1}
+              </span>
+              <span class="text-xs font-bold text-slate-800 uppercase tracking-wider">Pregunta N° ${idx + 1}</span>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-1 text-xs">
+                <span class="text-slate-500 font-semibold">Puntos:</span>
+                <input type="number" min="1" max="100" value="${p.puntos}" class="input-puntos w-14 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 text-center outline-none" data-idx="${idx}" />
+              </div>
+              <button type="button" class="btn-eliminar-p text-slate-400 hover:text-red-600 p-1 rounded-lg transition-colors cursor-pointer" data-idx="${idx}" title="Eliminar Pregunta">
+                <i class="fa-solid fa-trash-can text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Tipo de Pregunta y Enunciado -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Tipo de Respuesta</label>
+              <select class="select-tipo-p w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none font-bold text-slate-800" data-idx="${idx}">
+                <option value="opcion_unica" ${p.tipo === 'opcion_unica' ? 'selected' : ''}>Opción Única (Multiple Choice)</option>
+                <option value="seleccion_multiple" ${p.tipo === 'seleccion_multiple' ? 'selected' : ''}>Selección Múltiple (Casillas)</option>
+                <option value="desarrollo" ${p.tipo === 'desarrollo' ? 'selected' : ''}>Respuesta Escrita (Desarrollo)</option>
+              </select>
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Enunciado / Consigna</label>
+              <input type="text" value="${p.enunciado}" placeholder="Escriba aquí la pregunta para el alumno..." class="input-enunciado w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600 font-semibold" data-idx="${idx}" required />
+            </div>
+          </div>
+
+          <!-- Opciones para Opción Única o Selección Múltiple -->
+          ${p.tipo !== 'desarrollo' ? `
+            <div class="space-y-2.5 pt-2 border-t border-slate-100">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                  ${p.tipo === 'opcion_unica' ? 'Opciones (Marque la respuesta correcta)' : 'Opciones (Marque las respuestas válidas)'}
+                </span>
+                <button type="button" class="btn-agregar-opcion px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] rounded-lg transition-colors flex items-center gap-1 cursor-pointer" data-idx="${idx}">
+                  <i class="fa-solid fa-plus text-[10px]"></i>
+                  <span>+ Opción</span>
+                </button>
+              </div>
+
+              <div class="space-y-2">
+                ${p.opciones.map((opc, opcIdx) => {
+                  const esCorrecta = p.tipo === 'opcion_unica'
+                    ? p.respuesta_correcta === opc
+                    : Array.isArray(p.respuesta_correcta) && p.respuesta_correcta.includes(opc);
+
+                  return `
+                    <div class="flex items-center gap-2">
+                      <input 
+                        type="${p.tipo === 'opcion_unica' ? 'radio' : 'checkbox'}" 
+                        name="correcta_${p.id}" 
+                        ${esCorrecta ? 'checked' : ''} 
+                        class="check-correcta w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0" 
+                        data-p-idx="${idx}" 
+                        data-opc-idx="${opcIdx}" 
+                        title="Marcar como respuesta correcta"
+                      />
+                      <input 
+                        type="text" 
+                        value="${opc}" 
+                        placeholder="Opción ${opcIdx + 1}..." 
+                        class="input-opcion flex-1 px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600 font-medium" 
+                        data-p-idx="${idx}" 
+                        data-opc-idx="${opcIdx}" 
+                        required 
+                      />
+                      <button type="button" class="btn-eliminar-opcion text-slate-300 hover:text-red-500 p-1.5 rounded-lg transition-colors cursor-pointer shrink-0" data-p-idx="${idx}" data-opc-idx="${opcIdx}" title="Eliminar opción">
+                        <i class="fa-solid fa-xmark text-xs"></i>
+                      </button>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          ` : `
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/80 text-[11px] text-slate-500 flex items-center gap-2">
+              <i class="fa-solid fa-align-left text-blue-500"></i>
+              <span>El alumno responderá con un campo de texto abierto/desarrollo que usted podrá calificar y retroalimentar.</span>
+            </div>
+          `}
+        </div>
+      `).join('');
+
+      conectarEventosPreguntas();
+    }
+
+    function conectarEventosPreguntas() {
+      // Cambio de tipo de pregunta
+      document.querySelectorAll('.select-tipo-p').forEach((el) => {
+        el.addEventListener('change', (e) => {
+          const idx = Number((e.target as HTMLElement).getAttribute('data-idx'));
+          const nuevoTipo = (e.target as HTMLSelectElement).value as any;
+          preguntasExamen[idx].tipo = nuevoTipo;
+          if (nuevoTipo !== 'desarrollo' && preguntasExamen[idx].opciones.length === 0) {
+            preguntasExamen[idx].opciones = ['Opción A', 'Opción B'];
+            preguntasExamen[idx].respuesta_correcta = nuevoTipo === 'opcion_unica' ? 'Opción A' : ['Opción A'];
+          }
+          renderPreguntasBuilder();
+        });
+      });
+
+      // Cambio de enunciado
+      document.querySelectorAll('.input-enunciado').forEach((el) => {
+        el.addEventListener('input', (e) => {
+          const idx = Number((e.target as HTMLElement).getAttribute('data-idx'));
+          preguntasExamen[idx].enunciado = (e.target as HTMLInputElement).value;
+        });
+      });
+
+      // Cambio de puntos
+      document.querySelectorAll('.input-puntos').forEach((el) => {
+        el.addEventListener('input', (e) => {
+          const idx = Number((e.target as HTMLElement).getAttribute('data-idx'));
+          preguntasExamen[idx].puntos = Number((e.target as HTMLInputElement).value) || 1;
+        });
+      });
+
+      // Eliminar pregunta
+      document.querySelectorAll('.btn-eliminar-p').forEach((el) => {
+        el.addEventListener('click', (e) => {
+          const idx = Number((e.currentTarget as HTMLElement).getAttribute('data-idx'));
+          preguntasExamen.splice(idx, 1);
+          renderPreguntasBuilder();
+        });
+      });
+
+      // Agregar opción
+      document.querySelectorAll('.btn-agregar-opcion').forEach((el) => {
+        el.addEventListener('click', (e) => {
+          const pIdx = Number((e.currentTarget as HTMLElement).getAttribute('data-idx'));
+          const num = preguntasExamen[pIdx].opciones.length + 1;
+          preguntasExamen[pIdx].opciones.push(`Nueva Opción ${num}`);
+          renderPreguntasBuilder();
+        });
+      });
+
+      // Cambio de texto de opción
+      document.querySelectorAll('.input-opcion').forEach((el) => {
+        el.addEventListener('input', (e) => {
+          const pIdx = Number((e.target as HTMLElement).getAttribute('data-p-idx'));
+          const opcIdx = Number((e.target as HTMLElement).getAttribute('data-opc-idx'));
+          const prevVal = preguntasExamen[pIdx].opciones[opcIdx];
+          const newVal = (e.target as HTMLInputElement).value;
+          preguntasExamen[pIdx].opciones[opcIdx] = newVal;
+
+          // Actualizar respuesta correcta si coincidía
+          if (preguntasExamen[pIdx].tipo === 'opcion_unica') {
+            if (preguntasExamen[pIdx].respuesta_correcta === prevVal) {
+              preguntasExamen[pIdx].respuesta_correcta = newVal;
+            }
+          } else if (Array.isArray(preguntasExamen[pIdx].respuesta_correcta)) {
+            preguntasExamen[pIdx].respuesta_correcta = (preguntasExamen[pIdx].respuesta_correcta as string[]).map(r => r === prevVal ? newVal : r);
+          }
+        });
+      });
+
+      // Eliminar opción
+      document.querySelectorAll('.btn-eliminar-opcion').forEach((el) => {
+        el.addEventListener('click', (e) => {
+          const pIdx = Number((e.currentTarget as HTMLElement).getAttribute('data-p-idx'));
+          const opcIdx = Number((e.currentTarget as HTMLElement).getAttribute('data-opc-idx'));
+          if (preguntasExamen[pIdx].opciones.length <= 2) {
+            alert('Debe conservar al menos 2 opciones en una pregunta de opción múltiple.');
+            return;
+          }
+          const removed = preguntasExamen[pIdx].opciones.splice(opcIdx, 1)[0];
+          if (preguntasExamen[pIdx].tipo === 'opcion_unica' && preguntasExamen[pIdx].respuesta_correcta === removed) {
+            preguntasExamen[pIdx].respuesta_correcta = preguntasExamen[pIdx].opciones[0];
+          }
+          renderPreguntasBuilder();
+        });
+      });
+
+      // Marcar correcta
+      document.querySelectorAll('.check-correcta').forEach((el) => {
+        el.addEventListener('change', (e) => {
+          const pIdx = Number((e.target as HTMLElement).getAttribute('data-p-idx'));
+          const opcIdx = Number((e.target as HTMLElement).getAttribute('data-opc-idx'));
+          const opcion = preguntasExamen[pIdx].opciones[opcIdx];
+
+          if (preguntasExamen[pIdx].tipo === 'opcion_unica') {
+            preguntasExamen[pIdx].respuesta_correcta = opcion;
+          } else {
+            if (!Array.isArray(preguntasExamen[pIdx].respuesta_correcta)) {
+              preguntasExamen[pIdx].respuesta_correcta = [];
+            }
+            const arr = preguntasExamen[pIdx].respuesta_correcta as string[];
+            if ((e.target as HTMLInputElement).checked) {
+              if (!arr.includes(opcion)) arr.push(opcion);
+            } else {
+              preguntasExamen[pIdx].respuesta_correcta = arr.filter(o => o !== opcion);
+            }
+          }
+        });
+      });
+    }
+
+    btnAgregarPregunta?.addEventListener('click', () => {
+      const nuevaId = 'q_' + Date.now();
+      preguntasExamen.push({
+        id: nuevaId,
+        tipo: 'opcion_unica',
+        enunciado: '',
+        puntos: 3,
+        opciones: ['Opción 1', 'Opción 2', 'Opción 3'],
+        respuesta_correcta: 'Opción 1'
+      });
+      renderPreguntasBuilder();
+    });
+
+    function abrirModalExamen(unidadId?: string | null, unidadNombre?: string) {
+      if (unidadId && selectExamenUnidad) {
+        selectExamenUnidad.value = unidadId;
+      }
+      if (inputExamenTitulo) {
+        inputExamenTitulo.placeholder = unidadNombre ? `Evaluación: ${unidadNombre}` : 'Ej: Primer Parcial: Unidades 1 y 2';
+      }
+      if (inputExamenFecha && !inputExamenFecha.value) {
+        inputExamenFecha.value = new Date().toISOString().split('T')[0];
+      }
+      if (inputExamenHoraInicio && !inputExamenHoraInicio.value) {
+        inputExamenHoraInicio.value = '18:00';
+      }
+      if (inputExamenHoraFin && !inputExamenHoraFin.value) {
+        inputExamenHoraFin.value = '20:00';
+      }
+
+      // Iniciar con 2 preguntas por defecto si está vacío
+      if (preguntasExamen.length === 0) {
+        preguntasExamen = [
+          {
+            id: 'q_' + Date.now() + '_1',
+            tipo: 'opcion_unica',
+            enunciado: '¿Cuál es la función principal de los elementos de protección en una instalación?',
+            puntos: 3,
+            opciones: ['Proteger a las personas y equipos de fallas', 'Aumentar la potencia del circuito', 'Reducir el consumo eléctrico'],
+            respuesta_correcta: 'Proteger a las personas y equipos de fallas'
+          },
+          {
+            id: 'q_' + Date.now() + '_2',
+            tipo: 'seleccion_multiple',
+            enunciado: 'Seleccione todas las medidas de seguridad obligatorias:',
+            puntos: 3,
+            opciones: ['Uso de Elementos de Protección Personal (EPP)', 'Verificación de ausencia de tensión', 'Trabajar con calzado conductor'],
+            respuesta_correcta: ['Uso de Elementos de Protección Personal (EPP)', 'Verificación de ausencia de tensión']
+          },
+          {
+            id: 'q_' + Date.now() + '_3',
+            tipo: 'desarrollo',
+            enunciado: 'Explique con sus palabras la diferencia entre corriente continua y alterna.',
+            puntos: 4,
+            opciones: [],
+            respuesta_correcta: ''
+          }
+        ];
+      }
+      renderPreguntasBuilder();
+      modalExamen?.classList.remove('hidden');
+    }
+
+    const cerrarExamenModal = () => modalExamen?.classList.add('hidden');
+    document.getElementById('btn-cerrar-examen-modal')?.addEventListener('click', cerrarExamenModal);
+    document.getElementById('btn-cancelar-examen')?.addEventListener('click', cerrarExamenModal);
+
+    document.getElementById('form-crear-examen')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentCursoId) return;
+
+      if (preguntasExamen.length === 0) {
+        alert('Debe agregar al menos una pregunta a la evaluación.');
+        return;
+      }
+
+      // Validar que todas las preguntas tengan enunciado
+      for (let i = 0; i < preguntasExamen.length; i++) {
+        if (!preguntasExamen[i].enunciado.trim()) {
+          alert(`La pregunta N° ${i + 1} no tiene un enunciado definido.`);
+          return;
+        }
+      }
+
+      const duracion = Number(inputExamenDuracion.value) || 45;
+      const unidadId = selectExamenUnidad.value ? Number(selectExamenUnidad.value) : null;
+      const horaIni = inputExamenHoraInicio?.value || '18:00';
+      const horaFin = inputExamenHoraFin?.value || '20:00';
+
+      try {
+        await api.examen.agregar({
+          curso_id: currentCursoId,
+          unidad_id: unidadId,
+          descripcion: inputExamenTitulo.value.trim(),
+          fecha: inputExamenFecha.value || new Date().toISOString().split('T')[0],
+          hora_inicio: horaIni,
+          hora_fin: horaFin,
+          duracion_minutos: duracion,
+          preguntas: preguntasExamen,
+          estado: 'activo'
+        });
+
+        inputExamenTitulo.value = '';
+        preguntasExamen = [];
+        cerrarExamenModal();
+        await cargarContenidos(currentCursoId);
+      } catch (err: any) {
+        alert('Error al crear evaluación: ' + err.message);
+      }
+    });
+
+    // Inicializar
+    inicializarCursos();
+  </script>
 </DashboardLayout>
+

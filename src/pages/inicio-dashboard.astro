@@ -2,7 +2,601 @@
 import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 ---
 
-<DashboardLayout title='Dashboard escolar' path='inicio' pageTitle='Hola'>
-    <img class="w-2/4 ml-60 pt-20" src="../../public/img/Osito.gif" alt="Osito saludate">
+<DashboardLayout title="Panel Principal" path="inicio" pageTitle="Resumen General">
+  <div class="space-y-6">
+    <!-- Selector de Pestañas (Docente vs Administración) -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+      <div>
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+          <span>Panel de Control</span>
+          <span id="badge-current-role" class="text-xs font-bold px-2.5 py-1 rounded-full bg-blue-100 text-blue-800 uppercase tracking-wider">Cargando...</span>
+        </h1>
+        <p class="text-xs text-slate-500 mt-1">Supervisión integrada de docencia, aula virtual y administración institucional.</p>
+      </div>
 
+      <!-- Tab Buttons (Solo visible o interactivo si tiene permisos) -->
+      <div class="inline-flex p-1.5 bg-slate-200/70 rounded-2xl border border-slate-200 shadow-inner" id="dashboard-tabs-nav">
+        <button
+          id="tab-btn-docente"
+          type="button"
+          class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs transition-all bg-white text-blue-600 shadow-sm"
+        >
+          <i class="fa-solid fa-chalkboard-user"></i>
+          <span>Trabajo Docente</span>
+        </button>
+        <button
+          id="tab-btn-gestion"
+          type="button"
+          class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs transition-all text-slate-600 hover:text-slate-900"
+        >
+          <i class="fa-solid fa-building-columns"></i>
+          <span>Gestión y Administración</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ========================================================================================= -->
+    <!-- PESTAÑA 1: RESUMEN DE DOCENCIA (TRABAJO DE PROFESOR) -->
+    <!-- ========================================================================================= -->
+    <div id="tab-content-docente" class="space-y-8">
+      <!-- Tarjetas de Métricas de Docencia -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- TPs por Corregir -->
+        <a href="/practicos" class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between hover:border-amber-400 transition-all group">
+          <div>
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">TPs por Corregir</span>
+            <span class="text-3xl font-black text-amber-600 mt-1 block" id="metric-tps">...</span>
+            <span class="text-[11px] font-semibold text-slate-500 group-hover:text-amber-600 transition-colors">
+              Ver entregas pendientes →
+            </span>
+          </div>
+          <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-file-pen"></i>
+          </div>
+        </a>
+
+        <!-- Exámenes Activos -->
+        <a href="/examenes-y-materias" class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between hover:border-blue-400 transition-all group">
+          <div>
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Exámenes Creados</span>
+            <span class="text-3xl font-black text-blue-600 mt-1 block" id="metric-examenes">...</span>
+            <span class="text-[11px] font-semibold text-slate-500 group-hover:text-blue-600 transition-colors">
+              Gestionar constructor →
+            </span>
+          </div>
+          <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-pen-ruler"></i>
+          </div>
+        </a>
+
+        <!-- Mis Cursos a Cargo -->
+        <a href="/inicio" class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between hover:border-purple-400 transition-all group">
+          <div>
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Mis Cursos Asignados</span>
+            <span class="text-3xl font-black text-purple-600 mt-1 block" id="metric-docente-cursos">...</span>
+            <span class="text-[11px] font-semibold text-slate-500 group-hover:text-purple-600 transition-colors">
+              Abrir Aula Virtual →
+            </span>
+          </div>
+          <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-chalkboard-user"></i>
+          </div>
+        </a>
+
+        <!-- Alumnos en Mis Comisiones -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Alumnos en Mis Cursos</span>
+            <span class="text-3xl font-black text-slate-900 mt-1 block" id="metric-docente-alumnos">...</span>
+            <span class="text-[11px] font-semibold text-emerald-600 flex items-center gap-1 mt-1">
+              <i class="fa-solid fa-user-graduate text-[10px]"></i> Cursando actualmente
+            </span>
+          </div>
+          <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl">
+            <i class="fa-solid fa-users"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feed de Entregas Recientes por Corregir -->
+      <div class="bg-white rounded-3xl border border-slate-200 p-6 md:p-8 shadow-sm space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-file-circle-exclamation text-amber-500"></i>
+              <span>Entregas de Estudiantes Pendientes de Calificación</span>
+            </h2>
+            <p class="text-xs text-slate-500">Revise y asigne notas a los trabajos prácticos subidos recientemente por los estudiantes.</p>
+          </div>
+          <a href="/practicos" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-200/60 transition-colors">
+            <span>Ver todas las entregas</span>
+            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </a>
+        </div>
+
+        <div class="overflow-x-auto rounded-2xl border border-slate-100">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 uppercase font-bold tracking-wider border-b border-slate-200">
+              <tr>
+                <th class="p-3.5">Estudiante</th>
+                <th class="p-3.5">Curso</th>
+                <th class="p-3.5">Trabajo Práctico</th>
+                <th class="p-3.5">Fecha Entrega</th>
+                <th class="p-3.5">Estado</th>
+                <th class="p-3.5 text-right">Acción</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100" id="pending-table-body">
+              <tr>
+                <td colspan="6" class="p-6 text-center text-slate-400">Cargando entregas...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Atajos Rápidos de Docencia -->
+      <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
+        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-compass text-blue-600"></i>
+          <span>Atajos de Docencia y Aula Virtual</span>
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <a href="/practicos" class="p-4 rounded-2xl border border-slate-200 hover:border-amber-300 hover:bg-amber-50/20 transition-all text-xs font-semibold text-slate-700 flex items-center gap-3 group">
+            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-file-pen"></i>
+            </div>
+            <div>
+              <span class="block font-bold text-slate-900 group-hover:text-amber-700">Calificar Prácticos</span>
+              <span class="text-[11px] text-slate-400">Revisión de entregas</span>
+            </div>
+          </a>
+
+          <a href="/examenes-y-materias" class="p-4 rounded-2xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50/20 transition-all text-xs font-semibold text-slate-700 flex items-center gap-3 group">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <div>
+              <span class="block font-bold text-slate-900 group-hover:text-blue-700">Contenido del Curso</span>
+              <span class="text-[11px] text-slate-400">Gestión de unidades y contenidos</span>
+            </div>
+          </a>
+
+          <a href="/desempeno" class="p-4 rounded-2xl border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/20 transition-all text-xs font-semibold text-slate-700 flex items-center gap-3 group">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-chart-simple"></i>
+            </div>
+            <div>
+              <span class="block font-bold text-slate-900 group-hover:text-emerald-700">Notas de Cursado</span>
+              <span class="text-[11px] text-slate-400">Cargar calificaciones</span>
+            </div>
+          </a>
+
+          <a href="/inicio" class="p-4 rounded-2xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/20 transition-all text-xs font-semibold text-slate-700 flex items-center gap-3 group">
+            <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-desktop"></i>
+            </div>
+            <div>
+              <span class="block font-bold text-slate-900 group-hover:text-indigo-700">Aula Virtual</span>
+              <span class="text-[11px] text-slate-400">Vista tipo Moodle</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================================= -->
+    <!-- PESTAÑA 2: RESUMEN DE ADMINISTRACIÓN Y GESTIÓN -->
+    <!-- ========================================================================================= -->
+    <div id="tab-content-gestion" class="space-y-8 hidden">
+      <!-- Tarjetas de Métricas Institucionales -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Alumnos Registrados -->
+        <a href="/gestion-de-usuarios" class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between hover:border-blue-400 transition-all group">
+          <div>
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Alumnos Registrados</span>
+            <span class="text-3xl font-black text-slate-900 mt-1 block" id="metric-admin-alumnos">...</span>
+            <span class="text-[11px] font-semibold text-blue-600 flex items-center gap-1 mt-1 group-hover:translate-x-0.5 transition-transform">
+              <i class="fa-solid fa-users text-[10px]"></i> Total de matrícula →
+            </span>
+          </div>
+          <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-user-graduate"></i>
+          </div>
+        </a>
+
+        <!-- Personal y Docentes -->
+        <a href="/gestion-de-usuarios" class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between hover:border-purple-400 transition-all group">
+          <div>
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Personal y Docentes</span>
+            <span class="text-3xl font-black text-purple-600 mt-1 block" id="metric-admin-personal">...</span>
+            <span class="text-[11px] font-semibold text-purple-600 flex items-center gap-1 mt-1 group-hover:translate-x-0.5 transition-transform">
+              <i class="fa-solid fa-id-card text-[10px]"></i> Plantel activo →
+            </span>
+          </div>
+          <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-user-tie"></i>
+          </div>
+        </a>
+
+        <!-- Cursos / Oferta Académica -->
+        <a href="/administrar-cursos" class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between hover:border-indigo-400 transition-all group">
+          <div>
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Cursos y Comisiones</span>
+            <span class="text-3xl font-black text-indigo-600 mt-1 block" id="metric-admin-cursos">...</span>
+            <span class="text-[11px] font-semibold text-indigo-600 flex items-center gap-1 mt-1 group-hover:translate-x-0.5 transition-transform">
+              <i class="fa-solid fa-graduation-cap text-[10px]"></i> Oferta académica →
+            </span>
+          </div>
+          <div class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+        </a>
+
+        <!-- Aulas Físicas -->
+        <a href="/aulas-y-horarios" class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between hover:border-teal-400 transition-all group">
+          <div>
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Aulas Registradas</span>
+            <span class="text-3xl font-black text-teal-600 mt-1 block" id="metric-admin-aulas">...</span>
+            <span class="text-[11px] font-semibold text-teal-600 flex items-center gap-1 mt-1 group-hover:translate-x-0.5 transition-transform">
+              <i class="fa-solid fa-door-open text-[10px]"></i> Espacios de cursado →
+            </span>
+          </div>
+          <div class="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-building"></i>
+          </div>
+        </a>
+      </div>
+
+      <!-- Tabla Resumen Institucional de Cursos -->
+      <div class="bg-white rounded-3xl border border-slate-200 p-6 md:p-8 shadow-sm space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-purple-600"></i>
+              <span>Estado Institucional de Cursos y Comisiones</span>
+            </h2>
+            <p class="text-xs text-slate-500">Resumen de docentes asignados, capacidad y matrícula por comisión escolar.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="/administrar-cursos" class="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-xl border border-indigo-200/60 transition-colors">
+              <i class="fa-solid fa-plus text-[10px]"></i>
+              <span>Gestionar Cursos</span>
+            </a>
+            <a href="/inscripcion-de-estudiantes" class="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-700 hover:text-cyan-800 bg-cyan-50 px-3 py-1.5 rounded-xl border border-cyan-200/60 transition-colors">
+              <i class="fa-solid fa-user-plus text-[10px]"></i>
+              <span>Inscripciones</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-2xl border border-slate-100">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 uppercase font-bold tracking-wider border-b border-slate-200">
+              <tr>
+                <th class="p-3.5">Curso / Materia</th>
+                <th class="p-3.5">Año / Período</th>
+                <th class="p-3.5">Docente(s) a Cargo</th>
+                <th class="p-3.5">Inscriptos / Cupo</th>
+                <th class="p-3.5 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100" id="admin-courses-table-body">
+              <tr>
+                <td colspan="5" class="p-6 text-center text-slate-400">Cargando cursos institucionales...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Atajos Rápidos de Administración Escolar -->
+      <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
+        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-shield-halved text-purple-600"></i>
+          <span>Atajos de Administración Escolar e Institucional</span>
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          <a href="/gestion-de-usuarios" class="p-4 rounded-2xl border border-slate-200 hover:border-purple-300 hover:bg-purple-50/20 transition-all text-xs font-semibold text-slate-700 flex items-center gap-3 group">
+            <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-users-gear"></i>
+            </div>
+            <div>
+              <span class="block font-bold text-slate-900 group-hover:text-purple-700">Usuarios y Roles</span>
+              <span class="text-[11px] text-slate-400">Alumnos y docentes</span>
+            </div>
+          </a>
+
+          <a href="/administrar-cursos" class="p-4 rounded-2xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/20 transition-all text-xs font-semibold text-slate-700 flex items-center gap-3 group">
+            <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div>
+              <span class="block font-bold text-slate-900 group-hover:text-indigo-700">Cursos y Materias</span>
+              <span class="text-[11px] text-slate-400">Asignar profesores</span>
+            </div>
+          </a>
+
+          <a href="/inscripcion-de-estudiantes" class="p-4 rounded-2xl border border-slate-200 hover:border-cyan-300 hover:bg-cyan-50/20 transition-all text-xs font-semibold text-slate-700 flex items-center gap-3 group">
+            <div class="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-user-plus"></i>
+            </div>
+            <div>
+              <span class="block font-bold text-slate-900 group-hover:text-cyan-700">Inscripciones</span>
+              <span class="text-[11px] text-slate-400">Matricular y rematricular</span>
+            </div>
+          </a>
+
+          <a href="/aulas-y-horarios" class="p-4 rounded-2xl border border-slate-200 hover:border-teal-300 hover:bg-teal-50/20 transition-all text-xs font-semibold text-slate-700 flex items-center gap-3 group">
+            <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-calendar-days"></i>
+            </div>
+            <div>
+              <span class="block font-bold text-slate-900 group-hover:text-teal-700">Aulas y Horarios</span>
+              <span class="text-[11px] text-slate-400">Turnos y espacios</span>
+            </div>
+          </a>
+
+          <a href="/titulacion" class="p-4 rounded-2xl border border-slate-200 hover:border-amber-300 hover:bg-amber-50/20 transition-all text-xs font-semibold text-slate-700 flex items-center gap-3 group">
+            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-award"></i>
+            </div>
+            <div>
+              <span class="block font-bold text-slate-900 group-hover:text-amber-700">Diplomas y Títulos</span>
+              <span class="text-[11px] text-slate-400">Egresados y certificados</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    import { api } from '../lib/api';
+    import { getCurrentUser, normalizarRol } from '../lib/auth';
+
+    const user = getCurrentUser();
+    const rol = normalizarRol(user?.ocupacion);
+
+    // Configuración de elementos UI
+    const badgeRol = document.getElementById('badge-current-role');
+    const tabBtnDocente = document.getElementById('tab-btn-docente');
+    const tabBtnGestion = document.getElementById('tab-btn-gestion');
+    const tabContentDocente = document.getElementById('tab-content-docente');
+    const tabContentGestion = document.getElementById('tab-content-gestion');
+    const tabsNav = document.getElementById('dashboard-tabs-nav');
+
+    if (badgeRol) {
+      badgeRol.textContent = rol === 'administrador' ? 'Administrador' : 'Docente';
+      if (rol === 'administrador') {
+        badgeRol.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-purple-100 text-purple-800 uppercase tracking-wider';
+      }
+    }
+
+    function activarTab(tab: 'docente' | 'gestion') {
+      if (tab === 'docente') {
+        tabContentDocente?.classList.remove('hidden');
+        tabContentGestion?.classList.add('hidden');
+
+        tabBtnDocente?.classList.add('bg-white', 'text-blue-600', 'shadow-sm');
+        tabBtnDocente?.classList.remove('text-slate-600', 'hover:text-slate-900');
+
+        tabBtnGestion?.classList.remove('bg-white', 'text-blue-600', 'shadow-sm');
+        tabBtnGestion?.classList.add('text-slate-600', 'hover:text-slate-900');
+      } else {
+        tabContentDocente?.classList.add('hidden');
+        tabContentGestion?.classList.remove('hidden');
+
+        tabBtnGestion?.classList.add('bg-white', 'text-blue-600', 'shadow-sm');
+        tabBtnGestion?.classList.remove('text-slate-600', 'hover:text-slate-900');
+
+        tabBtnDocente?.classList.remove('bg-white', 'text-blue-600', 'shadow-sm');
+        tabBtnDocente?.classList.add('text-slate-600', 'hover:text-slate-900');
+      }
+    }
+
+    tabBtnDocente?.addEventListener('click', () => activarTab('docente'));
+    tabBtnGestion?.addEventListener('click', () => activarTab('gestion'));
+
+    // Si el usuario es docente (no administrador), ocultar pestaña de gestión
+    if (rol !== 'administrador') {
+      tabBtnGestion?.classList.add('hidden');
+      tabsNav?.classList.add('hidden');
+      activarTab('docente');
+    } else {
+      // Si el administrador accede con hash #gestion o similar, respetar
+      if (window.location.hash === '#gestion') {
+        activarTab('gestion');
+      } else {
+        activarTab('docente');
+      }
+    }
+
+    async function cargarDashboard() {
+      const tbodyDocente = document.getElementById('pending-table-body');
+      const tbodyAdmin = document.getElementById('admin-courses-table-body');
+
+      try {
+        const [alumnos, personal, materiales, examenes, cursos, aulas, resumenCursos] = await Promise.all([
+          api.alumno.todos().catch(() => []),
+          api.personal.todos().catch(() => []),
+          api.material.todos().catch(() => []),
+          api.examen.todos().catch(() => []),
+          api.curso.todos().catch(() => []),
+          api.aula.obtenerAulas().catch(() => []),
+          api.curso.resumen().catch(() => [])
+        ]);
+
+        // ==========================================
+        // 1. CARGA DE PESTAÑA: DOCENCIA
+        // ==========================================
+        const elTps = document.getElementById('metric-tps');
+        const elExamenes = document.getElementById('metric-examenes');
+        const elDocenteCursos = document.getElementById('metric-docente-cursos');
+        const elDocenteAlumnos = document.getElementById('metric-docente-alumnos');
+
+        // Cursos del usuario (si es admin o docente, verificar cursos en que participa)
+        let misCursos: any[] = [];
+        if (user?.id) {
+          try {
+            misCursos = await api.curso.cursosPorPersonal(user.id);
+          } catch (e) {
+            misCursos = cursos || [];
+          }
+        } else {
+          misCursos = cursos || [];
+        }
+
+        const misCursosIds = new Set((misCursos || []).map((c: any) => Number(c.id)));
+
+        // TPs pendientes correspondientes a los cursos del docente
+        const pendientes = (materiales || []).filter((m: any) =>
+          m.tipo === 'tp' &&
+          (misCursosIds.size === 0 || misCursosIds.has(Number(m.curso_id))) &&
+          (m.calificacion === '----' || !m.calificacion || m.estado === 'enviado' || m.estado === 'pendiente')
+        );
+
+        const examenesDocente = (examenes || []).filter((e: any) =>
+          misCursosIds.size === 0 || misCursosIds.has(Number(e.curso_id))
+        );
+
+        if (elTps) elTps.textContent = String(pendientes.length);
+        if (elExamenes) elExamenes.textContent = String(examenesDocente.length);
+        if (elDocenteCursos) elDocenteCursos.textContent = String(misCursos?.length || 0);
+
+        // Estimar alumnos en los cursos del profesor
+        let totalAlumnosDocente = 0;
+        if (resumenCursos && resumenCursos.length > 0 && misCursos && misCursos.length > 0) {
+          const misCursosIds = new Set(misCursos.map((c: any) => c.id));
+          totalAlumnosDocente = resumenCursos
+            .filter((rc: any) => misCursosIds.has(rc.id))
+            .reduce((acc: number, curr: any) => acc + (Number(curr.inscriptos) || 0), 0);
+        } else {
+          totalAlumnosDocente = alumnos?.length || 0;
+        }
+        if (elDocenteAlumnos) elDocenteAlumnos.textContent = String(totalAlumnosDocente);
+
+        // Tabla de entregas pendientes
+        if (tbodyDocente) {
+          if (pendientes.length === 0) {
+            tbodyDocente.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-medium">No hay entregas pendientes de calificación en este momento.</td></tr>`;
+          } else {
+            tbodyDocente.innerHTML = pendientes.slice(0, 5).map((tp: any) => {
+              const estudianteNombre = tp.alumno_nombre ? `${tp.alumno_apellido || ''}, ${tp.alumno_nombre}` : 'Estudiante';
+              const fechaStr = tp.fecha_subida ? new Date(tp.fecha_subida).toLocaleDateString('es-AR') : 'Reciente';
+
+              return `
+                <tr class="hover:bg-slate-50 transition-colors">
+                  <td class="p-3.5 font-bold text-slate-800">${estudianteNombre}</td>
+                  <td class="p-3.5 text-slate-600">${tp.curso_nombre || 'Curso'}</td>
+                  <td class="p-3.5 text-slate-600 font-semibold">${tp.observacion || tp.carpeta || 'Trabajo Práctico'}</td>
+                  <td class="p-3.5 text-slate-500">${fechaStr}</td>
+                  <td class="p-3.5">
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/50">Sin Calificar</span>
+                  </td>
+                  <td class="p-3.5 text-right">
+                    <a href="/practicos" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-colors inline-block">
+                      Calificar
+                    </a>
+                  </td>
+                </tr>
+              `;
+            }).join('');
+          }
+        }
+
+        // ==========================================
+        // 2. CARGA DE PESTAÑA: ADMINISTRACIÓN Y GESTIÓN
+        // ==========================================
+        const elAdminAlumnos = document.getElementById('metric-admin-alumnos');
+        const elAdminPersonal = document.getElementById('metric-admin-personal');
+        const elAdminCursos = document.getElementById('metric-admin-cursos');
+        const elAdminAulas = document.getElementById('metric-admin-aulas');
+
+        if (elAdminAlumnos) elAdminAlumnos.textContent = String(alumnos?.length || 0);
+        if (elAdminPersonal) elAdminPersonal.textContent = String(personal?.length || 0);
+        if (elAdminCursos) elAdminCursos.textContent = String(cursos?.length || 0);
+        if (elAdminAulas) elAdminAulas.textContent = String(aulas?.length || 0);
+
+        // Tabla de cursos institucionales
+        if (tbodyAdmin) {
+          if (!cursos || cursos.length === 0) {
+            tbodyAdmin.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400 font-medium">No hay cursos registrados en el sistema.</td></tr>`;
+          } else {
+            // Mapa de inscriptos desde resumenCursos
+            const mapaInscriptos = new Map();
+            (resumenCursos || []).forEach((rc: any) => {
+              const prev = mapaInscriptos.get(rc.id) || 0;
+              mapaInscriptos.set(rc.id, prev + (Number(rc.inscriptos) || 0));
+            });
+
+            tbodyAdmin.innerHTML = cursos.map((c: any) => {
+              const inscriptos = mapaInscriptos.get(c.id) || 0;
+              const cupo = c.cupo || 30;
+              const porcentaje = Math.min(100, Math.round((inscriptos / cupo) * 100));
+
+              // Formato de docentes asignados
+              let docentesHtml = '<span class="text-slate-400 italic">Sin docente</span>';
+              if (c.profesor && c.profesor.trim() !== '') {
+                const listaDocentes = c.profesor.split(',').map((p: string) => p.trim());
+                docentesHtml = `
+                  <div class="flex flex-wrap gap-1">
+                    ${listaDocentes.map((d: string) => `
+                      <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200/60">
+                        <i class="fa-solid fa-chalkboard-user mr-1 text-[9px]"></i>${d}
+                      </span>
+                    `).join('')}
+                  </div>
+                `;
+              }
+
+              return `
+                <tr class="hover:bg-slate-50 transition-colors">
+                  <td class="p-3.5">
+                    <div class="font-bold text-slate-900">${c.nombre || 'Curso'}</div>
+                    <div class="text-[11px] text-slate-400 line-clamp-1">${c.descripcion || 'Sin descripción'}</div>
+                  </td>
+                  <td class="p-3.5 text-slate-600 font-medium">
+                    ${c.anio ? `${c.anio}° Año` : 'Comisión General'}
+                  </td>
+                  <td class="p-3.5">
+                    ${docentesHtml}
+                  </td>
+                  <td class="p-3.5">
+                    <div class="flex items-center gap-2">
+                      <span class="font-bold text-slate-800">${inscriptos} / ${cupo}</span>
+                      <span class="text-[10px] text-slate-400">(${porcentaje}%)</span>
+                    </div>
+                    <div class="w-24 bg-slate-200 rounded-full h-1.5 mt-1 overflow-hidden">
+                      <div class="bg-indigo-600 h-1.5 rounded-full" style="width: ${porcentaje}%"></div>
+                    </div>
+                  </td>
+                  <td class="p-3.5 text-right space-x-1 whitespace-nowrap">
+                    <a href="/administrar-cursos" title="Gestionar docentes y cupo" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-colors inline-flex items-center gap-1">
+                      <i class="fa-solid fa-user-gear text-[10px]"></i>
+                      <span>Docentes</span>
+                    </a>
+                    <a href="/inscripcion-de-estudiantes" title="Inscribir alumnos" class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold rounded-xl text-xs transition-colors inline-flex items-center gap-1">
+                      <i class="fa-solid fa-user-plus text-[10px]"></i>
+                      <span>Inscribir</span>
+                    </a>
+                  </td>
+                </tr>
+              `;
+            }).join('');
+          }
+        }
+      } catch (err: any) {
+        console.error('Error al cargar datos del dashboard:', err);
+        if (tbodyDocente) {
+          tbodyDocente.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-red-500">Error al cargar datos de docencia: ${err.message}</td></tr>`;
+        }
+        if (tbodyAdmin) {
+          tbodyAdmin.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-red-500">Error al cargar datos de gestión: ${err.message}</td></tr>`;
+        }
+      }
+    }
+
+    cargarDashboard();
+  </script>
 </DashboardLayout>

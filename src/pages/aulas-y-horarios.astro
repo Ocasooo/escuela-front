@@ -2,64 +2,793 @@
 import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 ---
 
-<DashboardLayout title='Gestion de aulas y horarios' path='aulas y horarios' pageTitle='Gestión de aulas y horarios'>
-      <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" href="/agregar-usuario">Agregar aula y horario</a>
-      <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" href="/agregar-usuario">Ver calendario</a>
-            <!------------------------TABLE-------------------- -->
-            <!------------------------TABLE-------------------- -->
-          <div class="mb-10 mt-5">
-            <div class="xl:w-full px-10">
-              <div class="retive flex flex-col min-w-0 break-words bg-white w-full shadow-lg rounded">
-                <div class="rounded-t mb-0 px-4 py-3 border-0">
-                  <div class="flex flex-wrap items-center">
-                    <div class="relative w-full px-2 flex-grow flex-1">
-                      <h3 class="font-semibold text-base text-blueGray-700">Horarios agregados recientemente</h3>
+<DashboardLayout title="Aulas y Horarios" path="aulas-y-horarios" pageTitle="Distribución de Aulas, Talleres y Horarios">
+  <div class="space-y-6">
+    <!-- Header y Botones de Acción -->
+    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h2 class="text-sm font-bold text-slate-800">Grilla Horaria y Ocupación Semanal</h2>
+        <p class="text-xs text-slate-500">Administre la disponibilidad física de talleres y laboratorios por día y franja horaria.</p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <button id="btn-ver-asignaciones" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer">
+          <i class="fa-solid fa-list-check text-slate-500"></i>
+          <span>Listado de Asignaciones</span>
+        </button>
+        <button id="btn-nueva-aula" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer">
+          <i class="fa-solid fa-door-open text-slate-500"></i>
+          <span>Nueva Aula/Taller</span>
+        </button>
+        <button id="btn-asignar-horario" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-colors flex items-center gap-1.5 cursor-pointer">
+          <i class="fa-solid fa-calendar-plus"></i>
+          <span>Asignar Turno</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Pestañas por Día: Lunes a Viernes -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-1" id="tabs-dias-container">
+      <button class="tab-dia px-5 py-2.5 text-xs font-bold rounded-2xl transition-all bg-blue-600 text-white shadow-sm cursor-pointer" data-dia="Lunes">
+        <i class="fa-regular fa-calendar-day mr-1"></i> Lunes
+      </button>
+      <button class="tab-dia px-5 py-2.5 text-xs font-bold rounded-2xl transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer" data-dia="Martes">
+        <i class="fa-regular fa-calendar-day mr-1"></i> Martes
+      </button>
+      <button class="tab-dia px-5 py-2.5 text-xs font-bold rounded-2xl transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer" data-dia="Miércoles">
+        <i class="fa-regular fa-calendar-day mr-1"></i> Miércoles
+      </button>
+      <button class="tab-dia px-5 py-2.5 text-xs font-bold rounded-2xl transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer" data-dia="Jueves">
+        <i class="fa-regular fa-calendar-day mr-1"></i> Jueves
+      </button>
+      <button class="tab-dia px-5 py-2.5 text-xs font-bold rounded-2xl transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer" data-dia="Viernes">
+        <i class="fa-regular fa-calendar-day mr-1"></i> Viernes
+      </button>
+    </div>
+
+    <!-- Grilla Horaria por Aulas -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="p-4 bg-slate-50/70 border-b border-slate-200 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+          <h3 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">
+            Horarios para el día: <span id="label-dia-activo" class="text-blue-600 font-black">Lunes</span>
+          </h3>
+        </div>
+        <p class="text-[11px] text-slate-400">Franjas de 1 hora de 07:00 a 23:00 hs</p>
+      </div>
+
+      <div class="overflow-x-auto max-h-[650px]">
+        <table class="w-full text-center text-xs border-collapse">
+          <thead class="sticky top-0 z-20">
+            <tr class="bg-slate-100 text-slate-700 uppercase font-bold border-b border-slate-200" id="grilla-thead-row">
+              <th class="p-3 text-left w-32 bg-slate-100 sticky left-0 z-30 border-r border-slate-200 shadow-xs">
+                Horario
+              </th>
+              <!-- Columnas de Aulas generadas dinámicamente -->
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100" id="grilla-tbody">
+            <!-- 16 filas de 1 hora generadas dinámicamente -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Nueva Aula -->
+  <div id="modal-aula" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-fadeIn">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-base font-bold text-slate-900">Nueva Aula o Espacio Físico</h3>
+        <button id="btn-cerrar-modal-aula" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="form-aula" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nombre del Espacio</label>
+          <input type="text" id="aula-nombre" required placeholder="Ej: Laboratorio de Robótica" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600" />
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" id="btn-cancelar-aula" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
+          <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition-all">Guardar Aula</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Asignar Curso a Aula y Horario -->
+  <div id="modal-horario" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-fadeIn">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-base font-bold text-slate-900">Asignar Turno y Espacio Físico</h3>
+        <button id="btn-cerrar-modal-h" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="form-horario" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Curso / Materia</label>
+          <select id="horario-curso" required class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-100">
+            <option value="">Cargando cursos...</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Aula / Taller</label>
+          <select id="horario-aula" required class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-100">
+            <option value="">Cargando aulas...</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Día</label>
+            <select id="horario-dia" required class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-100">
+              <option value="Lunes">Lunes</option>
+              <option value="Martes">Martes</option>
+              <option value="Miércoles">Miércoles</option>
+              <option value="Jueves">Jueves</option>
+              <option value="Viernes">Viernes</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-1.5">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Desde</label>
+              <input type="time" id="horario-inicio" value="18:00" required class="w-full px-2 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Hasta</label>
+              <input type="time" id="horario-fin" value="21:00" required class="w-full px-2 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600" />
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" id="btn-cancelar-h" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
+          <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition-all">Guardar Asignación</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Éxito / Feedback -->
+  <div id="modal-exito-aulas" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center space-y-4 animate-fadeIn">
+      <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto text-xl">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-slate-900" id="exito-aulas-titulo">¡Operación Exitosa!</h3>
+        <p class="text-xs text-slate-500 mt-1" id="exito-aulas-mensaje">La información ha sido guardada correctamente.</p>
+      </div>
+      <button type="button" id="btn-cerrar-exito-aulas" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all">
+        Aceptar
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal Error -->
+  <div id="modal-error-aulas" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center space-y-4 animate-fadeIn">
+      <div class="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mx-auto text-xl">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-slate-900">Atención</h3>
+        <p class="text-xs text-slate-500 mt-1" id="error-aulas-mensaje">Ocurrió un error al procesar la solicitud.</p>
+      </div>
+      <button type="button" id="btn-cerrar-error-aulas" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all cursor-pointer">
+        Entendido
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal Confirmar Desasignar Turno -->
+  <div id="modal-desasignar-turno" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-fadeIn">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2 text-red-600">
+          <i class="fa-solid fa-calendar-xmark text-lg"></i>
+          <h3 class="text-base font-bold text-slate-900">Desasignar Turno y Espacio</h3>
+        </div>
+        <button id="btn-cerrar-modal-desasignar" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-2">
+        <p class="font-bold text-amber-900">¿Está seguro de que desea desasignar este turno?</p>
+        <div class="bg-white/90 p-3 rounded-xl border border-amber-200/60 space-y-1 text-slate-700">
+          <div><span class="font-bold text-slate-900">Materia:</span> <span id="desasignar-materia" class="font-semibold text-blue-900">---</span></div>
+          <div><span class="font-bold text-slate-900">Aula / Espacio:</span> <span id="desasignar-aula" class="font-semibold text-slate-800">---</span></div>
+          <div><span class="font-bold text-slate-900">Día:</span> <span id="desasignar-dia" class="font-semibold text-slate-800">---</span></div>
+          <div><span class="font-bold text-slate-900">Horario:</span> <span id="desasignar-horario" class="font-semibold text-slate-800">---</span></div>
+        </div>
+        <p class="text-[11px] text-amber-800">El aula quedará libre en esta franja horaria para otras asignaciones.</p>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" id="btn-cancelar-desasignar" class="px-4 py-2.5 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors cursor-pointer">Cancelar</button>
+        <button type="button" id="btn-confirmar-desasignar" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer">
+          <i class="fa-solid fa-trash-can"></i>
+          <span id="btn-texto-desasignar">Desasignar Turno</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Confirmar Eliminar Aula -->
+  <div id="modal-eliminar-aula" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-fadeIn">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2 text-red-600">
+          <i class="fa-solid fa-door-open text-lg"></i>
+          <h3 class="text-base font-bold text-slate-900">Eliminar Espacio Físico</h3>
+        </div>
+        <button id="btn-cerrar-modal-eliminar-aula" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-900 space-y-2">
+        <p class="font-bold">¿Está seguro de que desea eliminar el aula <span id="eliminar-aula-nombre" class="font-extrabold text-red-950">---</span>?</p>
+        <p class="text-[11px] text-red-700">Se eliminará este espacio de la grilla y se desasignarán todos los turnos que estuvieran programados en ella.</p>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" id="btn-cancelar-eliminar-aula" class="px-4 py-2.5 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors cursor-pointer">Cancelar</button>
+        <button type="button" id="btn-confirmar-eliminar-aula" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer">
+          <i class="fa-solid fa-trash-can"></i>
+          <span id="btn-texto-eliminar-aula">Eliminar Aula</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Listado Completo de Asignaciones -->
+  <div id="modal-listado-asignaciones" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-fadeIn max-h-[85vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
+        <div class="flex items-center gap-2 text-slate-800">
+          <i class="fa-solid fa-list-check text-blue-600 text-lg"></i>
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Listado de Turnos Asignados</h3>
+            <p class="text-xs text-slate-500">Revise y desasigne horarios de materias rápidamente.</p>
+          </div>
+        </div>
+        <button id="btn-cerrar-modal-listado" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Buscador en el listado -->
+      <div class="relative shrink-0">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+        <input type="text" id="input-buscar-asignacion" placeholder="Buscar por materia, aula o día..." class="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600" />
+      </div>
+
+      <!-- Contenedor scrollable -->
+      <div class="overflow-y-auto flex-1 divide-y divide-slate-100 pr-1 space-y-1" id="contenedor-listado-asignaciones">
+        <!-- Renders dinámicamente -->
+      </div>
+
+      <div class="flex justify-between items-center pt-2 border-t border-slate-100 shrink-0">
+        <span class="text-xs font-semibold text-slate-500" id="contador-asignaciones-total">0 turnos asignados</span>
+        <button type="button" id="btn-cerrar-listado-abajo" class="px-5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    import { api } from '../lib/api';
+
+    const modalH = document.getElementById('modal-horario');
+    const modalAula = document.getElementById('modal-aula');
+    const modalExito = document.getElementById('modal-exito-aulas');
+    const modalError = document.getElementById('modal-error-aulas');
+    const modalDesasignar = document.getElementById('modal-desasignar-turno');
+    const modalEliminarAula = document.getElementById('modal-eliminar-aula');
+    const modalListado = document.getElementById('modal-listado-asignaciones');
+
+    const selectCurso = document.getElementById('horario-curso') as HTMLSelectElement;
+    const selectAula = document.getElementById('horario-aula') as HTMLSelectElement;
+    const labelDiaActivo = document.getElementById('label-dia-activo');
+    const theadRow = document.getElementById('grilla-thead-row');
+    const tbody = document.getElementById('grilla-tbody');
+
+    let turnoSeleccionado: { horarioId: number | string; cursoNombre: string; aulaNombre: string; dia: string; rango: string } | null = null;
+    let aulaSeleccionada: { aulaId: number | string; aulaNombre: string } | null = null;
+
+    function mostrarExito(titulo: string, mensaje: string) {
+      const t = document.getElementById('exito-aulas-titulo');
+      const m = document.getElementById('exito-aulas-mensaje');
+      if (t) t.textContent = titulo;
+      if (m) m.textContent = mensaje;
+      modalExito?.classList.remove('hidden');
+    }
+
+    function mostrarError(mensaje: string) {
+      const m = document.getElementById('error-aulas-mensaje');
+      if (m) m.textContent = mensaje;
+      modalError?.classList.remove('hidden');
+    }
+
+    document.getElementById('btn-cerrar-exito-aulas')?.addEventListener('click', () => {
+      modalExito?.classList.add('hidden');
+    });
+
+    document.getElementById('btn-cerrar-error-aulas')?.addEventListener('click', () => {
+      modalError?.classList.add('hidden');
+    });
+
+    // 16 intervalos de 1 hora de 07:00 a 23:00
+    const INTERVALOS_HORARIOS = [
+      { inicio: '07:00', fin: '08:00', label: '07:00 - 08:00' },
+      { inicio: '08:00', fin: '09:00', label: '08:00 - 09:00' },
+      { inicio: '09:00', fin: '10:00', label: '09:00 - 10:00' },
+      { inicio: '10:00', fin: '11:00', label: '10:00 - 11:00' },
+      { inicio: '11:00', fin: '12:00', label: '11:00 - 12:00' },
+      { inicio: '12:00', fin: '13:00', label: '12:00 - 13:00' },
+      { inicio: '13:00', fin: '14:00', label: '13:00 - 14:00' },
+      { inicio: '14:00', fin: '15:00', label: '14:00 - 15:00' },
+      { inicio: '15:00', fin: '16:00', label: '15:00 - 16:00' },
+      { inicio: '16:00', fin: '17:00', label: '16:00 - 17:00' },
+      { inicio: '17:00', fin: '18:00', label: '17:00 - 18:00' },
+      { inicio: '18:00', fin: '19:00', label: '18:00 - 19:00' },
+      { inicio: '19:00', fin: '20:00', label: '19:00 - 20:00' },
+      { inicio: '20:00', fin: '21:00', label: '20:00 - 21:00' },
+      { inicio: '21:00', fin: '22:00', label: '21:00 - 22:00' },
+      { inicio: '22:00', fin: '23:00', label: '22:00 - 23:00' }
+    ];
+
+    let aulasData: any[] = [];
+    let asignacionesData: any[] = [];
+    let cursosData: any[] = [];
+    let diaActivo = 'Lunes';
+
+    // Tabs de días
+    document.querySelectorAll('.tab-dia').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const dia = btn.getAttribute('data-dia') || 'Lunes';
+        diaActivo = dia;
+        if (labelDiaActivo) labelDiaActivo.textContent = dia;
+
+        document.querySelectorAll('.tab-dia').forEach((b) => {
+          b.className = 'tab-dia px-5 py-2.5 text-xs font-bold rounded-2xl transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer';
+        });
+        btn.className = 'tab-dia px-5 py-2.5 text-xs font-bold rounded-2xl transition-all bg-blue-600 text-white shadow-sm cursor-pointer';
+
+        renderGrilla();
+      });
+    });
+
+    async function cargarDatos() {
+      try {
+        const [aulas, asignaciones, cursos] = await Promise.all([
+          api.aula.obtenerAulas(),
+          api.aula.obtenerInfoCompleta(),
+          api.curso.todos()
+        ]);
+
+        aulasData = aulas || [];
+        asignacionesData = asignaciones || [];
+        cursosData = cursos || [];
+
+        // Cargar selects para el modal
+        if (selectCurso && cursosData) {
+          selectCurso.innerHTML = '<option value="">Seleccione una materia...</option>' +
+            cursosData.map((c: any) => `<option value="${c.id}">${c.nombre}</option>`).join('');
+        }
+        if (selectAula && aulasData) {
+          selectAula.innerHTML = '<option value="">Seleccione un espacio...</option>' +
+            aulasData.map((a: any) => `<option value="${a.id}">${a.nombre}</option>`).join('');
+        }
+
+        renderGrilla();
+      } catch (err: any) {
+        console.error('Error al cargar aulas y horarios:', err);
+        if (tbody) tbody.innerHTML = `<tr><td colspan="10" class="p-8 text-center text-red-500">Error al cargar datos: ${err.message}</td></tr>`;
+      }
+    }
+
+    function renderGrilla() {
+      if (!theadRow || !tbody) return;
+
+      // 1. Render encabezado de columnas (Horario + Cada Aula con botón eliminar)
+      theadRow.innerHTML = `
+        <th class="p-3 text-left w-36 bg-slate-100 sticky left-0 z-30 border-r border-slate-200 shadow-xs font-bold text-slate-700">
+          Horario
+        </th>
+        ${aulasData.map((aula) => `
+          <th class="p-3 font-bold text-slate-800 border-r border-slate-200 min-w-[190px]">
+            <div class="flex items-center justify-between gap-1.5 px-1">
+              <div class="flex items-center gap-1.5 truncate">
+                <i class="fa-solid fa-door-closed text-slate-400 text-xs shrink-0"></i>
+                <span class="truncate">${aula.nombre}</span>
+              </div>
+              <button
+                type="button"
+                class="btn-eliminar-aula p-1 text-slate-300 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer shrink-0"
+                title="Eliminar aula '${aula.nombre}'"
+                data-aula-id="${aula.id}"
+                data-aula-nombre="${aula.nombre}"
+              >
+                <i class="fa-regular fa-trash-can text-xs"></i>
+              </button>
+            </div>
+          </th>
+        `).join('')}
+      `;
+
+      if (aulasData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400">No hay aulas ni talleres registrados todavía. Use el botón "Nueva Aula/Taller".</td></tr>`;
+        return;
+      }
+
+      // 2. Render filas por cada franja horaria (16 intervalos)
+      tbody.innerHTML = INTERVALOS_HORARIOS.map((slot) => {
+        const slotStart = slot.inicio + ':00';
+        const slotEnd = slot.fin + ':00';
+
+        const celdasAulas = aulasData.map((aula) => {
+          // Buscar asignación que coincida en día, aula y solape horario
+          const match = asignacionesData.find((asig: any) => {
+            if (asig.aula_nombre !== aula.nombre) return false;
+            if (asig.dia !== diaActivo) return false;
+
+            const hInicio = asig.hora_inicio || '00:00:00';
+            const hFin = asig.hora_fin || '23:59:59';
+
+            // Solape de intervalos: hInicio < slotEnd && hFin > slotStart
+            return hInicio < slotEnd && hFin > slotStart;
+          });
+
+          if (match) {
+            const inicio = match.hora_inicio ? match.hora_inicio.slice(0, 5) : '';
+            const fin = match.hora_fin ? match.hora_fin.slice(0, 5) : '';
+            return `
+              <td class="p-2 border-r border-slate-100 align-middle bg-blue-50/30">
+                <div class="group relative p-2.5 rounded-xl bg-blue-100/80 hover:bg-blue-100/95 border border-blue-200 text-blue-900 font-bold text-xs shadow-xs text-left transition-all">
+                  <div class="flex items-start justify-between gap-1.5">
+                    <div class="flex items-center gap-1.5 min-w-0">
+                      <i class="fa-solid fa-book-open-reader text-blue-600 text-[10px] shrink-0"></i>
+                      <span class="truncate font-black text-blue-950">${match.curso_nombre}</span>
                     </div>
-                    <div class="relative flex-grow flex-1 sm:text-right">
-                      <input class="border-2 border-black text-black text-xs font-bold px-7 py-1 rounded-full" type="text" placeholder="Buscar">
-                      <i class="relative md:visible invisible top-0.5 right-48 fa-solid fa-magnifying-glass" style="color: #000000;"></i>
-                    </div>
+                    <button
+                      type="button"
+                      class="btn-desasignar-turno p-1 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-100/80 transition-colors cursor-pointer shrink-0"
+                      title="Desasignar turno de esta materia"
+                      data-horario-id="${match.horario_id}"
+                      data-curso-nombre="${match.curso_nombre}"
+                      data-aula-nombre="${aula.nombre}"
+                      data-dia="${diaActivo}"
+                      data-rango="${inicio} - ${fin} hs"
+                    >
+                      <i class="fa-solid fa-trash-can text-xs text-red-500"></i>
+                    </button>
+                  </div>
+                  <div class="flex items-center justify-between mt-1 text-[10px] text-blue-700 font-medium">
+                    <span><i class="fa-regular fa-clock mr-0.5 text-blue-500"></i> ${inicio} - ${fin} hs</span>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">${aula.nombre}</span>
                   </div>
                 </div>
-            
-                <div class="block w-full overflow-x-auto">
-                  <table class="items-center bg-transparent w-full border-collapse ">
-                    <thead>
-                      <tr>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Materia</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Aula</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Dia</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Hora de inicio</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Hora de fin</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Opciones</th>
-                      </tr>
-                    </thead>
-            
-                    <tbody>
-                      <tr>
-                        <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">
-                          Matematicas
-                        </th>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          Aula 3
-                        </td>
-                        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          Martes
-                        </td>
-                        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                            16:00hs
-                          </td>
-                          <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                            18:00hs
-                          </td>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <button class="mr-2 rounded-3xl bg-sky-400 w-6 h-6"><i class="fa-solid fa-pen-to-square" style="color: #000000;"></i></button>
-                          <button class="rounded-3xl bg-red-600 w-6 h-6"><i class="fa-solid fa-xmark" style="color: #000000;"></i></button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+              </td>
+            `;
+          }
+
+          return `
+            <td class="p-2 border-r border-slate-100 align-middle text-center">
+              <span class="text-slate-300 text-[11px] font-medium">Libre</span>
+            </td>
+          `;
+        }).join('');
+
+        return `
+          <tr class="hover:bg-slate-50/60 transition-colors">
+            <td class="p-3 text-left font-mono font-bold text-slate-600 bg-slate-50 sticky left-0 z-10 border-r border-slate-200 shadow-xs text-xs whitespace-nowrap">
+              ${slot.label}
+            </td>
+            ${celdasAulas}
+          </tr>
+        `;
+      }).join('');
+
+      // Escuchar clics para desasignar turnos
+      document.querySelectorAll('.btn-desasignar-turno').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const target = btn as HTMLButtonElement;
+          const horarioId = target.getAttribute('data-horario-id') || '';
+          const cursoNombre = target.getAttribute('data-curso-nombre') || '';
+          const aulaNombre = target.getAttribute('data-aula-nombre') || '';
+          const dia = target.getAttribute('data-dia') || '';
+          const rango = target.getAttribute('data-rango') || '';
+
+          abrirModalDesasignar({ horarioId, cursoNombre, aulaNombre, dia, rango });
+        });
+      });
+
+      // Escuchar clics para eliminar aula
+      document.querySelectorAll('.btn-eliminar-aula').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const target = btn as HTMLButtonElement;
+          const aulaId = target.getAttribute('data-aula-id') || '';
+          const aulaNombre = target.getAttribute('data-aula-nombre') || '';
+
+          abrirModalEliminarAula({ aulaId, aulaNombre });
+        });
+      });
+    }
+
+    // Modal Desasignar Turno
+    function abrirModalDesasignar(datos: { horarioId: number | string; cursoNombre: string; aulaNombre: string; dia: string; rango: string }) {
+      turnoSeleccionado = datos;
+      const elMateria = document.getElementById('desasignar-materia');
+      const elAula = document.getElementById('desasignar-aula');
+      const elDia = document.getElementById('desasignar-dia');
+      const elHorario = document.getElementById('desasignar-horario');
+
+      if (elMateria) elMateria.textContent = datos.cursoNombre;
+      if (elAula) elAula.textContent = datos.aulaNombre;
+      if (elDia) elDia.textContent = datos.dia;
+      if (elHorario) elHorario.textContent = datos.rango;
+
+      modalDesasignar?.classList.remove('hidden');
+    }
+
+    const cerrarModalDesasignar = () => {
+      modalDesasignar?.classList.add('hidden');
+      turnoSeleccionado = null;
+    };
+
+    document.getElementById('btn-cerrar-modal-desasignar')?.addEventListener('click', cerrarModalDesasignar);
+    document.getElementById('btn-cancelar-desasignar')?.addEventListener('click', cerrarModalDesasignar);
+
+    document.getElementById('btn-confirmar-desasignar')?.addEventListener('click', async () => {
+      if (!turnoSeleccionado || !turnoSeleccionado.horarioId) return;
+
+      const btnConfirmar = document.getElementById('btn-confirmar-desasignar') as HTMLButtonElement | null;
+      const btnTexto = document.getElementById('btn-texto-desasignar');
+      const textoPrevio = btnTexto?.textContent || 'Desasignar Turno';
+
+      try {
+        if (btnConfirmar) btnConfirmar.disabled = true;
+        if (btnTexto) btnTexto.textContent = 'Desasignando...';
+
+        await api.aula.desasignarTurno(turnoSeleccionado.horarioId);
+        cerrarModalDesasignar();
+        await cargarDatos();
+
+        // Si el modal de listado está abierto, refrescarlo
+        if (!modalListado?.classList.contains('hidden')) {
+          renderListadoAsignaciones();
+        }
+
+        mostrarExito('¡Turno Desasignado!', 'El turno ha sido desasignado y el espacio físico quedó libre en esa franja horaria.');
+      } catch (err: any) {
+        console.error('Error al desasignar turno:', err);
+        mostrarError(err.message || 'Error al desasignar el turno.');
+      } finally {
+        if (btnConfirmar) btnConfirmar.disabled = false;
+        if (btnTexto) btnTexto.textContent = textoPrevio;
+      }
+    });
+
+    // Modal Eliminar Aula
+    function abrirModalEliminarAula(datos: { aulaId: number | string; aulaNombre: string }) {
+      aulaSeleccionada = datos;
+      const elNombre = document.getElementById('eliminar-aula-nombre');
+      if (elNombre) elNombre.textContent = datos.aulaNombre;
+      modalEliminarAula?.classList.remove('hidden');
+    }
+
+    const cerrarModalEliminarAula = () => {
+      modalEliminarAula?.classList.add('hidden');
+      aulaSeleccionada = null;
+    };
+
+    document.getElementById('btn-cerrar-modal-eliminar-aula')?.addEventListener('click', cerrarModalEliminarAula);
+    document.getElementById('btn-cancelar-eliminar-aula')?.addEventListener('click', cerrarModalEliminarAula);
+
+    document.getElementById('btn-confirmar-eliminar-aula')?.addEventListener('click', async () => {
+      if (!aulaSeleccionada || !aulaSeleccionada.aulaId) return;
+
+      const btnConfirmar = document.getElementById('btn-confirmar-eliminar-aula') as HTMLButtonElement | null;
+      const btnTexto = document.getElementById('btn-texto-eliminar-aula');
+      const textoPrevio = btnTexto?.textContent || 'Eliminar Aula';
+
+      try {
+        if (btnConfirmar) btnConfirmar.disabled = true;
+        if (btnTexto) btnTexto.textContent = 'Eliminando...';
+
+        await api.aula.eliminarAula(aulaSeleccionada.aulaId);
+        cerrarModalEliminarAula();
+        await cargarDatos();
+
+        // Si el modal de listado está abierto, refrescarlo
+        if (!modalListado?.classList.contains('hidden')) {
+          renderListadoAsignaciones();
+        }
+
+        mostrarExito('¡Aula Eliminada!', 'El espacio físico y sus turnos asignados han sido eliminados del sistema.');
+      } catch (err: any) {
+        console.error('Error al eliminar aula:', err);
+        mostrarError(err.message || 'Error al eliminar el espacio físico.');
+      } finally {
+        if (btnConfirmar) btnConfirmar.disabled = false;
+        if (btnTexto) btnTexto.textContent = textoPrevio;
+      }
+    });
+
+    // Modal Listado Completo de Asignaciones
+    const inputBuscarAsig = document.getElementById('input-buscar-asignacion') as HTMLInputElement;
+    const contenedorListado = document.getElementById('contenedor-listado-asignaciones');
+    const contadorAsigTotal = document.getElementById('contador-asignaciones-total');
+
+    function renderListadoAsignaciones() {
+      if (!contenedorListado) return;
+
+      const termino = inputBuscarAsig?.value.toLowerCase().trim() || '';
+
+      const filtradas = asignacionesData.filter((a: any) => {
+        const cNombre = (a.curso_nombre || '').toLowerCase();
+        const aNombre = (a.aula_nombre || '').toLowerCase();
+        const dia = (a.dia || '').toLowerCase();
+        return cNombre.includes(termino) || aNombre.includes(termino) || dia.includes(termino);
+      });
+
+      if (contadorAsigTotal) {
+        contadorAsigTotal.textContent = `${filtradas.length} de ${asignacionesData.length} turno(s) asignado(s)`;
+      }
+
+      if (filtradas.length === 0) {
+        contenedorListado.innerHTML = `
+          <div class="py-8 text-center text-slate-400">
+            <i class="fa-solid fa-calendar-xmark text-2xl mb-2 text-slate-300"></i>
+            <p class="text-xs">No se encontraron asignaciones coincidentes.</p>
           </div>
+        `;
+        return;
+      }
+
+      contenedorListado.innerHTML = filtradas.map((asig: any) => {
+        const inicio = asig.hora_inicio ? asig.hora_inicio.slice(0, 5) : '';
+        const fin = asig.hora_fin ? asig.hora_fin.slice(0, 5) : '';
+        return `
+          <div class="py-3 px-2 flex items-center justify-between gap-3 hover:bg-slate-50 transition-colors rounded-xl">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-700">
+                  ${asig.dia}
+                </span>
+                <span class="text-xs font-black text-slate-900 truncate">
+                  ${asig.curso_nombre}
+                </span>
+              </div>
+              <div class="flex items-center gap-3 mt-1 text-[11px] text-slate-500 font-medium">
+                <span><i class="fa-solid fa-door-closed text-slate-400 text-[10px] mr-1"></i>${asig.aula_nombre}</span>
+                <span><i class="fa-regular fa-clock text-slate-400 text-[10px] mr-1"></i>${inicio} - ${fin} hs</span>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="btn-desasignar-listado px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs rounded-xl transition-colors cursor-pointer shrink-0 flex items-center gap-1.5"
+              data-horario-id="${asig.horario_id}"
+              data-curso-nombre="${asig.curso_nombre}"
+              data-aula-nombre="${asig.aula_nombre}"
+              data-dia="${asig.dia}"
+              data-rango="${inicio} - ${fin} hs"
+            >
+              <i class="fa-solid fa-trash-can text-[11px]"></i>
+              <span>Desasignar</span>
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      // Event listeners para desasignar desde el listado
+      contenedorListado.querySelectorAll('.btn-desasignar-listado').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const target = btn as HTMLButtonElement;
+          const horarioId = target.getAttribute('data-horario-id') || '';
+          const cursoNombre = target.getAttribute('data-curso-nombre') || '';
+          const aulaNombre = target.getAttribute('data-aula-nombre') || '';
+          const dia = target.getAttribute('data-dia') || '';
+          const rango = target.getAttribute('data-rango') || '';
+
+          abrirModalDesasignar({ horarioId, cursoNombre, aulaNombre, dia, rango });
+        });
+      });
+    }
+
+    inputBuscarAsig?.addEventListener('input', renderListadoAsignaciones);
+
+    document.getElementById('btn-ver-asignaciones')?.addEventListener('click', () => {
+      if (inputBuscarAsig) inputBuscarAsig.value = '';
+      renderListadoAsignaciones();
+      modalListado?.classList.remove('hidden');
+    });
+
+    const cerrarModalListado = () => modalListado?.classList.add('hidden');
+    document.getElementById('btn-cerrar-modal-listado')?.addEventListener('click', cerrarModalListado);
+    document.getElementById('btn-cerrar-listado-abajo')?.addEventListener('click', cerrarModalListado);
+
+    // Modal Asignar Horario
+    document.getElementById('btn-asignar-horario')?.addEventListener('click', () => {
+      const selectDia = document.getElementById('horario-dia') as HTMLSelectElement;
+      if (selectDia) selectDia.value = diaActivo;
+      modalH?.classList.remove('hidden');
+    });
+
+    const cerrarModalH = () => modalH?.classList.add('hidden');
+    document.getElementById('btn-cerrar-modal-h')?.addEventListener('click', cerrarModalH);
+    document.getElementById('btn-cancelar-h')?.addEventListener('click', cerrarModalH);
+
+    document.getElementById('form-horario')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const idCurso = Number(selectCurso.value);
+      const idAula = Number(selectAula.value);
+      const dia = (document.getElementById('horario-dia') as HTMLSelectElement)?.value;
+      const hora_inicio = (document.getElementById('horario-inicio') as HTMLInputElement)?.value;
+      const hora_fin = (document.getElementById('horario-fin') as HTMLInputElement)?.value;
+
+      if (!idCurso || !idAula || !dia || !hora_inicio || !hora_fin) {
+        mostrarError('Por favor complete todos los campos requeridos para asignar el turno.');
+        return;
+      }
+
+      try {
+        await api.aula.asignarCursoAulaHorario({
+          idCurso,
+          idAula,
+          dia,
+          hora_inicio: hora_inicio.length === 5 ? hora_inicio + ':00' : hora_inicio,
+          hora_fin: hora_fin.length === 5 ? hora_fin + ':00' : hora_fin,
+        });
+        cerrarModalH();
+        await cargarDatos();
+        mostrarExito('¡Turno de Aula Asignado!', 'El turno y espacio físico han sido asignados correctamente a la materia.');
+      } catch (err: any) {
+        console.error('Error al asignar aula:', err);
+        mostrarError(err.message || 'Error al asignar aula y horario.');
+      }
+    });
+
+    // Modal Nueva Aula
+    document.getElementById('btn-nueva-aula')?.addEventListener('click', () => {
+      modalAula?.classList.remove('hidden');
+    });
+
+    const cerrarModalAula = () => modalAula?.classList.add('hidden');
+    document.getElementById('btn-cerrar-modal-aula')?.addEventListener('click', cerrarModalAula);
+    document.getElementById('btn-cancelar-aula')?.addEventListener('click', cerrarModalAula);
+
+    document.getElementById('form-aula')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const inputNombre = document.getElementById('aula-nombre') as HTMLInputElement;
+      const nombre = inputNombre?.value.trim();
+      if (!nombre) return;
+
+      try {
+        await api.aula.agregarAula({ nombre });
+        inputNombre.value = '';
+        cerrarModalAula();
+        await cargarDatos();
+        mostrarExito('¡Aula Creada!', 'El nuevo espacio físico fue creado exitosamente.');
+      } catch (err: any) {
+        console.error('Error al crear aula:', err);
+        mostrarError(err.message || 'Error al crear la nueva aula.');
+      }
+    });
+
+    // Iniciar
+    cargarDatos();
+  </script>
 </DashboardLayout>

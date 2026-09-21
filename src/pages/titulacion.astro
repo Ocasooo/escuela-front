@@ -2,56 +2,550 @@
 import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 ---
 
-<DashboardLayout title='Realizar titulación' path='titulación' pageTitle='Titulacion de estudiantes'>
-      <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" href="/agregar-usuario">Agregar usuario</a>
-            <!------------------------TABLE-------------------- -->
-            <!------------------------TABLE-------------------- -->
-          <div class="mb-10 mt-5">
-            <div class="xl:w-full px-10">
-              <div class="retive flex flex-col min-w-0 break-words bg-white w-full shadow-lg rounded">
-                <div class="rounded-t mb-0 px-4 py-3 border-0">
-                  <div class="flex flex-wrap items-center">
-                    <div class="relative w-full px-2 flex-grow flex-1">
-                      <h3 class="font-semibold text-base text-blueGray-700">Lista de usuarios</h3>
-                    </div>
-                    <div class="relative flex-grow flex-1 sm:text-right">
-                      <input class="border-2 border-black text-black text-xs font-bold px-7 py-1 rounded-full" type="text" placeholder="Buscar">
-                      <i class="relative md:visible invisible top-0.5 right-48 fa-solid fa-magnifying-glass" style="color: #000000;"></i>
-                    </div>
-                  </div>
-                </div>
-            
-                <div class="block w-full overflow-x-auto">
-                  <table class="items-center bg-transparent w-full border-collapse ">
-                    <thead>
-                      <tr>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">DNI</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Nombre y apellido</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Permiso</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Opciones</th>
-                      </tr>
-                    </thead>
-            
-                    <tbody>
-                      <tr>
-                        <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">
-                          43065607
-                        </th>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          Jorgito Serenito
-                        </td>
-                        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          Alumno
-                        </td>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <button class="mr-2 rounded-3xl bg-blue-700 py-1 px-3 rounded-3xl text-white text-xs">Más Información</button>
-                          <button class="mr-2 rounded-3xl bg-sky-400 w-6 h-6"><i class="fa-solid fa-pen-to-square" style="color: #000000;"></i></button>
-                          <button class="rounded-3xl bg-red-600 w-6 h-6"><i class="fa-solid fa-xmark" style="color: #000000;"></i></button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+<DashboardLayout title="Titulación y Diplomas" path="titulacion" pageTitle="Gestión de Egresados y Emisión de Títulos">
+  <div class="space-y-6">
+    <!-- Header y Resumen Estadístico -->
+    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <h2 class="text-sm font-bold text-slate-800">Padrón de Estudiantes Egresados</h2>
+        <p class="text-xs text-slate-500">Visualice todos los alumnos egresados, emita diplomas y genere certificados oficiales con validez ministerial.</p>
+      </div>
+
+      <!-- Contadores Resumen -->
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 flex items-center gap-2">
+          <i class="fa-solid fa-graduation-cap text-blue-600"></i>
+          <span>Total: <b id="counter-total" class="text-slate-900">0</b></span>
+        </div>
+        <div class="px-3.5 py-1.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-bold text-emerald-700 flex items-center gap-2">
+          <i class="fa-solid fa-award text-emerald-600"></i>
+          <span>Emitidos: <b id="counter-emitidos" class="text-emerald-900">0</b></span>
+        </div>
+        <div class="px-3.5 py-1.5 bg-amber-50 border border-amber-200 rounded-xl text-xs font-bold text-amber-700 flex items-center gap-2">
+          <i class="fa-solid fa-clock text-amber-600"></i>
+          <span>Pendientes: <b id="counter-pendientes" class="text-amber-900">0</b></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra de Filtros y Búsqueda en Tiempo Real -->
+    <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex flex-wrap items-center gap-3 w-full md:w-auto flex-1">
+        <!-- Búsqueda en tiempo real -->
+        <div class="w-full sm:w-72">
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-slate-400 text-xs"></i>
+            <input
+              type="text"
+              id="input-buscar-egresado"
+              placeholder="Buscar por DNI, nombre o apellido..."
+              class="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all font-medium text-slate-700"
+            />
           </div>
+        </div>
+
+        <!-- Filtro Curso -->
+        <div>
+          <select id="filtro-curso-titulacion" class="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-100">
+            <option value="todos">Todos los cursos</option>
+          </select>
+        </div>
+
+        <!-- Filtro Estado del Título -->
+        <div>
+          <select id="filtro-estado-titulacion" class="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-100">
+            <option value="todos">Todos los estados</option>
+            <option value="emitido">Título Emitido</option>
+            <option value="pendiente">Pendiente de Emisión</option>
+          </select>
+        </div>
+
+        <!-- Filtro Año -->
+        <div>
+          <select id="filtro-anio-titulacion" class="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-100">
+            <option value="todos">Todos los ciclos</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de Egresados -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-50 text-slate-500 uppercase font-bold tracking-wider border-b border-slate-200">
+            <tr>
+              <th class="p-4">DNI</th>
+              <th class="p-4">Estudiante Egresado</th>
+              <th class="p-4">Curso / Especialidad</th>
+              <th class="p-4">Ciclo Lectivo</th>
+              <th class="p-4 text-center">Nota Final</th>
+              <th class="p-4 text-center">Estado Título</th>
+              <th class="p-4 text-right">Acción</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100" id="egresados-table-body">
+            <!-- Filas dinámicas generadas por JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Previsualización e Impresión del Diploma Oficial -->
+  <div id="modal-diploma" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-3xl w-full p-6 md:p-8 shadow-2xl border border-slate-100 space-y-6 animate-fadeIn">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 no-print">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">Vista Previa de Certificado Oficial</h3>
+          <p class="text-xs text-slate-500">Listo para imprimir en hoja A4 u horizontal.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btn-imprimir-diploma" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-colors flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-print"></i>
+            <span>Imprimir Diploma</span>
+          </button>
+          <button id="btn-cerrar-modal-dip" class="text-slate-400 hover:text-slate-600 p-2 cursor-pointer">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- DIPLOMA OFICIAL CONTAINER -->
+      <div id="diploma-preview-container" class="diploma-card p-10 text-center text-slate-900 relative bg-[#fffdfa] border-8 border-double border-amber-800/30 rounded-2xl shadow-inner">
+        <div class="space-y-4">
+          <div class="border-b-2 border-amber-600/40 pb-4 inline-block px-12">
+            <h4 class="text-xs font-bold uppercase tracking-widest text-slate-600">Ministerio de Educación • Formación Profesional</h4>
+            <h2 class="text-2xl font-black text-slate-900 mt-1 diploma-title">ESCUELA DE FORMACIÓN PROFESIONAL N° 31</h2>
+            <p class="text-[11px] text-slate-500 italic mt-0.5">Resolución Ministerial N° 1482/19</p>
+          </div>
+
+          <p class="text-xs uppercase tracking-widest font-bold text-amber-700 mt-4">Otorga el presente</p>
+          <h1 class="text-3xl md:text-4xl font-black text-slate-900 diploma-title my-2 tracking-wide font-serif">CERTIFICADO OFICIAL</h1>
+          <p class="text-xs text-slate-600">por haber completado y aprobado satisfactoriamente todos los requisitos curriculares a:</p>
+
+          <h2 class="text-2xl font-black text-blue-900 tracking-wide mt-2" id="diploma-alumno-nombre">
+            Juan Manuel González
+          </h2>
+          <p class="text-xs text-slate-500 font-mono">D.N.I. N° <span id="diploma-alumno-dni">41.234.567</span></p>
+
+          <div class="my-4 py-2 border-y border-amber-600/30 max-w-xl mx-auto">
+            <p class="text-xs text-slate-600">en el trayecto formativo de:</p>
+            <h3 class="text-lg font-black text-slate-900 mt-0.5" id="diploma-curso-nombre">
+              Electricidad Industrial y Domiciliaria
+            </h3>
+            <p class="text-xs text-slate-600 mt-1">
+              Calificación Final: <b class="text-slate-900" id="diploma-nota">9(nueve)</b> • Ciclo Lectivo <span id="diploma-anio">2024</span>
+            </p>
+          </div>
+
+          <!-- Firmas y Sello Oficial -->
+          <div class="pt-8 flex items-end justify-between px-8">
+            <div class="text-center w-40">
+              <div class="border-b border-slate-400 mb-1"></div>
+              <p class="text-[10px] font-bold text-slate-700 uppercase">Profesor Instructor</p>
+              <p class="text-[9px] text-slate-400">EFP N° 31</p>
+            </div>
+
+            <!-- Sello dorado -->
+            <div class="w-16 h-16 rounded-full bg-amber-500/20 border-2 border-amber-600 flex items-center justify-center text-white text-xs font-black shadow-md mx-auto">
+              <i class="fa-solid fa-stamp text-xl text-amber-800"></i>
+            </div>
+
+            <div class="text-center w-40">
+              <div class="border-b border-slate-400 mb-1"></div>
+              <p class="text-[10px] font-bold text-slate-700 uppercase">Dirección de Estudios</p>
+              <p class="text-[9px] text-slate-400">EFP N° 31</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Confirmar Emisión de Título (Tailwind Modal) -->
+  <div id="modal-confirmar-emitir" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl border border-slate-100 space-y-5 animate-fadeIn">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg shadow-xs">
+            <i class="fa-solid fa-award"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-black text-slate-900">Emitir Título Oficial</h3>
+            <p class="text-[11px] text-slate-400">Certificación Ministerial de Formación Profesional</p>
+          </div>
+        </div>
+        <button id="btn-cerrar-modal-emitir" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <p class="text-xs text-slate-600">
+          ¿Confirma la emisión del título oficial con validez ministerial para el siguiente estudiante?
+        </p>
+
+        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-1.5 text-xs text-slate-700">
+          <div class="flex justify-between">
+            <span class="text-slate-400">Estudiante:</span>
+            <b class="text-slate-900" id="emitir-alumno-nombre">---</b>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">DNI:</span>
+            <span class="font-mono font-bold text-slate-700" id="emitir-alumno-dni">---</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Especialidad:</span>
+            <span class="font-bold text-slate-800" id="emitir-alumno-curso">---</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Ciclo Lectivo:</span>
+            <span class="font-bold text-slate-800" id="emitir-alumno-anio">---</span>
+          </div>
+          <div class="flex justify-between border-t border-slate-200/80 pt-1.5 mt-1">
+            <span class="text-slate-400">Calificación Final:</span>
+            <b class="text-emerald-700 font-black text-sm" id="emitir-alumno-nota">---</b>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2.5 pt-2">
+        <button type="button" id="btn-cancelar-emitir" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer">
+          Cancelar
+        </button>
+        <button type="button" id="btn-confirmar-emitir-btn" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer">
+          <i class="fa-solid fa-check"></i>
+          <span>Confirmar y Emitir Título</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Éxito Titulación (Tailwind Modal) -->
+  <div id="modal-exito-titulacion" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 md:p-8 shadow-2xl border border-slate-100 text-center space-y-5 animate-fadeIn">
+      <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-xs">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <div class="space-y-1">
+        <h3 class="text-lg font-black text-slate-900" id="exito-tit-titulo">¡Título Emitido con Éxito!</h3>
+        <p class="text-xs text-slate-500" id="exito-tit-mensaje">El certificado oficial ya se encuentra disponible para su consulta e impresión.</p>
+      </div>
+      <button type="button" id="btn-cerrar-exito-tit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer">
+        Aceptar
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal Error Titulación (Tailwind Modal) -->
+  <div id="modal-error-titulacion" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center space-y-4 animate-fadeIn">
+      <div class="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mx-auto text-xl">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-slate-900">Atención</h3>
+        <p class="text-xs text-slate-500 mt-1" id="error-tit-mensaje">No se pudo procesar la emisión del título.</p>
+      </div>
+      <button type="button" id="btn-cerrar-error-tit" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all cursor-pointer">
+        Cerrar
+      </button>
+    </div>
+  </div>
+
+  <script>
+    import { api } from '../lib/api';
+
+    interface EgresadoItem {
+      id_alumno: number;
+      id_curso: number;
+      dni: string;
+      nombre: string;
+      apellido: string;
+      curso: string;
+      anio: number;
+      nota: number;
+      titulado: boolean;
+    }
+
+    let egresadosData: EgresadoItem[] = [];
+    let egresadoPendienteEmision: EgresadoItem | null = null;
+
+    const tbody = document.getElementById('egresados-table-body');
+    const modalDip = document.getElementById('modal-diploma');
+    const modalConfirmarEmitir = document.getElementById('modal-confirmar-emitir');
+    const modalExitoTit = document.getElementById('modal-exito-titulacion');
+    const modalErrorTit = document.getElementById('modal-error-titulacion');
+
+    const inputBuscar = document.getElementById('input-buscar-egresado') as HTMLInputElement;
+    const filtroCurso = document.getElementById('filtro-curso-titulacion') as HTMLSelectElement;
+    const filtroEstado = document.getElementById('filtro-estado-titulacion') as HTMLSelectElement;
+    const filtroAnio = document.getElementById('filtro-anio-titulacion') as HTMLSelectElement;
+
+    const counterTotal = document.getElementById('counter-total');
+    const counterEmitidos = document.getElementById('counter-emitidos');
+    const counterPendientes = document.getElementById('counter-pendientes');
+
+    function mostrarExito(titulo: string, mensaje: string) {
+      const t = document.getElementById('exito-tit-titulo');
+      const m = document.getElementById('exito-tit-mensaje');
+      if (t) t.textContent = titulo;
+      if (m) m.textContent = mensaje;
+      modalExitoTit?.classList.remove('hidden');
+    }
+
+    function formatearNotaLetras(nota: number | string): string {
+      const num = Number(nota);
+      if (isNaN(num)) return String(nota);
+      const entero = Math.round(num);
+      const nombres: Record<number, string> = {
+        0: 'cero', 1: 'uno', 2: 'dos', 3: 'tres', 4: 'cuatro',
+        5: 'cinco', 6: 'seis', 7: 'siete', 8: 'ocho', 9: 'nueve', 10: 'diez'
+      };
+      const textoEntero = nombres[entero] || `${entero}`;
+      return `${entero}(${textoEntero})`;
+    }
+
+    function mostrarError(mensaje: string) {
+      const m = document.getElementById('error-tit-mensaje');
+      if (m) m.textContent = mensaje;
+      modalErrorTit?.classList.remove('hidden');
+    }
+
+    document.getElementById('btn-cerrar-exito-tit')?.addEventListener('click', () => {
+      modalExitoTit?.classList.add('hidden');
+    });
+
+    document.getElementById('btn-cerrar-error-tit')?.addEventListener('click', () => {
+      modalErrorTit?.classList.add('hidden');
+    });
+
+    async function cargarEgresados() {
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">Cargando nómina de egresados...</td></tr>`;
+      }
+      try {
+        const [data, cursos] = await Promise.all([
+          api.curso.alumnosConCursos(),
+          api.curso.todos().catch(() => [])
+        ]);
+
+        // Cargar cursos en el filtro
+        if (filtroCurso && cursos) {
+          filtroCurso.innerHTML = '<option value="todos">Todos los cursos</option>' +
+            cursos.map((c: any) => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
+        }
+
+        // Mostrar alumnos egresados o con cursada finalizada / aprobada (>= 6)
+        const graduados = (data || []).filter((item: any) => {
+          const estadoTerm = (item.estado_terminacion || '').toLowerCase();
+          const estado = (item.estado || '').toLowerCase();
+          const notaNum = item.nota !== null ? Number(item.nota) : null;
+
+          return (
+            estadoTerm === 'egresado' ||
+            estadoTerm === 'finalizado' ||
+            estado === 'egresado' ||
+            (notaNum !== null && notaNum >= 6 && estadoTerm !== 'abandonado' && estadoTerm !== 'baja')
+          );
+        });
+
+        egresadosData = graduados.map((item: any) => ({
+          id_alumno: item.id_alumno,
+          id_curso: item.id_curso,
+          dni: item.dni || 'S/D',
+          nombre: item.nombre || '',
+          apellido: item.apellido || '',
+          curso: item.curso_nombre || 'Especialidad Técnica',
+          anio: item.anio || new Date().getFullYear(),
+          nota: item.nota !== null ? Math.round(Number(item.nota)) : 7,
+          titulado: item.estado_terminacion === 'egresado' || item.estado === 'egresado'
+        }));
+
+        // Cargar años únicos en el filtro de año
+        if (filtroAnio) {
+          const aniosUnicos = Array.from(new Set(egresadosData.map((e) => e.anio))).sort((a, b) => b - a);
+          filtroAnio.innerHTML = '<option value="todos">Todos los ciclos</option>' +
+            aniosUnicos.map((a) => `<option value="${a}">${a}</option>`).join('');
+        }
+
+        actualizarContadores();
+        renderTabla();
+      } catch (err: any) {
+        console.error('Error al cargar egresados:', err);
+        if (tbody) {
+          tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-red-500">Error al cargar datos: ${err.message}</td></tr>`;
+        }
+      }
+    }
+
+    function actualizarContadores() {
+      const total = egresadosData.length;
+      const emitidos = egresadosData.filter((e) => e.titulado).length;
+      const pendientes = total - emitidos;
+
+      if (counterTotal) counterTotal.textContent = String(total);
+      if (counterEmitidos) counterEmitidos.textContent = String(emitidos);
+      if (counterPendientes) counterPendientes.textContent = String(pendientes);
+    }
+
+    function renderTabla() {
+      if (!tbody) return;
+
+      const termino = inputBuscar?.value.toLowerCase().trim() || '';
+      const cursoSel = filtroCurso?.value || 'todos';
+      const estadoSel = filtroEstado?.value || 'todos';
+      const anioSel = filtroAnio?.value || 'todos';
+
+      const filtrados = egresadosData.filter((e) => {
+        const matchTermino =
+          `${e.nombre} ${e.apellido}`.toLowerCase().includes(termino) ||
+          e.dni.includes(termino) ||
+          e.curso.toLowerCase().includes(termino);
+        const matchCurso = cursoSel === 'todos' || e.curso.toLowerCase().includes(cursoSel.toLowerCase());
+        const matchEstado =
+          estadoSel === 'todos' ||
+          (estadoSel === 'emitido' && e.titulado) ||
+          (estadoSel === 'pendiente' && !e.titulado);
+        const matchAnio = anioSel === 'todos' || String(e.anio) === anioSel;
+
+        return matchTermino && matchCurso && matchEstado && matchAnio;
+      });
+
+      if (filtrados.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">No se encontraron estudiantes egresados con los filtros seleccionados.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtrados.map((e) => {
+        // Encontrar índice real en egresadosData
+        const realIdx = egresadosData.findIndex((x) => x.id_alumno === e.id_alumno && x.id_curso === e.id_curso && x.anio === e.anio);
+
+        return `
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="p-4 font-mono font-semibold text-slate-500">${e.dni}</td>
+            <td class="p-4 font-bold text-slate-900">${e.apellido}, ${e.nombre}</td>
+            <td class="p-4 text-slate-700 font-semibold">${e.curso}</td>
+            <td class="p-4 text-slate-500">${e.anio}</td>
+            <td class="p-4 text-center font-black text-slate-900">${formatearNotaLetras(e.nota)}</td>
+            <td class="p-4 text-center">
+              <span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold ${
+                e.titulado ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
+              }">
+                ${e.titulado ? 'Título Emitido' : 'Pendiente Emisión'}
+              </span>
+            </td>
+            <td class="p-4 text-right">
+              <div class="flex items-center justify-end gap-2">
+                ${!e.titulado ? `
+                  <button class="btn-emitir-titulo px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-all shadow-sm cursor-pointer" data-idx="${realIdx}">
+                    <i class="fa-solid fa-check mr-1"></i> Emitir
+                  </button>
+                ` : ''}
+                <button class="btn-ver-diploma px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-all shadow-sm flex items-center gap-1.5 cursor-pointer" data-idx="${realIdx}">
+                  <i class="fa-solid fa-award"></i>
+                  <span>Ver Diploma</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      document.querySelectorAll('.btn-ver-diploma').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const idx = Number(btn.getAttribute('data-idx'));
+          const egresado = egresadosData[idx];
+          if (egresado) abrirDiploma(egresado);
+        });
+      });
+
+      document.querySelectorAll('.btn-emitir-titulo').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const idx = Number(btn.getAttribute('data-idx'));
+          const egresado = egresadosData[idx];
+          if (!egresado) return;
+
+          egresadoPendienteEmision = egresado;
+
+          const elNombre = document.getElementById('emitir-alumno-nombre');
+          const elDni = document.getElementById('emitir-alumno-dni');
+          const elCurso = document.getElementById('emitir-alumno-curso');
+          const elAnio = document.getElementById('emitir-alumno-anio');
+          const elNota = document.getElementById('emitir-alumno-nota');
+
+          if (elNombre) elNombre.textContent = `${egresado.nombre} ${egresado.apellido}`;
+          if (elDni) elDni.textContent = egresado.dni;
+          if (elCurso) elCurso.textContent = egresado.curso;
+          if (elAnio) elAnio.textContent = String(egresado.anio);
+          if (elNota) elNota.textContent = formatearNotaLetras(egresado.nota);
+
+          modalConfirmarEmitir?.classList.remove('hidden');
+        });
+      });
+    }
+
+    // Modal Confirmar Emisión Handlers
+    const cerrarModalEmitir = () => modalConfirmarEmitir?.classList.add('hidden');
+    document.getElementById('btn-cancelar-emitir')?.addEventListener('click', cerrarModalEmitir);
+    document.getElementById('btn-cerrar-modal-emitir')?.addEventListener('click', cerrarModalEmitir);
+
+    document.getElementById('btn-confirmar-emitir-btn')?.addEventListener('click', async () => {
+      if (!egresadoPendienteEmision) return;
+      try {
+        await api.curso.titular({
+          id_alumno: egresadoPendienteEmision.id_alumno,
+          id_curso: egresadoPendienteEmision.id_curso,
+          anio: egresadoPendienteEmision.anio,
+          nota: egresadoPendienteEmision.nota
+        });
+        cerrarModalEmitir();
+        mostrarExito('¡Título Emitido con Éxito!', `Se ha emitido el título oficial para ${egresadoPendienteEmision.nombre} ${egresadoPendienteEmision.apellido}.`);
+        egresadoPendienteEmision = null;
+        await cargarEgresados();
+      } catch (err: any) {
+        mostrarError(err.message || 'Error al emitir título');
+      }
+    });
+
+    function abrirDiploma(e: EgresadoItem) {
+      const nom = document.getElementById('diploma-alumno-nombre');
+      const dni = document.getElementById('diploma-alumno-dni');
+      const cur = document.getElementById('diploma-curso-nombre');
+      const nota = document.getElementById('diploma-nota');
+      const anio = document.getElementById('diploma-anio');
+
+      if (nom) nom.textContent = `${e.nombre} ${e.apellido}`;
+      if (dni) dni.textContent = e.dni;
+      if (cur) cur.textContent = e.curso;
+      if (nota) nota.textContent = formatearNotaLetras(e.nota);
+      if (anio) anio.textContent = String(e.anio);
+
+      modalDip?.classList.remove('hidden');
+    }
+
+    const cerrarModalDip = () => modalDip?.classList.add('hidden');
+    document.getElementById('btn-cerrar-modal-dip')?.addEventListener('click', cerrarModalDip);
+
+    document.getElementById('btn-imprimir-diploma')?.addEventListener('click', () => {
+      window.print();
+    });
+
+    // Listeners de filtros
+    inputBuscar?.addEventListener('input', renderTabla);
+    filtroCurso?.addEventListener('change', renderTabla);
+    filtroEstado?.addEventListener('change', renderTabla);
+    filtroAnio?.addEventListener('change', renderTabla);
+
+    // Cerrar modales al hacer clic en el backdrop exterior
+    [modalConfirmarEmitir, modalExitoTit, modalErrorTit, modalDip].forEach((modal) => {
+      modal?.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.add('hidden');
+      });
+    });
+
+    // Cargar datos iniciales
+    cargarEgresados();
+  </script>
 </DashboardLayout>

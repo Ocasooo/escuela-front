@@ -2,55 +2,823 @@
 import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 ---
 
-<DashboardLayout title="Gestion de inscripción de estudiantes" path='inscripcion de estudiantes' pageTitle='Gestión de usuarios'>
-            <!------------------------TABLE-------------------- -->
-            <!------------------------TABLE-------------------- -->
-          <div class="mb-10 mt-5">
-            <div class="xl:w-full px-10">
-              <div class="retive flex flex-col min-w-0 break-words bg-white w-full shadow-lg rounded">
-                <div class="rounded-t mb-0 px-4 py-3 border-0">
-                  <div class="flex flex-wrap items-center">
-                    <div class="relative w-full px-2 flex-grow flex-1">
-                      <h3 class="font-semibold text-base text-blueGray-700">Lista de usuarios</h3>
-                    </div>
-                    <div class="relative flex-grow flex-1 sm:text-right">
-                      <input class="border-2 border-black text-black text-xs font-bold px-7 py-1 rounded-full" type="text" placeholder="Buscar">
-                      <i class="relative md:visible invisible top-0.5 right-48 fa-solid fa-magnifying-glass" style="color: #000000;"></i>
-                    </div>
-                  </div>
-                </div>
-            
-                <div class="block w-full overflow-x-auto">
-                  <table class="items-center bg-transparent w-full border-collapse ">
-                    <thead>
-                      <tr>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">DNI</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Nombre y apellido</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Plan de estudio</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Opciones</th>
-                      </tr>
-                    </thead>
-            
-                    <tbody>
-                      <tr>
-                        <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">
-                          43065607
-                        </th>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          Jorgito Serenito
-                        </td>
-                        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          Alumno
-                        </td>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <button class="mr-2 rounded-3xl bg-blue-700 py-1 px-3 rounded-3xl text-white text-xs">Más Información</button>
-                          <button class="mr-2 rounded-3xl bg-sky-400 w-6 h-6"><i class="fa-solid fa-pen-to-square" style="color: #000000;"></i></button>
-                          <button class="rounded-3xl bg-red-600 w-6 h-6"><i class="fa-solid fa-xmark" style="color: #000000;"></i></button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+<DashboardLayout title="Inscripción de Estudiantes" path="inscripcion-de-estudiantes" pageTitle="Inscripción y Matriculación a Cursos">
+  <div class="space-y-6">
+    <!-- Pestañas de Navegación: Matrículas Activas vs Ver Egresados -->
+    <div class="flex items-center gap-3 border-b border-slate-200 pb-3">
+      <button
+        id="tab-btn-activas"
+        class="px-5 py-2.5 text-xs font-bold rounded-2xl transition-all bg-blue-600 text-white shadow-sm flex items-center gap-2 cursor-pointer"
+      >
+        <i class="fa-solid fa-users"></i>
+        <span>Matrículas Activas</span>
+        <span id="badge-count-activas" class="px-2 py-0.5 rounded-full text-[10px] bg-blue-700 text-white font-black">0</span>
+      </button>
+
+      <button
+        id="tab-btn-egresados"
+        class="px-5 py-2.5 text-xs font-bold rounded-2xl transition-all bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center gap-2 cursor-pointer"
+      >
+        <i class="fa-solid fa-graduation-cap"></i>
+        <span>Ver Egresados</span>
+        <span id="badge-count-egresados" class="px-2 py-0.5 rounded-full text-[10px] bg-slate-200 text-slate-700 font-black">0</span>
+      </button>
+    </div>
+
+    <!-- PANEL 1: MATRÍCULAS ACTIVAS (Sin egresados) -->
+    <div id="panel-activas" class="space-y-6">
+      <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex flex-wrap items-center gap-4">
+          <!-- Búsqueda rápida -->
+          <div class="w-full sm:w-72">
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Buscar Matrícula</label>
+            <div class="relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-slate-400 text-xs"></i>
+              <input
+                type="text"
+                id="input-buscar-inscripcion"
+                placeholder="Buscar por DNI o apellido..."
+                class="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all font-medium text-slate-700"
+              />
+            </div>
           </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Filtrar por Curso</label>
+            <select id="filtro-curso-inscripcion" class="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-100">
+              <option value="todos">Todos los cursos</option>
+            </select>
+          </div>
+        </div>
+
+        <button id="btn-nueva-inscripcion" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2">
+          <i class="fa-solid fa-user-plus"></i>
+          <span>Matricular Estudiante</span>
+        </button>
+      </div>
+
+      <!-- Tabla de Inscripciones Activas -->
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 uppercase font-bold tracking-wider border-b border-slate-200">
+              <tr>
+                <th class="p-4">DNI</th>
+                <th class="p-4">Estudiante</th>
+                <th class="p-4">Curso Asignado</th>
+                <th class="p-4">Ciclo Lectivo</th>
+                <th class="p-4">Estado Matrícula</th>
+                <th class="p-4 text-right">Acción</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100" id="inscripciones-table-body">
+              <!-- Filas dinámicas generadas por JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL 2: VER EGRESADOS (Dedicado) -->
+    <div id="panel-egresados" class="space-y-6 hidden">
+      <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex flex-wrap items-center gap-4">
+          <!-- Búsqueda en tiempo real por DNI, Nombre o Email -->
+          <div class="w-full sm:w-80">
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Buscar Egresado en Tiempo Real</label>
+            <div class="relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-slate-400 text-xs"></i>
+              <input
+                type="text"
+                id="input-buscar-egresados"
+                placeholder="Buscar por nombre, email o DNI..."
+                class="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all font-medium text-slate-700"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Filtrar por Curso</label>
+            <select id="filtro-curso-egresados" class="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-100">
+              <option value="todos">Todos los cursos</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <a
+            href="/titulacion"
+            class="px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-xl transition-all flex items-center gap-2 border border-emerald-200"
+          >
+            <i class="fa-solid fa-award"></i>
+            <span>Ir a Emisión de Diplomas</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Tabla de Egresados -->
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 uppercase font-bold tracking-wider border-b border-slate-200">
+              <tr>
+                <th class="p-4">DNI</th>
+                <th class="p-4">Estudiante Egresado</th>
+                <th class="p-4">Correo Institucional</th>
+                <th class="p-4">Curso / Especialidad</th>
+                <th class="p-4">Año Egreso</th>
+                <th class="p-4 text-center">Nota Final</th>
+                <th class="p-4 text-center">Estado Título</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100" id="egresados-table-body">
+              <!-- Filas dinámicas generadas por JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Matricular Alumno (Búsqueda predictiva sencilla en tiempo real) -->
+  <div id="modal-matricular" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl border border-slate-100 space-y-5 animate-fadeIn">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">Matricular Estudiante a Curso</h3>
+          <p class="text-xs text-slate-500">Busque al estudiante por nombre, DNI o correo para asignarlo.</p>
+        </div>
+        <button id="btn-cerrar-modal-mat" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="form-matricular" class="space-y-4">
+        <!-- Búsqueda en tiempo real con dropdown flotante -->
+        <div class="relative">
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+            Seleccionar Estudiante <span class="text-blue-600">*</span>
+          </label>
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+            <input
+              type="text"
+              id="mat-buscar-input"
+              autocomplete="off"
+              placeholder="Buscar por DNI, nombre o correo..."
+              class="w-full pl-9 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all font-medium text-slate-700"
+            />
+          </div>
+
+          <!-- Dropdown con resultados en tiempo real -->
+          <div
+            id="mat-busqueda-resultados"
+            class="absolute z-20 left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-white border border-slate-200 rounded-2xl shadow-xl hidden divide-y divide-slate-100"
+          >
+            <!-- Opciones renderizadas dinámicamente -->
+          </div>
+        </div>
+
+        <!-- Tarjeta de estudiante seleccionado -->
+        <div id="mat-alumno-seleccionado-card" class="hidden p-3 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">
+              <i class="fa-solid fa-user-check"></i>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-emerald-900" id="card-alumno-nombre">Nombre Apellido</p>
+              <p class="text-[11px] text-emerald-700 font-mono" id="card-alumno-info">DNI: 00000000 • correo@mail.com</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            id="btn-cambiar-alumno"
+            class="text-xs text-emerald-700 hover:text-emerald-900 font-bold px-2 py-1 hover:bg-emerald-100 rounded-lg transition-colors"
+          >
+            Cambiar
+          </button>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Curso a Matricular</label>
+          <select id="mat-curso" required class="w-full px-3 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-medium outline-none focus:ring-2 focus:ring-blue-100">
+            <option value="">Cargando cursos...</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Año Lectivo</label>
+          <input type="number" id="mat-anio" value={new Date().getFullYear()} required class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none" />
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" id="btn-cancelar-mat" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
+          <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5">
+            <i class="fa-solid fa-check"></i>
+            <span>Confirmar Matrícula</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Confirmar Desmatriculación -->
+  <div id="modal-confirmar-desmatricular" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center space-y-4 animate-fadeIn">
+      <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mx-auto text-xl">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-slate-900">¿Dar de baja matrícula?</h3>
+        <p class="text-xs text-slate-500 mt-1" id="desmat-mensaje">
+          Se registrará como abandono para el ciclo lectivo seleccionado. El historial del estudiante se conservará intacto.
+        </p>
+      </div>
+      <div class="flex justify-center gap-2 pt-2">
+        <button type="button" id="btn-cancelar-desmat" class="flex-1 py-2.5 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
+        <button type="button" id="btn-confirmar-desmat-btn" class="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl shadow-md transition-all">Dar de Baja</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Confirmar Re-matriculación -->
+  <div id="modal-confirmar-rematricular" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center space-y-4 animate-fadeIn">
+      <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto text-xl">
+        <i class="fa-solid fa-user-plus"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-slate-900">¿Volver a matricular estudiante?</h3>
+        <p class="text-xs text-slate-500 mt-1" id="remat-mensaje">
+          El estudiante volverá a cursar esta materia en estado activo. Su historial anterior se conservará.
+        </p>
+      </div>
+      <div class="flex justify-center gap-2 pt-2">
+        <button type="button" id="btn-cancelar-remat" class="flex-1 py-2.5 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
+        <button type="button" id="btn-confirmar-remat-btn" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all">Re-matricular</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Éxito / Feedback -->
+  <div id="modal-exito-inscripcion" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center space-y-4 animate-fadeIn">
+      <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto text-xl">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-slate-900" id="exito-ins-titulo">¡Operación Exitosa!</h3>
+        <p class="text-xs text-slate-500 mt-1" id="exito-ins-mensaje">La matrícula fue actualizada correctamente.</p>
+      </div>
+      <button type="button" id="btn-cerrar-exito-ins" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all">
+        Aceptar
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal Error -->
+  <div id="modal-error-inscripcion" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center space-y-4 animate-fadeIn">
+      <div class="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mx-auto text-xl">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-slate-900">Atención</h3>
+        <p class="text-xs text-slate-500 mt-1" id="error-ins-mensaje">Ocurrió un error al procesar la solicitud.</p>
+      </div>
+      <button type="button" id="btn-cerrar-error-ins" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">
+        Cerrar
+      </button>
+    </div>
+  </div>
+
+  <script>
+    import { api } from '../lib/api';
+
+    interface InscripcionItem {
+      id_alumno: number;
+      id_curso: number;
+      dni: string;
+      alumno: string;
+      correo?: string;
+      curso: string;
+      anio: number;
+      estado: string;
+      nota?: string | number | null;
+      esEgresado: boolean;
+    }
+
+    let todasInscripciones: InscripcionItem[] = [];
+    let alumnosCache: any[] = [];
+    let cursosCache: any[] = [];
+    let selectedAlumnoId: number | null = null;
+    let pestañaActiva: 'activas' | 'egresados' = 'activas';
+
+    let alumnoAccionPendiente: { idAlumno: number; idCurso: number; anio: number } | null = null;
+
+    // Elementos DOM
+    const tabBtnActivas = document.getElementById('tab-btn-activas');
+    const tabBtnEgresados = document.getElementById('tab-btn-egresados');
+    const panelActivas = document.getElementById('panel-activas');
+    const panelEgresados = document.getElementById('panel-egresados');
+    const badgeCountActivas = document.getElementById('badge-count-activas');
+    const badgeCountEgresados = document.getElementById('badge-count-egresados');
+
+    const tbodyActivas = document.getElementById('inscripciones-table-body');
+    const tbodyEgresados = document.getElementById('egresados-table-body');
+    const inputBuscarActivas = document.getElementById('input-buscar-inscripcion') as HTMLInputElement;
+    const filtroCursoActivas = document.getElementById('filtro-curso-inscripcion') as HTMLSelectElement;
+    const inputBuscarEgresados = document.getElementById('input-buscar-egresados') as HTMLInputElement;
+    const filtroCursoEgresados = document.getElementById('filtro-curso-egresados') as HTMLSelectElement;
+
+    const modalMat = document.getElementById('modal-matricular');
+    const inputMatBuscar = document.getElementById('mat-buscar-input') as HTMLInputElement;
+    const dropdownResultados = document.getElementById('mat-busqueda-resultados');
+    const cardAlumnoSeleccionado = document.getElementById('mat-alumno-seleccionado-card');
+    const cardNombre = document.getElementById('card-alumno-nombre');
+    const cardInfo = document.getElementById('card-alumno-info');
+    const btnCambiarAlumno = document.getElementById('btn-cambiar-alumno');
+    const selectMatCurso = document.getElementById('mat-curso') as HTMLSelectElement;
+
+    const modalDesmat = document.getElementById('modal-confirmar-desmatricular');
+    const modalRemat = document.getElementById('modal-confirmar-rematricular');
+    const modalExito = document.getElementById('modal-exito-inscripcion');
+    const modalError = document.getElementById('modal-error-inscripcion');
+
+    function mostrarExito(titulo: string, mensaje: string) {
+      const tit = document.getElementById('exito-ins-titulo');
+      const msg = document.getElementById('exito-ins-mensaje');
+      if (tit) tit.textContent = titulo;
+      if (msg) msg.textContent = mensaje;
+      modalExito?.classList.remove('hidden');
+    }
+
+    function mostrarError(mensaje: string) {
+      const msg = document.getElementById('error-ins-mensaje');
+      if (msg) msg.textContent = mensaje;
+      modalError?.classList.remove('hidden');
+    }
+
+    document.getElementById('btn-cerrar-exito-ins')?.addEventListener('click', () => {
+      modalExito?.classList.add('hidden');
+    });
+
+    document.getElementById('btn-cerrar-error-ins')?.addEventListener('click', () => {
+      modalError?.classList.add('hidden');
+    });
+
+    // Manejo de pestañas
+    function cambiarPestaña(pestaña: 'activas' | 'egresados') {
+      pestañaActiva = pestaña;
+      if (pestaña === 'activas') {
+        panelActivas?.classList.remove('hidden');
+        panelEgresados?.classList.add('hidden');
+
+        tabBtnActivas?.classList.remove('bg-slate-100', 'text-slate-600', 'hover:bg-slate-200');
+        tabBtnActivas?.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
+
+        tabBtnEgresados?.classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
+        tabBtnEgresados?.classList.add('bg-slate-100', 'text-slate-600', 'hover:bg-slate-200');
+      } else {
+        panelActivas?.classList.add('hidden');
+        panelEgresados?.classList.remove('hidden');
+
+        tabBtnEgresados?.classList.remove('bg-slate-100', 'text-slate-600', 'hover:bg-slate-200');
+        tabBtnEgresados?.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
+
+        tabBtnActivas?.classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
+        tabBtnActivas?.classList.add('bg-slate-100', 'text-slate-600', 'hover:bg-slate-200');
+      }
+    }
+
+    tabBtnActivas?.addEventListener('click', () => cambiarPestaña('activas'));
+    tabBtnEgresados?.addEventListener('click', () => cambiarPestaña('egresados'));
+
+    async function cargarCursos() {
+      try {
+        cursosCache = await api.curso.todos();
+        const opciones = '<option value="todos">Todos los cursos</option>' +
+          cursosCache.map((c) => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
+
+        if (filtroCursoActivas) filtroCursoActivas.innerHTML = opciones;
+        if (filtroCursoEgresados) filtroCursoEgresados.innerHTML = opciones;
+
+        if (selectMatCurso) {
+          selectMatCurso.innerHTML = '<option value="">Seleccione un curso...</option>' +
+            cursosCache.map((c) => `<option value="${c.id}">${c.nombre}</option>`).join('');
+        }
+      } catch (err) {
+        console.error('Error al cargar cursos:', err);
+      }
+    }
+
+    async function cargarAlumnos() {
+      try {
+        alumnosCache = await api.alumno.todos();
+      } catch (err) {
+        console.error('Error al cargar alumnos:', err);
+      }
+    }
+
+    async function cargarInscripciones() {
+      if (tbodyActivas) {
+        tbodyActivas.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">Cargando inscripciones desde el servidor...</td></tr>`;
+      }
+      if (tbodyEgresados) {
+        tbodyEgresados.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">Cargando egresados...</td></tr>`;
+      }
+
+      try {
+        const [data, alumnosList] = await Promise.all([
+          api.curso.alumnosConCursos(),
+          alumnosCache.length ? alumnosCache : api.alumno.todos().catch(() => [])
+        ]);
+
+        alumnosCache = alumnosList;
+
+        const emailPorId = new Map<number, string>();
+        alumnosList.forEach((a: any) => {
+          if (a.id && a.correo) emailPorId.set(a.id, a.correo);
+        });
+
+        todasInscripciones = (data || []).map((item: any) => {
+          const estadoTerm = (item.estado_terminacion || '').toLowerCase();
+          const estado = (item.estado || '').toLowerCase();
+          const notaNum = item.nota !== null ? Number(item.nota) : null;
+
+          // Es egresado si su estado_terminacion o estado es egresado/finalizado, o si aprobó con nota >= 6 sin estar abandonado
+          const esEgresado =
+            estadoTerm === 'egresado' ||
+            estadoTerm === 'finalizado' ||
+            estado === 'egresado' ||
+            (notaNum !== null && notaNum >= 6 && estadoTerm !== 'abandonado' && estadoTerm !== 'baja');
+
+          return {
+            id_alumno: item.id_alumno,
+            id_curso: item.id_curso,
+            dni: item.dni || 'S/D',
+            alumno: `${item.apellido || ''}, ${item.nombre || ''}`.trim(),
+            correo: emailPorId.get(item.id_alumno) || item.correo || '---',
+            curso: item.curso_nombre || 'Sin curso',
+            anio: item.anio || new Date().getFullYear(),
+            estado: estadoTerm || estado || 'cursando',
+            nota: item.nota,
+            esEgresado
+          };
+        });
+
+        actualizarContadores();
+        renderTablaActivas();
+        renderTablaEgresados();
+      } catch (err: any) {
+        console.error('Error al cargar inscripciones:', err);
+        if (tbodyActivas) {
+          tbodyActivas.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500">Error al cargar datos: ${err.message}</td></tr>`;
+        }
+      }
+    }
+
+    function actualizarContadores() {
+      const activasCount = todasInscripciones.filter((i) => !i.esEgresado).length;
+      const egresadosCount = todasInscripciones.filter((i) => i.esEgresado).length;
+
+      if (badgeCountActivas) badgeCountActivas.textContent = String(activasCount);
+      if (badgeCountEgresados) badgeCountEgresados.textContent = String(egresadosCount);
+    }
+
+    // Renderizar panel 1: Matrículas Activas (excluye egresados)
+    function renderTablaActivas() {
+      if (!tbodyActivas) return;
+
+      const termino = inputBuscarActivas?.value.toLowerCase().trim() || '';
+      const cursoSel = filtroCursoActivas?.value || 'todos';
+
+      const filtrados = todasInscripciones.filter((item) => {
+        if (item.esEgresado) return false; // QUITA DE LA VISTA LOS EGRESADOS
+
+        const matchTermino = item.alumno.toLowerCase().includes(termino) || item.dni.includes(termino);
+        const matchCurso = cursoSel === 'todos' || item.curso.toLowerCase().includes(cursoSel.toLowerCase());
+        return matchTermino && matchCurso;
+      });
+
+      if (filtrados.length === 0) {
+        tbodyActivas.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">No se encontraron matrículas activas registradas.</td></tr>`;
+        return;
+      }
+
+      tbodyActivas.innerHTML = filtrados.map((item) => {
+        const esAbandonado = item.estado === 'abandonado' || item.estado === 'baja';
+
+        let badgeHTML = '';
+        let accionHTML = '';
+
+        if (esAbandonado) {
+          badgeHTML = `<span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-red-50 text-red-700 inline-flex items-center gap-1"><i class="fa-solid fa-circle-xmark text-[10px]"></i> abandonado</span>`;
+          accionHTML = `
+            <button class="btn-rematricular px-3 py-1.5 text-xs font-bold text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all inline-flex items-center gap-1 border border-emerald-200/80 shadow-xs cursor-pointer" data-alumno="${item.id_alumno}" data-curso="${item.id_curso}" data-anio="${item.anio}" data-nombre="${item.alumno}" data-cursonombre="${item.curso}">
+              <i class="fa-solid fa-user-plus text-[11px]"></i>
+              <span>Volver a matricular</span>
+            </button>
+          `;
+        } else {
+          badgeHTML = `<span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-emerald-50 text-emerald-700 inline-flex items-center gap-1"><i class="fa-solid fa-circle-dot text-[8px]"></i> cursando</span>`;
+          accionHTML = `
+            <button class="btn-desmatricular px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-50 rounded-xl transition-all inline-flex items-center gap-1 cursor-pointer" data-alumno="${item.id_alumno}" data-curso="${item.id_curso}" data-anio="${item.anio}" data-nombre="${item.alumno}" data-cursonombre="${item.curso}">
+              <i class="fa-solid fa-user-minus text-[11px]"></i>
+              <span>Desmatricular</span>
+            </button>
+          `;
+        }
+
+        return `
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="p-4 font-mono font-semibold text-slate-500">${item.dni}</td>
+            <td class="p-4 font-bold text-slate-900">${item.alumno}</td>
+            <td class="p-4 text-slate-700 font-semibold">${item.curso}</td>
+            <td class="p-4 text-slate-500">${item.anio}</td>
+            <td class="p-4">${badgeHTML}</td>
+            <td class="p-4 text-right">${accionHTML}</td>
+          </tr>
+        `;
+      }).join('');
+
+      // Conectar botones Desmatricular
+      document.querySelectorAll('.btn-desmatricular').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const idAlumno = Number(btn.getAttribute('data-alumno'));
+          const idCurso = Number(btn.getAttribute('data-curso'));
+          const anio = Number(btn.getAttribute('data-anio'));
+          const nombre = btn.getAttribute('data-nombre');
+          const curso = btn.getAttribute('data-cursonombre');
+
+          alumnoAccionPendiente = { idAlumno, idCurso, anio };
+
+          const msg = document.getElementById('desmat-mensaje');
+          if (msg) {
+            msg.innerHTML = `¿Está seguro de desmatricular a <b>${nombre}</b> del curso <b>${curso}</b> (${anio})?<br><span class="text-[11px] text-slate-400 mt-1 block">El historial del alumno se conservará y podrá volver a matricularse.</span>`;
+          }
+          modalDesmat?.classList.remove('hidden');
+        });
+      });
+
+      // Conectar botones Volver a Matricular
+      document.querySelectorAll('.btn-rematricular').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const idAlumno = Number(btn.getAttribute('data-alumno'));
+          const idCurso = Number(btn.getAttribute('data-curso'));
+          const anio = Number(btn.getAttribute('data-anio'));
+          const nombre = btn.getAttribute('data-nombre');
+          const curso = btn.getAttribute('data-cursonombre');
+
+          alumnoAccionPendiente = { idAlumno, idCurso, anio };
+
+          const msg = document.getElementById('remat-mensaje');
+          if (msg) {
+            msg.innerHTML = `¿Desea volver a matricular a <b>${nombre}</b> en el curso <b>${curso}</b> para el ciclo lectivo <b>${anio}</b>?<br><span class="text-[11px] text-slate-400 mt-1 block">El alumno volverá al estado activo ("cursando") y mantendrá su historial.</span>`;
+          }
+          modalRemat?.classList.remove('hidden');
+        });
+      });
+    }
+
+    // Renderizar panel 2: Ver Egresados (con búsqueda en tiempo real por DNI, Nombre o Email)
+    function renderTablaEgresados() {
+      if (!tbodyEgresados) return;
+
+      const termino = inputBuscarEgresados?.value.toLowerCase().trim() || '';
+      const cursoSel = filtroCursoEgresados?.value || 'todos';
+
+      const egresadosList = todasInscripciones.filter((item) => {
+        if (!item.esEgresado) return false; // SOLO EGRESADOS
+
+        const matchTermino =
+          item.alumno.toLowerCase().includes(termino) ||
+          (item.correo && item.correo.toLowerCase().includes(termino)) ||
+          item.dni.includes(termino);
+        const matchCurso = cursoSel === 'todos' || item.curso.toLowerCase().includes(cursoSel.toLowerCase());
+        return matchTermino && matchCurso;
+      });
+
+      if (egresadosList.length === 0) {
+        tbodyEgresados.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">No se encontraron egresados con los filtros aplicados.</td></tr>`;
+        return;
+      }
+
+      tbodyEgresados.innerHTML = egresadosList.map((item) => {
+        const notaFinal = item.nota !== null ? Math.round(Number(item.nota)) : '---';
+        const titulado = item.estado === 'egresado';
+
+        return `
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="p-4 font-mono font-semibold text-slate-500">${item.dni}</td>
+            <td class="p-4 font-bold text-slate-900">${item.alumno}</td>
+            <td class="p-4 text-slate-600">${item.correo || '---'}</td>
+            <td class="p-4 text-slate-700 font-semibold">${item.curso}</td>
+            <td class="p-4 text-slate-500">${item.anio}</td>
+            <td class="p-4 text-center font-black text-slate-900">${notaFinal}</td>
+            <td class="p-4 text-center">
+              <span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold ${titulado ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'}">
+                ${titulado ? 'Título Emitido' : 'Egresado'}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Eventos de búsqueda y filtros
+    inputBuscarActivas?.addEventListener('input', renderTablaActivas);
+    filtroCursoActivas?.addEventListener('change', renderTablaActivas);
+
+    inputBuscarEgresados?.addEventListener('input', renderTablaEgresados);
+    filtroCursoEgresados?.addEventListener('change', renderTablaEgresados);
+
+    // BÚSQUEDA PREDICTIVA EN TIEMPO REAL PARA EL MODAL MATRICULAR
+    function filtrarAlumnosPredictivo() {
+      const query = inputMatBuscar?.value.toLowerCase().trim() || '';
+      if (!dropdownResultados) return;
+
+      if (!query) {
+        dropdownResultados.classList.add('hidden');
+        dropdownResultados.innerHTML = '';
+        return;
+      }
+
+      const coincidencias = alumnosCache.filter((a: any) => {
+        const fullNom = `${a.nombre || ''} ${a.apellido || ''}`.toLowerCase();
+        const dniStr = String(a.dni || '').trim();
+        const mail = String(a.correo || '').toLowerCase();
+        return fullNom.includes(query) || dniStr.includes(query) || mail.includes(query);
+      }).slice(0, 10); // mostrar hasta 10 resultados
+
+      if (coincidencias.length === 0) {
+        dropdownResultados.innerHTML = `
+          <div class="p-4 text-center text-xs text-slate-400">
+            No se encontraron estudiantes para "<b>${query}</b>"
+          </div>
+        `;
+        dropdownResultados.classList.remove('hidden');
+        return;
+      }
+
+      dropdownResultados.innerHTML = coincidencias.map((a: any) => `
+        <div
+          class="item-alumno-resultado p-3 hover:bg-blue-50/70 cursor-pointer transition-colors flex items-center justify-between"
+          data-id="${a.id}"
+          data-nombre="${a.apellido}, ${a.nombre}"
+          data-dni="${a.dni}"
+          data-correo="${a.correo || ''}"
+        >
+          <div>
+            <div class="text-xs font-bold text-slate-800">${a.apellido}, ${a.nombre}</div>
+            <div class="text-[11px] text-slate-500">${a.correo || 'Sin correo registrado'}</div>
+          </div>
+          <span class="text-xs font-mono font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-100">
+            DNI: ${a.dni}
+          </span>
+        </div>
+      `).join('');
+
+      dropdownResultados.classList.remove('hidden');
+
+      dropdownResultados.querySelectorAll('.item-alumno-resultado').forEach((item) => {
+        item.addEventListener('click', () => {
+          const id = Number(item.getAttribute('data-id'));
+          const nombre = item.getAttribute('data-nombre') || '';
+          const dni = item.getAttribute('data-dni') || '';
+          const correo = item.getAttribute('data-correo') || '';
+
+          seleccionarAlumno(id, nombre, dni, correo);
+        });
+      });
+    }
+
+    function seleccionarAlumno(id: number, nombre: string, dni: string, correo: string) {
+      selectedAlumnoId = id;
+      if (cardNombre) cardNombre.textContent = nombre;
+      if (cardInfo) cardInfo.textContent = `DNI: ${dni} • ${correo || 'Sin correo'}`;
+
+      cardAlumnoSeleccionado?.classList.remove('hidden');
+      dropdownResultados?.classList.add('hidden');
+      if (inputMatBuscar) {
+        inputMatBuscar.value = '';
+        inputMatBuscar.placeholder = `Estudiante seleccionado: ${nombre}`;
+      }
+    }
+
+    btnCambiarAlumno?.addEventListener('click', () => {
+      selectedAlumnoId = null;
+      cardAlumnoSeleccionado?.classList.add('hidden');
+      if (inputMatBuscar) {
+        inputMatBuscar.placeholder = 'Buscar por DNI, nombre o correo...';
+        inputMatBuscar.value = '';
+        inputMatBuscar.focus();
+      }
+    });
+
+    inputMatBuscar?.addEventListener('input', filtrarAlumnosPredictivo);
+
+    // Cerrar dropdown si se hace click fuera
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (!inputMatBuscar?.contains(target) && !dropdownResultados?.contains(target)) {
+        dropdownResultados?.classList.add('hidden');
+      }
+    });
+
+    // Abrir Modal Matricular
+    document.getElementById('btn-nueva-inscripcion')?.addEventListener('click', async () => {
+      selectedAlumnoId = null;
+      cardAlumnoSeleccionado?.classList.add('hidden');
+      if (inputMatBuscar) {
+        inputMatBuscar.value = '';
+        inputMatBuscar.placeholder = 'Buscar por DNI, nombre o correo...';
+      }
+      dropdownResultados?.classList.add('hidden');
+      if (!alumnosCache.length) await cargarAlumnos();
+      modalMat?.classList.remove('hidden');
+      inputMatBuscar?.focus();
+    });
+
+    const cerrarModalMat = () => modalMat?.classList.add('hidden');
+    document.getElementById('btn-cerrar-modal-mat')?.addEventListener('click', cerrarModalMat);
+    document.getElementById('btn-cancelar-mat')?.addEventListener('click', cerrarModalMat);
+
+    // Submit Matricular
+    document.getElementById('form-matricular')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!selectedAlumnoId) {
+        mostrarError('Por favor busque y seleccione a un estudiante de la lista antes de continuar.');
+        return;
+      }
+
+      const cursoId = Number(selectMatCurso.value);
+      if (!cursoId) {
+        mostrarError('Por favor seleccione el curso a matricular.');
+        return;
+      }
+
+      const inputAnio = document.getElementById('mat-anio') as HTMLInputElement;
+      const anio = Number(inputAnio?.value) || new Date().getFullYear();
+
+      try {
+        await api.curso.asignarAlumno({
+          id_alumno: selectedAlumnoId,
+          id_curso: cursoId,
+          anio,
+        });
+        cerrarModalMat();
+        await cargarInscripciones();
+        mostrarExito('¡Estudiante Matriculado!', 'La inscripción fue registrada exitosamente en el curso.');
+      } catch (err: any) {
+        console.error('Error al matricular:', err);
+        mostrarError(err.message || 'Error al matricular al estudiante');
+      }
+    });
+
+    // Modal Desmatricular Handlers
+    const cerrarModalDesmat = () => modalDesmat?.classList.add('hidden');
+    document.getElementById('btn-cancelar-desmat')?.addEventListener('click', cerrarModalDesmat);
+
+    document.getElementById('btn-confirmar-desmat-btn')?.addEventListener('click', async () => {
+      if (!alumnoAccionPendiente) return;
+      try {
+        await api.curso.quitarAlumno({
+          id_alumno: alumnoAccionPendiente.idAlumno,
+          id_curso: alumnoAccionPendiente.idCurso,
+          anio: alumnoAccionPendiente.anio
+        });
+        cerrarModalDesmat();
+        await cargarInscripciones();
+        mostrarExito('Matrícula Dada de Baja', 'El estudiante ha sido registrado como "abandonado". Su historial se conservó en el sistema.');
+      } catch (err: any) {
+        mostrarError('Error al desmatricular: ' + err.message);
+      }
+    });
+
+    // Modal Re-matricular Handlers
+    const cerrarModalRemat = () => modalRemat?.classList.add('hidden');
+    document.getElementById('btn-cancelar-remat')?.addEventListener('click', cerrarModalRemat);
+
+    document.getElementById('btn-confirmar-remat-btn')?.addEventListener('click', async () => {
+      if (!alumnoAccionPendiente) return;
+      try {
+        await api.curso.asignarAlumno({
+          id_alumno: alumnoAccionPendiente.idAlumno,
+          id_curso: alumnoAccionPendiente.idCurso,
+          anio: alumnoAccionPendiente.anio
+        });
+        cerrarModalRemat();
+        await cargarInscripciones();
+        mostrarExito('¡Estudiante Re-matriculado!', 'El estudiante ha sido reincorporado en estado activo ("cursando") conservando todo su historial.');
+      } catch (err: any) {
+        mostrarError('Error al re-matricular: ' + err.message);
+      }
+    });
+
+    // Inicializar
+    cargarCursos();
+    cargarAlumnos();
+    cargarInscripciones();
+  </script>
 </DashboardLayout>

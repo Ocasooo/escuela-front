@@ -1,0 +1,384 @@
+---
+import MoodleLayout from '../layouts/Moodle-Layout.astro';
+---
+
+<MoodleLayout title="Rendir Examen en Línea">
+  <div class="max-w-4xl mx-auto space-y-6 pb-12">
+    <!-- Header del Examen con Temporizador Flotante/Fijo -->
+    <div class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 sticky top-20 z-20">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-800 flex items-center gap-1">
+            <i class="fa-solid fa-bolt text-amber-600"></i> EVALUACIÓN EN CURSO
+          </span>
+          <span id="examen-duracion-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700">
+            45 Minutos
+          </span>
+        </div>
+        <h1 class="text-xl md:text-2xl font-black text-slate-900 mt-1" id="examen-header-title">Evaluación en Línea</h1>
+        <p class="text-xs text-slate-500" id="examen-header-curso">Cargando datos del examen...</p>
+      </div>
+
+      <!-- Temporizador -->
+      <div class="flex items-center gap-3 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-md shrink-0">
+        <i class="fa-solid fa-clock text-amber-400 text-lg animate-pulse"></i>
+        <div>
+          <span class="text-[10px] text-slate-400 block uppercase font-bold tracking-wider">Tiempo Restante</span>
+          <span class="text-lg font-black font-mono text-amber-300" id="timer-display">45:00</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario de Examen Dinámico -->
+    <form id="examen-form" class="space-y-6">
+      <div id="preguntas-render-container" class="space-y-6">
+        <div class="bg-white rounded-3xl p-12 text-center border border-slate-200 shadow-sm">
+          <i class="fa-solid fa-spinner fa-spin text-3xl text-blue-600 mb-3 block"></i>
+          <p class="text-sm font-bold text-slate-700">Cargando preguntas de la evaluación...</p>
+        </div>
+      </div>
+
+      <!-- Barra de Finalización y Envío -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-sm">
+        <div class="flex items-center gap-2 text-xs text-slate-500">
+          <i class="fa-solid fa-circle-info text-blue-500 text-base shrink-0"></i>
+          <span>Revise cuidadosamente sus respuestas antes de enviar. Una vez finalizado no podrá modificarlas.</span>
+        </div>
+        <button
+          type="submit"
+          id="btn-enviar-examen"
+          class="px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-500/30 transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+        >
+          <i class="fa-solid fa-paper-plane"></i>
+          <span>Finalizar y Enviar Examen</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Modal Éxito al Finalizar Examen -->
+  <div id="modal-examen-completado" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 text-center space-y-5 animate-fadeIn">
+      <div class="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl mx-auto shadow-sm">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <div class="space-y-1">
+        <h3 class="text-lg font-black text-slate-900">¡Evaluación Entregada con Éxito!</h3>
+        <p class="text-xs text-slate-500">Tus respuestas fueron registradas en el sistema. El docente a cargo revisará tu examen y asignará la calificación correspondiente.</p>
+      </div>
+      <button
+        type="button"
+        id="btn-volver-curso"
+        class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-colors"
+      >
+        Volver al Aula del Curso
+      </button>
+    </div>
+  </div>
+
+  <script>
+    import { api } from '../lib/api';
+    import { getCurrentUser } from '../lib/auth';
+
+    const user = getCurrentUser();
+    const esDocenteOAdmin = user && (user.ocupacion === 'profesor' || user.ocupacion === 'administrador' || user.ocupacion === 'docente');
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const examId = urlParams.get('id');
+    const container = document.getElementById('preguntas-render-container');
+    const titleEl = document.getElementById('examen-header-title');
+    const cursoEl = document.getElementById('examen-header-curso');
+    const duracionBadge = document.getElementById('examen-duracion-badge');
+    const timerDisplay = document.getElementById('timer-display');
+    const modalCompletado = document.getElementById('modal-examen-completado');
+    const btnVolverCurso = document.getElementById('btn-volver-curso');
+
+    let cursoIdAsociado: number | null = null;
+    let countdownInterval: any = null;
+
+    async function cargarExamen() {
+      if (!examId) {
+        if (container) {
+          container.innerHTML = `
+            <div class="bg-white rounded-3xl p-12 text-center border border-slate-200">
+              <i class="fa-solid fa-triangle-exclamation text-3xl text-amber-500 mb-2 block"></i>
+              <p class="text-sm font-bold text-slate-700">No se especificó ninguna evaluación.</p>
+              <a href="/inicio" class="mt-4 inline-block px-4 py-2 bg-blue-600 text-white font-bold text-xs rounded-xl">Volver a Mis Cursos</a>
+            </div>
+          `;
+        }
+        return;
+      }
+
+      try {
+        const examen = await api.examen.uno(examId);
+        if (!examen) {
+          if (container) {
+            container.innerHTML = `
+              <div class="bg-white rounded-3xl p-12 text-center border border-slate-200">
+                <i class="fa-solid fa-circle-xmark text-3xl text-red-500 mb-2 block"></i>
+                <p class="text-sm font-bold text-slate-700">Evaluación no encontrada en el sistema.</p>
+                <a href="/inicio" class="mt-4 inline-block px-4 py-2 bg-blue-600 text-white font-bold text-xs rounded-xl">Volver a Mis Cursos</a>
+              </div>
+            `;
+          }
+          return;
+        }
+
+        cursoIdAsociado = examen.curso_id || null;
+
+        // Validar ventana de habilitación si es alumno
+        if (!esDocenteOAdmin && examen.fecha) {
+          const fechaStr = typeof examen.fecha === 'string' ? examen.fecha.split('T')[0] : '';
+          const horaIniStr = examen.hora_inicio ? examen.hora_inicio.slice(0, 5) : '18:00';
+          const horaFinStr = examen.hora_fin ? examen.hora_fin.slice(0, 5) : '20:00';
+
+          if (fechaStr) {
+            const [y, m, d] = fechaStr.split('-').map(Number);
+            const [hIni, mIni] = horaIniStr.split(':').map(Number);
+            const [hFin, mFin] = horaFinStr.split(':').map(Number);
+
+            const fechaInicio = new Date(y, m - 1, d, hIni, mIni, 0);
+            const fechaFin = new Date(y, m - 1, d, hFin, mFin, 59);
+            const ahora = new Date();
+            const fLocal = new Date(y, m - 1, d).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+            if (ahora < fechaInicio) {
+              if (container) {
+                container.innerHTML = `
+                  <div class="bg-white rounded-3xl p-10 text-center border border-amber-200 max-w-lg mx-auto space-y-4 shadow-sm">
+                    <div class="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-3xl mx-auto">
+                      <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <div class="space-y-1.5">
+                      <h3 class="text-lg font-black text-slate-900">Evaluación Aún Bloqueada</h3>
+                      <p class="text-xs text-slate-500 leading-relaxed">
+                        Este examen está programado para el <b>${fLocal}</b> y se habilitará a las <b>${horaIniStr} hs</b>. Estará disponible hasta las <b>${horaFinStr} hs</b>.
+                      </p>
+                    </div>
+                    <div class="pt-2">
+                      <a href="/curso-detalle?id=${examen.curso_id || 1}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-colors">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Volver al Aula del Curso</span>
+                      </a>
+                    </div>
+                  </div>
+                `;
+              }
+              const submitBar = document.querySelector('form button[type="submit"]')?.parentElement;
+              if (submitBar) submitBar.classList.add('hidden');
+              return;
+            } else if (ahora > fechaFin) {
+              if (container) {
+                container.innerHTML = `
+                  <div class="bg-white rounded-3xl p-10 text-center border border-slate-200 max-w-lg mx-auto space-y-4 shadow-sm">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-100 text-slate-500 flex items-center justify-center text-3xl mx-auto">
+                      <i class="fa-solid fa-calendar-xmark"></i>
+                    </div>
+                    <div class="space-y-1.5">
+                      <h3 class="text-lg font-black text-slate-900">Plazo de Evaluación Finalizado</h3>
+                      <p class="text-xs text-slate-500 leading-relaxed">
+                        El periodo habilitado para rendir este examen concluyó el <b>${fLocal}</b> a las <b>${horaFinStr} hs</b>. El acceso se encuentra cerrado.
+                      </p>
+                    </div>
+                    <div class="pt-2">
+                      <a href="/curso-detalle?id=${examen.curso_id || 1}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-colors">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Volver al Aula del Curso</span>
+                      </a>
+                    </div>
+                  </div>
+                `;
+              }
+              const submitBar = document.querySelector('form button[type="submit"]')?.parentElement;
+              if (submitBar) submitBar.classList.add('hidden');
+              return;
+            }
+          }
+        }
+
+        if (titleEl) titleEl.textContent = examen.descripcion || 'Evaluación en Línea';
+        if (cursoEl) {
+          cursoEl.textContent = examen.nombre_curso ? `Curso: ${examen.nombre_curso}` : `Curso #${examen.curso_id || '1'}`;
+        }
+        if (duracionBadge) {
+          duracionBadge.textContent = `${examen.duracion_minutos || 45} Minutos`;
+        }
+
+        // Iniciar Temporizador
+        iniciarTemporizador(examen.duracion_minutos || 45);
+
+        // Parsear Preguntas
+        let preguntas: any[] = [];
+        if (examen.preguntas) {
+          try {
+            preguntas = typeof examen.preguntas === 'string' ? JSON.parse(examen.preguntas) : examen.preguntas;
+          } catch (e) {
+            console.error('Error parseando preguntas:', e);
+          }
+        }
+
+        // Fallback si no hay preguntas configuradas
+        if (!Array.isArray(preguntas) || preguntas.length === 0) {
+          preguntas = [
+            {
+              id: 'p1',
+              tipo: 'opcion_unica',
+              enunciado: '¿Cuál es la función primordial de los elementos de protección en una instalación técnica?',
+              puntos: 3,
+              opciones: [
+                'Proteger a las personas contra contactos directos e indirectos por falla de aislamiento.',
+                'Proteger a los equipos y conductores contra sobrecargas y cortocircuitos.',
+                'Asegurar la correcta operación según los estándares y normativas vigentes.'
+              ]
+            },
+            {
+              id: 'p2',
+              tipo: 'seleccion_multiple',
+              enunciado: 'En relación a la seguridad operativa, ¿qué factores son indispensables verificar antes de realizar una intervención?',
+              puntos: 3,
+              opciones: [
+                'La ausencia total de tensión o energía en el sector de trabajo.',
+                'Uso obligatorio de Elementos de Protección Personal (EPP).',
+                'La temperatura ambiente y el pronóstico meteorológico.'
+              ]
+            },
+            {
+              id: 'p3',
+              tipo: 'desarrollo',
+              enunciado: 'Describa los conceptos fundamentales aplicados en el trayecto de esta materia y cómo garantizan la calidad del trabajo.',
+              puntos: 4,
+              opciones: []
+            }
+          ];
+        }
+
+        // Renderizar Preguntas
+        renderizarPreguntas(preguntas);
+
+      } catch (err: any) {
+        console.error('Error cargando examen:', err);
+        if (container) {
+          container.innerHTML = `
+            <div class="bg-white rounded-3xl p-12 text-center border border-slate-200">
+              <p class="text-sm font-bold text-red-600">Error al cargar la evaluación: ${err.message}</p>
+            </div>
+          `;
+        }
+      }
+    }
+
+    function renderizarPreguntas(preguntas: any[]) {
+      if (!container) return;
+
+      container.innerHTML = preguntas.map((p: any, idx: number) => {
+        const pId = p.id || `q_${idx + 1}`;
+        const puntos = p.puntos || 1;
+
+        let badgeTipo = '';
+        let opcionesHtml = '';
+
+        if (p.tipo === 'opcion_unica') {
+          badgeTipo = '<span class="text-[11px] font-bold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full">Opción Única</span>';
+          opcionesHtml = `
+            <div class="space-y-2.5">
+              ${(p.opciones || []).map((opc: string, oIdx: number) => `
+                <label class="flex items-center p-3.5 rounded-2xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50">
+                  <input type="radio" name="respuesta_${pId}" value="${encodeURIComponent(opc)}" required class="w-4 h-4 text-blue-600 focus:ring-blue-500 mr-3 shrink-0" />
+                  <span class="text-xs font-medium text-slate-700">${opc}</span>
+                </label>
+              `).join('')}
+            </div>
+          `;
+        } else if (p.tipo === 'seleccion_multiple') {
+          badgeTipo = '<span class="text-[11px] font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-full">Selección Múltiple</span>';
+          opcionesHtml = `
+            <div class="space-y-2.5">
+              ${(p.opciones || []).map((opc: string, oIdx: number) => `
+                <label class="flex items-center p-3.5 rounded-2xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50">
+                  <input type="checkbox" name="respuesta_${pId}[]" value="${encodeURIComponent(opc)}" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 mr-3 shrink-0" />
+                  <span class="text-xs font-medium text-slate-700">${opc}</span>
+                </label>
+              `).join('')}
+            </div>
+          `;
+        } else {
+          // Desarrollo / Escrita
+          badgeTipo = '<span class="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full">Respuesta Escrita</span>';
+          opcionesHtml = `
+            <div>
+              <textarea
+                name="respuesta_${pId}"
+                rows="5"
+                required
+                placeholder="Escribe tu desarrollo técnico aquí..."
+                class="w-full p-4 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition-all font-medium text-slate-800"
+              ></textarea>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-sm space-y-4">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <span class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-xl">
+                Pregunta ${idx + 1} de ${preguntas.length} (${puntos} ${puntos === 1 ? 'Punto' : 'Puntos'})
+              </span>
+              ${badgeTipo}
+            </div>
+            <h2 class="text-base font-bold text-slate-900 leading-snug">
+              ${p.enunciado}
+            </h2>
+            ${opcionesHtml}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function iniciarTemporizador(minutos: number) {
+      let segundosRestantes = minutos * 60;
+
+      if (countdownInterval) clearInterval(countdownInterval);
+
+      const actualizarDisplay = () => {
+        const m = Math.floor(segundosRestantes / 60);
+        const s = segundosRestantes % 60;
+        if (timerDisplay) {
+          timerDisplay.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+      };
+
+      actualizarDisplay();
+
+      countdownInterval = setInterval(() => {
+        segundosRestantes--;
+        actualizarDisplay();
+
+        if (segundosRestantes <= 0) {
+          clearInterval(countdownInterval);
+          finalizarExamen();
+        }
+      }, 1000);
+    }
+
+    function finalizarExamen() {
+      if (countdownInterval) clearInterval(countdownInterval);
+      modalCompletado?.classList.remove('hidden');
+    }
+
+    document.getElementById('examen-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      finalizarExamen();
+    });
+
+    btnVolverCurso?.addEventListener('click', () => {
+      if (cursoIdAsociado) {
+        window.location.href = `/curso-detalle?id=${cursoIdAsociado}`;
+      } else {
+        window.location.href = '/inicio';
+      }
+    });
+
+    cargarExamen();
+  </script>
+</MoodleLayout>

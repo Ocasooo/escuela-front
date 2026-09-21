@@ -2,63 +2,519 @@
 import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 ---
 
-<DashboardLayout title='Gestión de planes de estudio' path='plan de estudio' pageTitle='Gestionar plan de estudios'>
-      <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" href="/agregar-curso">Agregar nuevo curso</a>
-            <!------------------------TABLE-------------------- -->
-            <!------------------------TABLE-------------------- -->
-          <div class="mb-10 mt-5">
-            <div class="xl:w-full px-10">
-              <div class="retive flex flex-col min-w-0 break-words bg-white w-full shadow-lg rounded">
-                <div class="rounded-t mb-0 px-4 py-3 border-0">
-                  <div class="flex flex-wrap items-center">
-                    <div class="relative w-full px-2 flex-grow flex-1">
-                      <h3 class="font-semibold text-base text-blueGray-700">Planes de estudio vigentes</h3>
-                    </div>
-                    <div class="relative flex-grow flex-1 sm:text-right">
-                      <input class="border-2 border-black text-black text-xs font-bold px-7 py-1 rounded-full" type="text" placeholder="Buscar">
-                      <i class="relative md:visible invisible top-0.5 right-48 fa-solid fa-magnifying-glass" style="color: #000000;"></i>
-                    </div>
-                  </div>
-                </div>
-            
-                <div class="block w-full overflow-x-auto">
-                  <table class="items-center bg-transparent w-full border-collapse ">
-                    <thead>
-                      <tr>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Nombre</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Descripción</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Inscriptos</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Abandonos</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Egresados</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Opciones</th>
-                      </tr>
-                    </thead>
-            
-                    <tbody>
-                      <tr>
-                        <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">
-                          Carpinteria
-                        </th>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          Carpintear bien chingon
-                        </td>
-                        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          50
-                        </td>
-                        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                            2
-                          </td>
-                          <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                            10
-                          </td>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                            <button class="mr-2 rounded-3xl bg-sky-400 w-6 h-6"><i class="fa-solid fa-pen-to-square" style="color: #000000;"></i></button>
-                            <button class="rounded-3xl bg-red-600 w-6 h-6"><i class="fa-solid fa-xmark" style="color: #000000;"></i></button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+<DashboardLayout title="Administrar Cursos" path="administrar-cursos" pageTitle="Gestión de Cursos y Asignación Docente">
+  <div class="space-y-6">
+    <!-- Barra Superior -->
+    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div>
+        <h2 class="text-sm font-bold text-slate-800">Oferta Académica Vigente</h2>
+        <p class="text-xs text-slate-500">Cree nuevas materias y asigne profesores a cargo de cada comisión.</p>
+      </div>
+
+      <!-- Buscador de Cursos -->
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1 max-w-xl lg:mx-6">
+        <div class="relative flex-1">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input
+            type="text"
+            id="input-buscar-curso"
+            placeholder="Buscar por nombre de curso, código o profesor..."
+            class="w-full pl-9 pr-9 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-800 placeholder-slate-400 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all shadow-2xs"
+          />
+          <button id="btn-limpiar-busqueda" type="button" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 hidden text-xs transition-colors cursor-pointer" title="Limpiar búsqueda">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <span id="contador-cursos" class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-2 rounded-xl text-center shrink-0">
+          Cargando...
+        </span>
+      </div>
+
+      <button id="btn-crear-curso" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 shrink-0">
+        <i class="fa-solid fa-folder-plus"></i>
+        <span>Crear Nuevo Curso</span>
+      </button>
+    </div>
+
+    <!-- Grilla de Cursos -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="cursos-admin-grid">
+      <!-- Tarjetas dinámicas generadas por JS -->
+    </div>
+  </div>
+
+  <!-- Modal Asignar / Gestionar Profesores del Curso -->
+  <div id="modal-asignar-profesor" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-fadeIn">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">Profesores a Cargo del Curso</h3>
+          <p class="text-xs text-blue-600 font-semibold" id="modal-curso-nombre">Cargando...</p>
+        </div>
+        <button id="btn-cerrar-modal-prof" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Lista de profesores actualmente asignados -->
+      <div class="space-y-2">
+        <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Profesores / Administradores Asignados</label>
+        <div id="lista-docentes-asignados" class="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+          <p class="text-xs text-slate-400 py-2 text-center">Cargando asignaciones...</p>
+        </div>
+      </div>
+
+      <!-- Formulario para agregar un nuevo profesor -->
+      <form id="form-asignar-docente" class="space-y-3 pt-3 border-t border-slate-100">
+        <input type="hidden" id="modal-curso-id" value="" />
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Agregar Profesor o Administrador</label>
+          <select id="select-docente" required class="w-full px-3 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-medium outline-none focus:ring-2 focus:ring-blue-100">
+            <option value="">Cargando profesores...</option>
+          </select>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-1">
+          <button type="button" id="btn-cancelar-prof" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors">Cerrar</button>
+          <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5">
+            <i class="fa-solid fa-plus text-[10px]"></i>
+            <span>Asignar al Curso</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Crear Nuevo Curso -->
+  <div id="modal-crear-curso" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-fadeIn">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-base font-bold text-slate-900">Crear Nuevo Curso</h3>
+        <button id="btn-cerrar-modal-crear" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="form-crear-curso" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nombre del Curso / Materia</label>
+          <input type="text" id="crear-nombre-curso" required placeholder="Ej: Redes y Telecomunicaciones" class="w-full px-3 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-medium outline-none focus:ring-2 focus:ring-blue-100" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Descripción del Programa</label>
+          <textarea id="crear-descripcion-curso" rows="3" placeholder="Breve resumen del contenido y objetivos..." class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-medium outline-none focus:ring-2 focus:ring-blue-100"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Docente Titular (Opcional)</label>
+          <select id="crear-select-docente" class="w-full px-3 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-medium outline-none focus:ring-2 focus:ring-blue-100">
+            <option value="">-- Sin docente asignado por ahora --</option>
+          </select>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" id="btn-cancelar-crear" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
+          <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition-all">Crear Curso</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Confirmar Eliminación -->
+  <div id="modal-confirmar-eliminar" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center space-y-4 animate-fadeIn">
+      <div class="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mx-auto text-xl">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-slate-900">¿Eliminar Curso?</h3>
+        <p class="text-xs text-slate-500 mt-1" id="modal-eliminar-mensaje">Esta acción eliminará el curso y todas sus asignaciones asociadas.</p>
+      </div>
+      <div class="flex justify-center gap-2 pt-2">
+        <button type="button" id="btn-cancelar-eliminar" class="flex-1 py-2.5 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
+        <button type="button" id="btn-confirmar-eliminar" class="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl shadow-md transition-all">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Éxito / Feedback -->
+  <div id="modal-exito-accion" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center space-y-4 animate-fadeIn">
+      <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto text-xl">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-slate-900" id="exito-titulo">¡Operación Exitosa!</h3>
+        <p class="text-xs text-slate-500 mt-1" id="exito-mensaje">La información ha sido actualizada correctamente.</p>
+      </div>
+      <button type="button" id="btn-cerrar-exito" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all">
+        Aceptar
+      </button>
+    </div>
+  </div>
+
+  <script>
+    import { api } from '../lib/api';
+
+    interface CursoItem {
+      id: number;
+      nombre: string;
+      codigo: string;
+      profesor: string;
+      alumnos: number;
+      cupo: number;
+      turno: string;
+    }
+
+    let cursosData: CursoItem[] = [];
+    let docentesList: any[] = [];
+    let cursoEliminarId: number | null = null;
+
+    const grid = document.getElementById('cursos-admin-grid');
+    const modalProf = document.getElementById('modal-asignar-profesor');
+    const modalCrear = document.getElementById('modal-crear-curso');
+    const modalEliminar = document.getElementById('modal-confirmar-eliminar');
+    const modalExito = document.getElementById('modal-exito-accion');
+
+    const inputBuscar = document.getElementById('input-buscar-curso') as HTMLInputElement;
+    const btnLimpiarBusqueda = document.getElementById('btn-limpiar-busqueda') as HTMLButtonElement;
+    const contadorCursos = document.getElementById('contador-cursos');
+
+    const selectDocente = document.getElementById('select-docente') as HTMLSelectElement;
+    const crearSelectDocente = document.getElementById('crear-select-docente') as HTMLSelectElement;
+
+    function mostrarExito(titulo: string, mensaje: string) {
+      const tit = document.getElementById('exito-titulo');
+      const msg = document.getElementById('exito-mensaje');
+      if (tit) tit.textContent = titulo;
+      if (msg) msg.textContent = mensaje;
+      modalExito?.classList.remove('hidden');
+    }
+
+    document.getElementById('btn-cerrar-exito')?.addEventListener('click', () => {
+      modalExito?.classList.add('hidden');
+    });
+
+    async function cargarDocentes() {
+      try {
+        const personal = await api.personal.todos().catch(() => []);
+        if (personal && Array.isArray(personal)) {
+          docentesList = personal.filter((p: any) => {
+            const ocup = (p.ocupacion || '').toLowerCase();
+            return ocup === 'profesor' || ocup === 'docente' || ocup === 'administrador' || ocup === 'admin';
+          });
+
+          const opcionesHTML = docentesList.map((d: any) => {
+            return `<option value="${d.id}">${d.nombre} ${d.apellido} (Profesor)</option>`;
+          }).join('');
+
+          if (selectDocente) {
+            selectDocente.innerHTML = opcionesHTML || '<option value="">No hay profesores disponibles</option>';
+          }
+          if (crearSelectDocente) {
+            crearSelectDocente.innerHTML = `<option value="">-- Sin profesor asignado por ahora --</option>` + opcionesHTML;
+          }
+        }
+      } catch (err) {
+        console.error('Error cargando profesores:', err);
+      }
+    }
+
+    async function cargarCursos() {
+      try {
+        const [cursos, resumen] = await Promise.all([
+          api.curso.todos().catch(() => []),
+          api.curso.resumen().catch(() => [])
+        ]);
+
+        cursosData = (cursos || []).map((c: any) => {
+          const res = (resumen || []).find((r: any) => r.id === c.id);
+          return {
+            id: c.id,
+            nombre: c.nombre,
+            codigo: `CURSO-${c.id}`,
+            profesor: c.profesor && c.profesor.trim() !== '' ? c.profesor : 'Sin profesor asignado',
+            alumnos: res ? res.inscriptos : 0,
+            cupo: 35,
+            turno: 'Turno Regular'
+          };
+        });
+      } catch (err) {
+        console.error('Error cargando cursos:', err);
+      }
+      renderCursos();
+    }
+
+    function renderCursos() {
+      if (!grid) return;
+
+      const query = inputBuscar?.value.trim().toLowerCase() || '';
+
+      if (btnLimpiarBusqueda) {
+        if (query) {
+          btnLimpiarBusqueda.classList.remove('hidden');
+        } else {
+          btnLimpiarBusqueda.classList.add('hidden');
+        }
+      }
+
+      if (cursosData.length === 0) {
+        if (contadorCursos) contadorCursos.textContent = '0 cursos';
+        grid.innerHTML = `
+          <div class="col-span-full bg-white p-12 rounded-3xl border border-slate-200 text-center space-y-3">
+            <i class="fa-solid fa-graduation-cap text-4xl text-slate-300"></i>
+            <h3 class="text-sm font-bold text-slate-700">No hay cursos registrados</h3>
+            <p class="text-xs text-slate-400">Comience creando un nuevo curso con el botón superior.</p>
           </div>
+        `;
+        return;
+      }
+
+      const cursosFiltrados = cursosData.filter((c) => {
+        if (!query) return true;
+        const matchNombre = c.nombre.toLowerCase().includes(query);
+        const matchCodigo = c.codigo.toLowerCase().includes(query);
+        const matchProfesor = c.profesor.toLowerCase().includes(query);
+        return matchNombre || matchCodigo || matchProfesor;
+      });
+
+      if (contadorCursos) {
+        contadorCursos.textContent = `${cursosFiltrados.length} de ${cursosData.length} curso(s)`;
+      }
+
+      if (cursosFiltrados.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full bg-white p-12 rounded-3xl border border-slate-200 text-center space-y-3">
+            <i class="fa-solid fa-magnifying-glass text-3xl text-slate-300 block mb-1"></i>
+            <h3 class="text-sm font-bold text-slate-700">No se encontraron cursos coincidentes</h3>
+            <p class="text-xs text-slate-400">No se hallaron materias que contengan los términos de búsqueda ingresados.</p>
+            <button type="button" id="btn-reset-busqueda" class="px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition-colors inline-flex items-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-rotate-left text-[11px]"></i>
+              <span>Restablecer Búsqueda</span>
+            </button>
+          </div>
+        `;
+
+        document.getElementById('btn-reset-busqueda')?.addEventListener('click', () => {
+          if (inputBuscar) inputBuscar.value = '';
+          renderCursos();
+          inputBuscar?.focus();
+        });
+        return;
+      }
+
+      grid.innerHTML = cursosFiltrados.map((c) => {
+        const tieneDocente = c.profesor && c.profesor !== 'Sin profesor asignado';
+        return `
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex justify-between items-start mb-2">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-700 font-mono">${c.codigo}</span>
+              <span class="text-xs font-bold text-slate-400">${c.alumnos}/${c.cupo} alumnos</span>
+            </div>
+            <h3 class="text-base font-bold text-slate-900">${c.nombre}</h3>
+            <p class="text-xs text-slate-500 mt-1"><i class="fa-solid fa-clock text-slate-400 mr-1"></i> ${c.turno}</p>
+          </div>
+
+          <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/60 flex items-center justify-between">
+            <div class="flex items-center space-x-3 overflow-hidden">
+              <div class="w-9 h-9 rounded-xl ${tieneDocente ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'} flex-shrink-0 flex items-center justify-center text-sm font-bold shadow-sm">
+                <i class="fa-solid ${tieneDocente ? 'fa-user-tie' : 'fa-user-slash'}"></i>
+              </div>
+              <div class="overflow-hidden">
+                <span class="text-[10px] font-extrabold text-slate-400 block uppercase tracking-wider">Profesor a cargo</span>
+                <span class="text-xs block truncate ${tieneDocente ? 'font-bold text-slate-800' : 'font-semibold italic text-amber-600'}">
+                  ${c.profesor}
+                </span>
+              </div>
+            </div>
+            <button class="btn-asignar-prof p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-xl transition-all shadow-none hover:shadow-sm cursor-pointer" data-id="${c.id}" data-nombre="${c.nombre}" title="${tieneDocente ? 'Cambiar Profesor' : 'Asignar Profesor'}">
+              <i class="fa-solid fa-user-pen text-xs"></i>
+            </button>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+            <a href="/inscripcion-de-estudiantes" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+              <span>Ver Inscriptos</span>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+            <button class="btn-eliminar-curso text-xs font-bold text-red-500 hover:text-red-700 flex items-center gap-1 transition-colors" data-id="${c.id}" data-nombre="${c.nombre}">
+              <i class="fa-solid fa-trash-can text-[11px]"></i>
+              <span>Eliminar</span>
+            </button>
+          </div>
+        </div>
+      `}).join('');
+
+      // Conectar botones Asignar Docente
+      document.querySelectorAll('.btn-asignar-prof').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const id = Number(btn.getAttribute('data-id'));
+          const nombre = btn.getAttribute('data-nombre');
+          const inputId = document.getElementById('modal-curso-id') as HTMLInputElement;
+          const labelNombre = document.getElementById('modal-curso-nombre');
+
+          if (inputId) inputId.value = String(id);
+          if (labelNombre) labelNombre.textContent = nombre || 'Curso';
+
+          modalProf?.classList.remove('hidden');
+          await cargarDocentesCurso(id);
+        });
+      });
+
+      // Conectar botones Eliminar Curso
+      document.querySelectorAll('.btn-eliminar-curso').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          cursoEliminarId = Number(btn.getAttribute('data-id'));
+          const nombre = btn.getAttribute('data-nombre');
+          const msg = document.getElementById('modal-eliminar-mensaje');
+          if (msg) msg.textContent = `¿Está seguro de eliminar el curso "${nombre}"? Esta acción no se puede deshacer.`;
+          modalEliminar?.classList.remove('hidden');
+        });
+      });
+    }
+
+    async function cargarDocentesCurso(cursoId: number) {
+      const container = document.getElementById('lista-docentes-asignados');
+      if (!container) return;
+
+      try {
+        const profesores = await api.curso.profesoresPorCurso(cursoId);
+        if (!profesores || profesores.length === 0) {
+          container.innerHTML = `
+            <div class="p-3 bg-amber-50 border border-amber-200/60 rounded-xl text-xs text-amber-700 font-semibold flex items-center gap-2">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <span>Este curso aún no tiene ningún profesor o administrador asignado.</span>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = profesores.map((p: any) => `
+          <div class="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-800">
+            <div class="flex items-center gap-2 overflow-hidden">
+              <i class="fa-solid fa-user-tie text-blue-600 shrink-0"></i>
+              <span class="truncate">${p.nombre} ${p.apellido}</span>
+              <span class="text-[10px] font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md uppercase shrink-0">${p.ocupacion}</span>
+            </div>
+            <button type="button" class="btn-quitar-docente text-xs font-bold text-red-500 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded-lg transition-colors flex items-center gap-1 shrink-0" data-personal="${p.id}" data-curso="${cursoId}">
+              <i class="fa-solid fa-xmark"></i>
+              <span>Quitar</span>
+            </button>
+          </div>
+        `).join('');
+
+        container.querySelectorAll('.btn-quitar-docente').forEach((btn) => {
+          btn.addEventListener('click', async () => {
+            const personalId = Number(btn.getAttribute('data-personal'));
+            const cId = Number(btn.getAttribute('data-curso'));
+            try {
+              await api.curso.quitarPersonal({ id_personal: personalId, id_curso: cId });
+              await cargarDocentesCurso(cId);
+              await cargarCursos();
+              mostrarExito('Profesor Removido', 'El profesor fue desvinculado del curso correctamente.');
+            } catch (err: any) {
+              console.error('Error quitando profesor:', err);
+              alert(err.message || 'Error al quitar profesor');
+            }
+          });
+        });
+      } catch (err) {
+        console.error('Error cargando profesores del curso:', err);
+      }
+    }
+
+    // Modal Asignar Docente
+    const cerrarModalProf = () => modalProf?.classList.add('hidden');
+    document.getElementById('btn-cerrar-modal-prof')?.addEventListener('click', cerrarModalProf);
+    document.getElementById('btn-cancelar-prof')?.addEventListener('click', cerrarModalProf);
+
+    document.getElementById('form-asignar-docente')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const cursoId = Number((document.getElementById('modal-curso-id') as HTMLInputElement)?.value);
+      const personalId = Number(selectDocente?.value);
+
+      if (!cursoId || !personalId) return;
+
+      try {
+        await api.curso.asignarPersonal({ id_personal: personalId, id_curso: cursoId });
+        await cargarDocentesCurso(cursoId);
+        await cargarCursos();
+        mostrarExito('¡Profesor Asignado!', 'El profesor o administrador fue asignado exitosamente al curso.');
+      } catch (err: any) {
+        console.error('Error asignando profesor:', err);
+        alert(err.message || 'Error al asignar profesor al curso');
+      }
+    });
+
+    // Modal Crear Curso
+    const cerrarModalCrear = () => modalCrear?.classList.add('hidden');
+    document.getElementById('btn-crear-curso')?.addEventListener('click', () => modalCrear?.classList.remove('hidden'));
+    document.getElementById('btn-cerrar-modal-crear')?.addEventListener('click', cerrarModalCrear);
+    document.getElementById('btn-cancelar-crear')?.addEventListener('click', cerrarModalCrear);
+
+    document.getElementById('form-crear-curso')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nombre = (document.getElementById('crear-nombre-curso') as HTMLInputElement)?.value;
+      const descripcion = (document.getElementById('crear-descripcion-curso') as HTMLTextAreaElement)?.value;
+      const personalId = crearSelectDocente?.value ? Number(crearSelectDocente.value) : null;
+
+      if (!nombre) return;
+
+      try {
+        await api.curso.agregar({ nombre, descripcion });
+        
+        // Si seleccionó un docente inicial, buscamos el curso creado y se lo asignamos
+        if (personalId) {
+          const cursosActualizados = await api.curso.todos().catch(() => []);
+          const nuevoCurso = (cursosActualizados || []).find((c: any) => c.nombre === nombre);
+          if (nuevoCurso) {
+            await api.curso.asignarPersonal({ id_personal: personalId, id_curso: nuevoCurso.id }).catch(() => null);
+          }
+        }
+
+        cerrarModalCrear();
+        (document.getElementById('form-crear-curso') as HTMLFormElement)?.reset();
+        await cargarCursos();
+        mostrarExito('¡Curso Creado!', `El curso "${nombre}" ha sido dado de alta exitosamente.`);
+      } catch (err: any) {
+        console.error('Error creando curso:', err);
+        alert(err.message || 'Error al crear el nuevo curso');
+      }
+    });
+
+    // Modal Eliminar Curso
+    const cerrarModalEliminar = () => modalEliminar?.classList.add('hidden');
+    document.getElementById('btn-cancelar-eliminar')?.addEventListener('click', cerrarModalEliminar);
+
+    document.getElementById('btn-confirmar-eliminar')?.addEventListener('click', async () => {
+      if (!cursoEliminarId) return;
+
+      try {
+        await api.curso.eliminar(cursoEliminarId);
+        cerrarModalEliminar();
+        await cargarCursos();
+        mostrarExito('Curso Eliminado', 'El curso y sus asociaciones fueron eliminados correctamente.');
+      } catch (err: any) {
+        console.error('Error eliminando curso:', err);
+        alert(err.message || 'Error al eliminar el curso');
+      }
+    });
+
+    // Eventos del Buscador de Cursos
+    inputBuscar?.addEventListener('input', () => {
+      renderCursos();
+    });
+
+    btnLimpiarBusqueda?.addEventListener('click', () => {
+      if (inputBuscar) inputBuscar.value = '';
+      renderCursos();
+      inputBuscar?.focus();
+    });
+
+    // Inicialización
+    cargarDocentes();
+    cargarCursos();
+  </script>
 </DashboardLayout>

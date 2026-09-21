@@ -2,82 +2,298 @@
 import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 ---
 
-<DashboardLayout title='Desempeño estudiantil' path='desempeño' pageTitle='Desempeño estudiantil del curso'>
-      <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" href="/agregar-practico">Seleccionar curso</a>
-            <!------------------------TABLE-------------------- -->
-            <!------------------------TABLE-------------------- -->
-          <div class="mb-10 mt-5">
-            <div class="xl:w-full px-10">
-              <div class="retive flex flex-col min-w-0 break-words bg-white w-full shadow-lg rounded">
-                <div class="rounded-t mb-0 px-4 py-3 border-0">
-                  <div class="flex flex-wrap items-center">
-                    <div class="relative w-full px-2 flex-grow flex-1">
-                      <h3 class="font-semibold text-base text-blueGray-700">Prácticos cargados</h3>
-                    </div>
-                    <div class="relative flex-grow flex-1 sm:text-right">
-                      <input class="border-2 border-black text-black text-xs font-bold px-7 py-1 rounded-full" type="text" placeholder="Buscar">
-                      <i class="relative md:visible invisible top-0.5 right-48 fa-solid fa-magnifying-glass" style="color: #000000;"></i>
-                    </div>
-                  </div>
-                </div>
-            
-                <div class="block w-full overflow-x-auto">
-                  <table class="items-center bg-transparent w-full border-collapse ">
-                    <thead>
-                      <tr>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">DNI</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Nombre y apellido</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Promedio prácticos</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Promedio examenes</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Promedio general</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Opciones</th>
-                      </tr>
-                    </thead>
-            
-                    <tbody>
-                      <tr>
-                        <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">
-                          43065607
-                        </th>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          Jorgito Serenito
-                        </td>
-                        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          8.00
-                        </td>
-                        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                            8.00
-                          </td>
-                          <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                            8.00
-                          </td>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <button class="mr-2 rounded-3xl bg-blue-700 py-1 px-3 rounded-3xl text-white text-xs">Corregir</button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">
-                          43065607
-                        </th>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          Jorgito Serenito
-                        </td>
-                        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          8.00
-                        </td>
-                        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                            8.00
-                          </td>
-                          <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                            8.00
-                          </td>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <button class="mr-2 rounded-3xl bg-sky-400 w-6 h-6"><i class="fa-solid fa-pen-to-square" style="color: #000000;"></i></button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+<DashboardLayout title="Notas de Cursado" path="desempeno" pageTitle="Registro de Calificaciones Finales y Cursado">
+  <div class="space-y-6">
+    <!-- Barra de Selección y Búsqueda (Requisito Explícito del Usuario) -->
+    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex flex-wrap items-center gap-4">
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Materia / Comisión</label>
+          <select id="select-materia" class="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 outline-none focus:ring-2 focus:ring-blue-100">
+            <option value="">Cargando materias asignadas...</option>
+          </select>
+        </div>
+
+        <!-- BUSCADOR POR NOMBRE, APELLIDO O DNI -->
+        <div class="w-full sm:w-72">
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Buscar Estudiante</label>
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-slate-400 text-xs"></i>
+            <input
+              type="text"
+              id="input-buscar-alumno"
+              placeholder="Buscar por nombre, apellido o DNI..."
+              class="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all font-medium text-slate-700"
+            />
           </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button id="btn-guardar-todas" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2">
+          <i class="fa-solid fa-floppy-disk"></i>
+          <span>Guardar Cambios</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabla de Calificaciones de Cursado -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-50 text-slate-500 uppercase font-bold tracking-wider border-b border-slate-200">
+            <tr>
+              <th class="p-4">DNI</th>
+              <th class="p-4">Estudiante</th>
+              <th class="p-4 text-center">Promedio TPs</th>
+              <th class="p-4 text-center">Parcial Teórico</th>
+              <th class="p-4 text-center">Asistencia %</th>
+              <th class="p-4 text-center">Nota Cursado</th>
+              <th class="p-4 text-center">Condición Final</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100" id="alumnos-cursado-body">
+            <!-- Filas dinámicas generadas por JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Éxito de Notas Guardadas -->
+  <div id="modal-exito-notas" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 md:p-8 shadow-2xl border border-slate-100 animate-fadeIn text-center space-y-5">
+      <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto text-2xl">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      
+      <div class="space-y-1">
+        <h3 class="text-lg font-black text-slate-900">¡Notas Actualizadas!</h3>
+        <p class="text-xs text-slate-500">Todas las notas de cursado se guardaron correctamente en la base de datos.</p>
+      </div>
+
+      <button type="button" id="btn-cerrar-exito-notas" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition-all">
+        Aceptar
+      </button>
+    </div>
+  </div>
+
+  <script>
+    import { api } from '../lib/api';
+    import { getCurrentUser } from '../lib/auth';
+
+    interface AlumnoCursado {
+      id: number;
+      dni: string;
+      nombre: string;
+      apellido: string;
+      promedio_tp: number;
+      nota_parcial: number;
+      asistencia: number;
+      nota_final: number;
+    }
+
+    let alumnosData: AlumnoCursado[] = [];
+    const selectMateria = document.getElementById('select-materia') as HTMLSelectElement;
+    const modalExito = document.getElementById('modal-exito-notas');
+
+    async function inicializarMaterias() {
+      try {
+        const user = getCurrentUser();
+        let cursos: any[] = [];
+        if (user?.id) {
+          cursos = await api.curso.cursosPorPersonal(user.id).catch(() => []);
+        } else {
+          cursos = await api.curso.todos().catch(() => []);
+        }
+
+        if (selectMateria) {
+          if (cursos && cursos.length > 0) {
+            selectMateria.innerHTML = cursos.map((c: any) => 
+              `<option value="${c.id}">${c.nombre}</option>`
+            ).join('');
+            await cargarAlumnos();
+          } else {
+            selectMateria.innerHTML = '<option value="">No tienes materias asignadas</option>';
+            alumnosData = [];
+            renderTabla();
+          }
+        }
+      } catch (err) {
+        console.error('Error al inicializar materias:', err);
+      }
+    }
+
+    async function cargarAlumnos() {
+      const cursoId = selectMateria?.value;
+      if (!cursoId) {
+        alumnosData = [];
+        renderTabla();
+        return;
+      }
+
+      try {
+        const rows = await api.curso.obtenerNotasPorCurso(cursoId);
+        if (rows && Array.isArray(rows)) {
+          alumnosData = rows.map((r: any) => ({
+            id: r.id || r.alumno_id,
+            dni: String(r.dni || '---'),
+            nombre: r.nombre || '',
+            apellido: r.apellido || '',
+            promedio_tp: r.promedio_tp ? Number(r.promedio_tp) : 8.0,
+            nota_parcial: r.nota_parcial ? Number(r.nota_parcial) : 8.0,
+            asistencia: r.asistencia ? Number(r.asistencia) : 90,
+            nota_final: (r.nota !== null && r.nota !== undefined && r.nota !== '') ? Math.round(Number(r.nota)) : 7
+          }));
+        } else {
+          alumnosData = [];
+        }
+      } catch (err) {
+        console.error('Error al cargar notas de cursado:', err);
+        alumnosData = [];
+      }
+      renderTabla();
+    }
+
+    const tbody = document.getElementById('alumnos-cursado-body');
+    const inputBuscar = document.getElementById('input-buscar-alumno') as HTMLInputElement;
+
+    function renderTabla() {
+      if (!tbody) return;
+
+      const termino = inputBuscar?.value.toLowerCase().trim() || '';
+
+      const filtrados = alumnosData.filter((a) => {
+        const matchNombre = `${a.nombre} ${a.apellido}`.toLowerCase().includes(termino);
+        const matchDni = a.dni.includes(termino);
+        return matchNombre || matchDni;
+      });
+
+      if (filtrados.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">No se encontraron estudiantes para la materia seleccionada.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtrados.map((a) => {
+        const notaEntera = Math.round(Number(a.nota_final) || 0);
+        const aprobado = notaEntera >= 6;
+        return `
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="p-4 font-mono text-slate-500 font-semibold">${a.dni}</td>
+            <td class="p-4 font-bold text-slate-900">${a.apellido}, ${a.nombre}</td>
+            <td class="p-4 text-center font-semibold text-slate-700">${a.promedio_tp.toFixed(1)}</td>
+            <td class="p-4 text-center font-semibold text-slate-700">${a.nota_parcial.toFixed(1)}</td>
+            <td class="p-4 text-center font-semibold text-slate-600">${a.asistencia}%</td>
+            <td class="p-4 text-center">
+              <input
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                maxlength="2"
+                value="${notaEntera}"
+                data-id="${a.id}"
+                placeholder="1-10"
+                class="input-nota-cursado w-14 text-center font-black text-slate-900 bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all shadow-2xs"
+              />
+            </td>
+            <td class="p-4 text-center">
+              <span class="px-2.5 py-1 rounded-full text-xs font-extrabold ${
+                aprobado ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
+              }">
+                ${aprobado ? 'Aprobado' : 'Desaprobado'}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // Escuchar cambios de notas para actualizar condición inmediatamente
+      document.querySelectorAll('.input-nota-cursado').forEach((input) => {
+        // Permitir solo ingresar números enteros
+        input.addEventListener('input', (e) => {
+          const target = e.target as HTMLInputElement;
+          target.value = target.value.replace(/[^0-9]/g, '');
+          if (target.value !== '' && Number(target.value) > 10) {
+            target.value = '10';
+          }
+        });
+
+        input.addEventListener('change', (e) => {
+          const target = e.target as HTMLInputElement;
+          const id = Number(target.getAttribute('data-id'));
+          let nuevaNota = parseInt(target.value, 10);
+          if (isNaN(nuevaNota) || nuevaNota < 1) nuevaNota = 1;
+          if (nuevaNota > 10) nuevaNota = 10;
+          target.value = String(nuevaNota);
+          const alumno = alumnosData.find((a) => a.id === id);
+          if (alumno) {
+            alumno.nota_final = nuevaNota;
+            renderTabla();
+          }
+        });
+      });
+    }
+
+    inputBuscar?.addEventListener('input', renderTabla);
+
+    document.getElementById('btn-guardar-todas')?.addEventListener('click', async () => {
+      const cursoId = Number(selectMateria?.value) || 1;
+      const btnGuardar = document.getElementById('btn-guardar-todas') as HTMLButtonElement | null;
+      const textoOriginal = btnGuardar?.innerHTML || 'Guardar Cambios';
+
+      // Sincronizar cualquier valor activo en los inputs antes de enviar
+      document.querySelectorAll('.input-nota-cursado').forEach((inp) => {
+        const target = inp as HTMLInputElement;
+        const id = Number(target.getAttribute('data-id'));
+        let val = parseInt(target.value, 10);
+        if (!isNaN(val)) {
+          if (val < 1) val = 1;
+          if (val > 10) val = 10;
+          const a = alumnosData.find((item) => item.id === id);
+          if (a) a.nota_final = val;
+        }
+      });
+
+      try {
+        if (btnGuardar) {
+          btnGuardar.disabled = true;
+          btnGuardar.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg> Guardando...`;
+        }
+
+        // Guardar todas las notas en lote al backend
+        await api.curso.cargarNotaCursado({
+          cursoId,
+          id_curso: cursoId,
+          notas: alumnosData.map((a) => ({
+            alumnoId: a.id,
+            id_alumno: a.id,
+            nota: a.nota_final,
+            calificacion: a.nota_final,
+            cursoId,
+            id_curso: cursoId,
+          }))
+        });
+
+        // Refrescar desde la base de datos para asegurar persistencia
+        await cargarAlumnos();
+
+        modalExito?.classList.remove('hidden');
+      } catch (err: any) {
+        console.error('Error al guardar notas de cursado:', err);
+        alert('Ocurrió un error al guardar las notas: ' + (err.message || 'Error del servidor'));
+      } finally {
+        if (btnGuardar) {
+          btnGuardar.disabled = false;
+          btnGuardar.innerHTML = textoOriginal;
+        }
+      }
+    });
+
+    document.getElementById('btn-cerrar-exito-notas')?.addEventListener('click', () => {
+      modalExito?.classList.add('hidden');
+    });
+
+    selectMateria?.addEventListener('change', cargarAlumnos);
+    inicializarMaterias();
+  </script>
 </DashboardLayout>

@@ -1,72 +1,917 @@
 ---
-import DashboardLayout from "../layouts/Dashboard-Layout.astro";
-import DropdownButton from "../components/dropdownButton.astro";
+import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 ---
 
-<DashboardLayout title="Gestion de practicos" path="practicos" pageTitle="Prácticos">
-      <DropdownButton buttonText="Seleccionar materia" options={["Matematicas","Calculo"]}></DropdownButton>
-      <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" href="/agregar-practico">Seleccionar carpeta</a>
-            <!------------------------TABLE-------------------- -->
-            <!------------------------TABLE-------------------- -->
-          <div class="mb-10 mt-5">
-            <div class="xl:w-full px-10">
-              <div class="retive flex flex-col min-w-0 break-words bg-white w-full shadow-lg rounded">
-                <div class="rounded-t mb-0 px-4 py-3 border-0">
-                  <div class="flex flex-wrap items-center">
-                    <div class="relative w-full px-2 flex-grow flex-1">
-                      <h3 class="font-semibold text-base text-blueGray-700">Prácticos cargados</h3>
-                    </div>
-                    <div class="relative flex-grow flex-1 sm:text-right">
-                      <input class="border-2 border-black text-black text-xs font-bold px-7 py-1 rounded-full" type="text" placeholder="Buscar">
-                      <i class="relative md:visible invisible top-0.5 right-48 fa-solid fa-magnifying-glass" style="color: #000000;"></i>
-                    </div>
-                  </div>
+<DashboardLayout title="Corrección de Prácticos" path="practicos" pageTitle="Revisión y Calificación de Trabajos Prácticos">
+  <div class="space-y-6">
+    <!-- Navegación de Pestañas: Prácticos Activos vs Historial de Prácticos -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-1">
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          id="tab-btn-activos"
+          class="tab-btn px-5 py-3 text-sm font-bold border-b-2 border-blue-600 text-blue-600 flex items-center gap-2.5 transition-all cursor-pointer"
+        >
+          <i class="fa-solid fa-list-check text-base"></i>
+          <span>Prácticos Activos</span>
+          <span id="badge-count-activos" class="px-2.5 py-0.5 text-xs font-black rounded-full bg-blue-100 text-blue-800 transition-colors">
+            0
+          </span>
+        </button>
+
+        <button
+          type="button"
+          id="tab-btn-historial"
+          class="tab-btn px-5 py-3 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2.5 transition-all cursor-pointer"
+        >
+          <i class="fa-solid fa-clock-rotate-left text-base"></i>
+          <span>Historial de Prácticos (Vencidos)</span>
+          <span id="badge-count-historial" class="px-2.5 py-0.5 text-xs font-black rounded-full bg-slate-100 text-slate-600 transition-colors">
+            0
+          </span>
+        </button>
+      </div>
+
+      <!-- Botón de Acción Exclusivo de Historial -->
+      <div id="contenedor-accion-historial" class="hidden">
+        <button
+          type="button"
+          id="btn-abrir-borrar-historial"
+          class="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs rounded-xl border border-rose-200 shadow-2xs transition-all flex items-center gap-2 cursor-pointer"
+          title="Eliminar todos los trabajos prácticos vencidos y sus archivos del servidor"
+        >
+          <i class="fa-regular fa-trash-can text-sm"></i>
+          <span>Borrar Historial Completo</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Header y Filtros -->
+    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex flex-wrap items-center gap-3 flex-1">
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Filtrar por Curso</label>
+          <select id="filtro-curso" class="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-blue-100">
+            <option value="todos">Todos los cursos</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Estado de Entrega</label>
+          <select id="filtro-estado" class="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-blue-100">
+            <option value="todos">Todos los estados</option>
+            <option value="con_pendientes">Con entregas por corregir</option>
+            <option value="completos">Todas corregidas</option>
+            <option value="sin_entregas">Sin entregas aún</option>
+          </select>
+        </div>
+
+        <div class="relative flex-1 min-w-[220px]">
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Buscar Trabajo Práctico o Alumno</label>
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input
+              type="text"
+              id="filtro-busqueda"
+              placeholder="Buscar por título, unidad, curso o alumno..."
+              class="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-blue-100 transition-colors"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="text-right shrink-0">
+        <span class="text-xs font-bold text-slate-600 bg-slate-100 px-3.5 py-2 rounded-xl border border-slate-200/60 inline-block" id="tp-counter">
+          Cargando trabajos prácticos...
+        </span>
+      </div>
+    </div>
+
+    <!-- Contenedor de Trabajos Prácticos -->
+    <div id="tps-agrupados-container" class="space-y-6">
+      <div class="bg-white rounded-3xl border border-slate-200 p-12 text-center text-slate-400 font-medium">
+        <i class="fa-solid fa-spinner fa-spin text-2xl text-blue-500 mb-2 block"></i>
+        Cargando gestión de trabajos prácticos...
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Calificación -->
+  <div id="modal-calificar" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl border border-slate-100 animate-fadeIn space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+        <div>
+          <h3 class="text-lg font-black text-slate-900">Calificar Trabajo Práctico</h3>
+          <p class="text-xs text-slate-500" id="modal-subtitulo">Estudiante: --</p>
+        </div>
+        <button id="btn-cerrar-modal" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+        <div class="flex justify-between text-xs">
+          <span class="text-slate-500">Curso:</span>
+          <span class="font-bold text-slate-800" id="modal-curso">--</span>
+        </div>
+        <div class="flex justify-between text-xs">
+          <span class="text-slate-500">Trabajo:</span>
+          <span class="font-bold text-slate-800" id="modal-tp">--</span>
+        </div>
+        <div class="flex justify-between text-xs pt-1 border-t border-slate-200/60">
+          <span class="text-slate-500">Archivo entregado:</span>
+          <a href="#" id="modal-descarga" class="text-blue-600 font-bold hover:underline flex items-center gap-1 cursor-pointer">
+            <i class="fa-solid fa-file-pdf text-red-500"></i>
+            <span>Descargar Resolución</span>
+          </a>
+        </div>
+      </div>
+
+      <form id="form-calificar" class="space-y-4">
+        <input type="hidden" id="modal-alumno-id" value="" />
+        <input type="hidden" id="modal-carpeta" value="" />
+        <input type="hidden" id="modal-submission-id" value="" />
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+            Nota Numérica (1 al 10)
+          </label>
+          <input
+            type="number"
+            id="modal-nota"
+            min="1"
+            max="10"
+            step="0.5"
+            required
+            placeholder="Ej: 8.5"
+            class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none font-bold text-slate-800"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+            Devolución / Observaciones Pedagógicas
+          </label>
+          <textarea
+            id="modal-devolucion"
+            rows="3"
+            placeholder="Escriba aquí los comentarios para el alumno..."
+            class="w-full p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none"
+          ></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-2">
+          <button type="button" id="btn-cancelar-modal" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors cursor-pointer">
+            Cancelar
+          </button>
+          <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-check"></i>
+            <span>Guardar Calificación</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación de Calificación -->
+  <div id="modal-confirmar-calificacion" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl border border-slate-100 animate-fadeIn space-y-5">
+      <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mx-auto text-2xl">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      
+      <div class="text-center space-y-1">
+        <h3 class="text-lg font-black text-slate-900">¿Confirmar calificación?</h3>
+        <p class="text-xs text-slate-500">Por favor, revisa los datos antes de asentar la nota final.</p>
+      </div>
+
+      <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2 text-xs">
+        <div class="flex justify-between">
+          <span class="text-slate-500 font-medium">Estudiante:</span>
+          <span class="font-bold text-slate-800" id="conf-alumno">--</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-500 font-medium">Curso:</span>
+          <span class="font-bold text-slate-800" id="conf-curso">--</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-500 font-medium">Trabajo:</span>
+          <span class="font-bold text-slate-800" id="conf-tp">--</span>
+        </div>
+        <div class="flex justify-between pt-2 border-t border-slate-200">
+          <span class="text-slate-500 font-medium">Calificación asignada:</span>
+          <span class="font-black text-blue-600 text-sm" id="conf-nota">--</span>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <button type="button" id="btn-cancelar-conf" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors cursor-pointer">
+          Volver a editar
+        </button>
+        <button type="button" id="btn-confirmar-guardar" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer">
+          <i class="fa-solid fa-check"></i>
+          <span>Confirmar y Guardar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Éxito de Calificación -->
+  <div id="modal-exito-calificacion" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 md:p-8 shadow-2xl border border-slate-100 animate-fadeIn text-center space-y-5">
+      <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto text-2xl">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      
+      <div class="space-y-1">
+        <h3 class="text-lg font-black text-slate-900">¡Calificación Guardada!</h3>
+        <p class="text-xs text-slate-500">La nota ha sido registrada y el estado del trabajo práctico se actualizó exitosamente.</p>
+      </div>
+
+      <button type="button" id="btn-cerrar-exito" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer">
+        Aceptar
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación para Vaciar Historial -->
+  <div id="modal-confirmar-eliminar-historial" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl border border-slate-100 animate-fadeIn space-y-5">
+      <div class="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto text-2xl">
+        <i class="fa-regular fa-trash-can"></i>
+      </div>
+      
+      <div class="text-center space-y-1.5">
+        <h3 class="text-lg font-black text-slate-900">¿Vaciar Historial de Prácticos?</h3>
+        <p class="text-xs text-slate-500 leading-relaxed">
+          Esta acción eliminará todos los trabajos prácticos vencidos que se encuentran en el historial y los archivos de entregas asociados.
+        </p>
+      </div>
+
+      <div class="bg-rose-50/70 p-4 rounded-2xl border border-rose-200 text-xs text-rose-800 space-y-1">
+        <p class="font-bold flex items-center gap-1.5">
+          <i class="fa-solid fa-triangle-exclamation text-rose-600"></i>
+          <span>Acción irreversible</span>
+        </p>
+        <p class="text-[11px] text-rose-700/90 leading-normal">
+          Los trabajos prácticos vigentes y en curso NO se verán afectados.
+        </p>
+      </div>
+
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <button type="button" id="btn-cancelar-borrar-historial" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors cursor-pointer">
+          Cancelar
+        </button>
+        <button type="button" id="btn-confirmar-borrar-historial" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer">
+          <i class="fa-regular fa-trash-can"></i>
+          <span>Sí, Vaciar Historial</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación para Eliminar TP Individual -->
+  <div id="modal-confirmar-eliminar-tp" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl border border-slate-100 animate-fadeIn space-y-5">
+      <div class="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto text-2xl">
+        <i class="fa-solid fa-trash-can"></i>
+      </div>
+      
+      <div class="text-center space-y-1.5">
+        <h3 class="text-lg font-black text-slate-900">¿Eliminar Trabajo Práctico?</h3>
+        <p class="text-xs text-slate-500" id="txt-eliminar-tp-nombre">
+          Se eliminará este trabajo práctico histórico del sistema.
+        </p>
+      </div>
+
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <button type="button" id="btn-cancelar-eliminar-tp" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors cursor-pointer">
+          Cancelar
+        </button>
+        <button type="button" id="btn-confirmar-eliminar-tp" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer">
+          <i class="fa-solid fa-trash-can"></i>
+          <span>Eliminar TP</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    import { api } from '../lib/api';
+    import { getCurrentUser } from '../lib/auth';
+
+    interface TPEntrega {
+      id: number;
+      alumno_id: number;
+      alumno: string;
+      archivo_nombre: string;
+      archivo_scan: string;
+      fecha: string;
+      calificacion: string;
+      estado: 'pendiente' | 'calificado';
+      carpeta: string;
+    }
+
+    interface TPGestion {
+      id: number;
+      titulo: string;
+      curso: string;
+      curso_id: number;
+      unidad: string;
+      unidad_id: number;
+      archivo_consigna: string | null;
+      archivo_nombre: string;
+      fecha_subida: string;
+      fecha_limite: string | null;
+      carpeta: string;
+      vencido: boolean;
+      total_entregas: number;
+      pendientes: number;
+      calificados: number;
+      entregas: TPEntrega[];
+    }
+
+    let tpsData: TPGestion[] = [];
+    let tabActiva: 'activos' | 'historial' = 'activos';
+    let tpIdAEliminar: number | null = null;
+
+    // Elementos DOM
+    const container = document.getElementById('tps-agrupados-container');
+    const counter = document.getElementById('tp-counter');
+    const tabBtnActivos = document.getElementById('tab-btn-activos');
+    const tabBtnHistorial = document.getElementById('tab-btn-historial');
+    const badgeCountActivos = document.getElementById('badge-count-activos');
+    const badgeCountHistorial = document.getElementById('badge-count-historial');
+    const contenedorAccionHistorial = document.getElementById('contenedor-accion-historial');
+    const filtroCurso = document.getElementById('filtro-curso') as HTMLSelectElement;
+    const filtroEstado = document.getElementById('filtro-estado') as HTMLSelectElement;
+    const filtroBusqueda = document.getElementById('filtro-busqueda') as HTMLInputElement;
+
+    // Modales
+    const modalCalificar = document.getElementById('modal-calificar');
+    const formCalificar = document.getElementById('form-calificar');
+    const modalConfirmar = document.getElementById('modal-confirmar-calificacion');
+    const modalExito = document.getElementById('modal-exito-calificacion');
+    const modalBorrarHistorial = document.getElementById('modal-confirmar-eliminar-historial');
+    const modalEliminarTP = document.getElementById('modal-confirmar-eliminar-tp');
+
+    async function cargarDatos() {
+      try {
+        const user = getCurrentUser();
+        let cursos: any[] = [];
+        if (user?.id) {
+          cursos = await api.curso.cursosPorPersonal(user.id).catch(() => []);
+        } else {
+          cursos = await api.curso.todos().catch(() => []);
+        }
+
+        if (filtroCurso) {
+          const valorPrevio = filtroCurso.value;
+          if (cursos && cursos.length > 0) {
+            filtroCurso.innerHTML = `
+              <option value="todos">Todos los cursos</option>
+              ${cursos.map((c: any) => `<option value="${c.nombre}">${c.nombre}</option>`).join('')}
+            `;
+            if (valorPrevio) filtroCurso.value = valorPrevio;
+          } else {
+            filtroCurso.innerHTML = `<option value="todos">Todos los cursos</option>`;
+          }
+        }
+
+        // Llamar al endpoint optimizado de gestión de TPs
+        const res = await api.material.tpsGestion();
+        tpsData = Array.isArray(res) ? res : [];
+
+        actualizarContadoresPestanias();
+      } catch (err) {
+        console.error('Error cargando gestión de TPs:', err);
+      }
+      renderTabla();
+    }
+
+    function actualizarContadoresPestanias() {
+      const activos = tpsData.filter(t => !t.vencido);
+      const historial = tpsData.filter(t => t.vencido);
+
+      if (badgeCountActivos) badgeCountActivos.textContent = String(activos.length);
+      if (badgeCountHistorial) badgeCountHistorial.textContent = String(historial.length);
+    }
+
+    function cambiarPestania(nuevaTab: 'activos' | 'historial') {
+      tabActiva = nuevaTab;
+
+      if (tabActiva === 'activos') {
+        tabBtnActivos?.classList.add('border-blue-600', 'text-blue-600');
+        tabBtnActivos?.classList.remove('border-transparent', 'text-slate-500');
+        tabBtnHistorial?.classList.remove('border-blue-600', 'text-blue-600');
+        tabBtnHistorial?.classList.add('border-transparent', 'text-slate-500');
+        contenedorAccionHistorial?.classList.add('hidden');
+      } else {
+        tabBtnHistorial?.classList.add('border-blue-600', 'text-blue-600');
+        tabBtnHistorial?.classList.remove('border-transparent', 'text-slate-500');
+        tabBtnActivos?.classList.remove('border-blue-600', 'text-blue-600');
+        tabBtnActivos?.classList.add('border-transparent', 'text-slate-500');
+        contenedorAccionHistorial?.classList.remove('hidden');
+      }
+
+      renderTabla();
+    }
+
+    tabBtnActivos?.addEventListener('click', () => cambiarPestania('activos'));
+    tabBtnHistorial?.addEventListener('click', () => cambiarPestania('historial'));
+
+    function renderTabla() {
+      if (!container) return;
+
+      const cursoSel = filtroCurso?.value || 'todos';
+      const estadoSel = filtroEstado?.value || 'todos';
+      const busqueda = (filtroBusqueda?.value || '').toLowerCase().trim();
+
+      // 1. Filtrar por pestaña activa (Activos vs Historial vencido)
+      let items = tpsData.filter(t => (tabActiva === 'activos' ? !t.vencido : t.vencido));
+
+      // 2. Filtrar por Curso
+      if (cursoSel !== 'todos') {
+        items = items.filter(t => t.curso.toLowerCase().includes(cursoSel.toLowerCase()));
+      }
+
+      // 3. Filtrar por Estado de Corrección
+      if (estadoSel === 'con_pendientes') {
+        items = items.filter(t => t.pendientes > 0);
+      } else if (estadoSel === 'completos') {
+        items = items.filter(t => t.total_entregas > 0 && t.pendientes === 0);
+      } else if (estadoSel === 'sin_entregas') {
+        items = items.filter(t => t.total_entregas === 0);
+      }
+
+      // 4. Filtrar por búsqueda de texto
+      if (busqueda) {
+        items = items.filter(t => {
+          const matchTitulo = t.titulo.toLowerCase().includes(busqueda);
+          const matchCurso = t.curso.toLowerCase().includes(busqueda);
+          const matchUnidad = t.unidad.toLowerCase().includes(busqueda);
+          const matchAlumno = t.entregas.some(e => e.alumno.toLowerCase().includes(busqueda));
+          return matchTitulo || matchCurso || matchUnidad || matchAlumno;
+        });
+      }
+
+      if (counter) {
+        const totalEntregas = items.reduce((acc, curr) => acc + curr.total_entregas, 0);
+        counter.textContent = `${items.length} trabajo(s) práctico(s) • ${totalEntregas} entrega(s)`;
+      }
+
+      if (items.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white rounded-3xl border border-slate-200 p-12 text-center text-slate-400 font-medium space-y-3 shadow-sm">
+            <div class="w-16 h-16 mx-auto rounded-2xl bg-slate-100 flex items-center justify-center text-3xl text-slate-400">
+              <i class="fa-solid ${tabActiva === 'historial' ? 'fa-clock-rotate-left' : 'fa-clipboard-check'}"></i>
+            </div>
+            <div>
+              <p class="text-sm font-bold text-slate-700">
+                ${tabActiva === 'historial'
+                  ? 'No hay trabajos prácticos en el historial vencido'
+                  : 'No hay trabajos prácticos activos para mostrar'}
+              </p>
+              <p class="text-xs text-slate-400 mt-1">
+                ${tabActiva === 'historial'
+                  ? 'Los trabajos prácticos cuyo plazo de entrega finalice aparecerán automáticamente en este apartado.'
+                  : 'Pruebe ajustando los filtros de curso, estado o búsqueda.'}
+              </p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = items.map((tp) => {
+        // Formatear fecha límite si existe
+        let fechaLimiteTexto = '';
+        if (tp.fecha_limite) {
+          const fLim = new Date(tp.fecha_limite);
+          if (!isNaN(fLim.getTime())) {
+            const fDia = fLim.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const fHora = fLim.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+            fechaLimiteTexto = `${fDia} a las ${fHora} hs`;
+          }
+        }
+
+        return `
+          <div class="bg-white rounded-3xl border ${tp.vencido ? 'border-red-200' : 'border-slate-200'} shadow-sm overflow-hidden transition-all hover:shadow-md">
+            <!-- Encabezado del Trabajo Práctico -->
+            <div class="p-5 md:p-6 ${tp.vencido ? 'bg-red-50/30 border-red-100' : 'bg-slate-50/80 border-slate-200'} border-b flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="space-y-1.5 flex-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800 uppercase tracking-wider">
+                    <i class="fa-solid fa-graduation-cap mr-1"></i> ${tp.curso}
+                  </span>
+                  ${tp.unidad ? `
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-200/80 text-slate-700">
+                      <i class="fa-solid fa-layer-group mr-1 text-[9px]"></i> ${tp.unidad}
+                    </span>
+                  ` : ''}
+                  ${tp.fecha_limite ? (
+                    tp.vencido ? `
+                      <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-100 text-red-700 uppercase flex items-center gap-1">
+                        <i class="fa-solid fa-clock-rotate-left"></i> Plazo Vencido (${fechaLimiteTexto})
+                      </span>
+                    ` : `
+                      <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200/70 flex items-center gap-1">
+                        <i class="fa-regular fa-clock text-amber-600"></i> Límite: ${fechaLimiteTexto}
+                      </span>
+                    `
+                  ) : `
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500">
+                      Sin fecha límite
+                    </span>
+                  `}
                 </div>
-            
-                <div class="block w-full overflow-x-auto">
-                  <table class="items-center bg-transparent w-full border-collapse ">
-                    <thead>
-                      <tr>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">DNI</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Nombre y apellido</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Calificación</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Opciones</th>
-                      </tr>
-                    </thead>
-            
-                    <tbody>
-                      <tr>
-                        <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">
-                          43065607
-                        </th>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          Jorgito Serenito
-                        </td>
-                        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          8.00
-                        </td>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <button class="mr-2 rounded-3xl bg-blue-700 py-1 px-3 rounded-3xl text-white text-xs">Corregir</button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">
-                          43065607
-                        </th>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          Jorgito Serenito
-                        </td>
-                        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          8.00
-                        </td>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <button class="mr-2 rounded-3xl bg-sky-400 w-6 h-6"><i class="fa-solid fa-pen-to-square" style="color: #000000;"></i></button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+
+                <div class="flex items-center gap-3 pt-0.5">
+                  <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-file-signature ${tp.vencido ? 'text-red-500' : 'text-amber-500'}"></i>
+                    <span>${tp.titulo}</span>
+                  </h3>
+
+                  ${tp.archivo_consigna ? `
+                    <button type="button" class="btn-descargar-consigna text-blue-600 hover:underline font-bold text-xs flex items-center gap-1 cursor-pointer shrink-0 ml-1" data-id="${tp.id}" data-nombre="${tp.archivo_nombre}">
+                      <i class="fa-solid fa-file-arrow-down text-blue-500"></i>
+                      <span>Ver Consigna</span>
+                    </button>
+                  ` : ''}
                 </div>
               </div>
-          </div>
-</DashboardLayout>
 
+              <div class="flex items-center gap-3">
+                <div class="text-left sm:text-right bg-white px-3.5 py-1.5 rounded-2xl border border-slate-200/80 shadow-2xs">
+                  <span class="text-xs font-black text-slate-800 block">
+                    ${tp.total_entregas === 0 ? '0 entregas recibidas' : `${tp.total_entregas} entrega(s)`}
+                  </span>
+                  <span class="text-[11px] font-bold ${tp.total_entregas === 0 ? 'text-slate-400' : tp.pendientes > 0 ? 'text-amber-600' : 'text-emerald-600'}">
+                    ${tp.total_entregas === 0 ? 'Sin entregas aún' : tp.pendientes > 0 ? `${tp.pendientes} por corregir` : 'Todas corregidas ✓'}
+                  </span>
+                </div>
+
+                ${tp.vencido ? `
+                  <button type="button" class="btn-eliminar-tp-indiv p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer" data-id="${tp.id}" data-titulo="${encodeURIComponent(tp.titulo)}" title="Eliminar este trabajo práctico del historial">
+                    <i class="fa-regular fa-trash-can text-sm"></i>
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+
+            <!-- Contenido: Lista de Entregas o Estado Vacío -->
+            ${tp.total_entregas === 0 ? `
+              <div class="p-8 text-center bg-slate-50/40 border-t border-slate-100 space-y-1.5">
+                <div class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 text-xl mx-auto mb-2">
+                  <i class="fa-regular fa-folder-open"></i>
+                </div>
+                <p class="text-xs font-bold text-slate-700">
+                  ${tp.vencido ? 'El plazo de entrega finalizó sin entregas de estudiantes' : 'Sin entregas recibidas aún'}
+                </p>
+                <p class="text-[11px] text-slate-400 max-w-md mx-auto">
+                  ${tp.vencido
+                    ? 'Este trabajo práctico no registró resoluciones enviadas durante su período de vigencia.'
+                    : 'Las resoluciones enviadas por los estudiantes asignados a este curso se mostrarán aquí para su revisión.'}
+                </p>
+              </div>
+            ` : `
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-white text-slate-400 uppercase font-bold tracking-wider border-b border-slate-100">
+                    <tr>
+                      <th class="p-4">Estudiante</th>
+                      <th class="p-4">Archivo de Resolución</th>
+                      <th class="p-4">Fecha de Envío</th>
+                      <th class="p-4">Calificación</th>
+                      <th class="p-4 text-right">Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100">
+                    ${tp.entregas.map((item) => `
+                      <tr class="hover:bg-slate-50/70 transition-colors">
+                        <td class="p-4">
+                          <div class="font-bold text-slate-800 text-sm">${item.alumno}</div>
+                          <div class="text-[11px] text-slate-400">${tp.titulo}</div>
+                        </td>
+                        <td class="p-4">
+                          <button type="button" class="btn-descargar-resolucion inline-flex items-center gap-1.5 text-blue-600 hover:underline font-bold text-left cursor-pointer" data-id="${item.id}" data-nombre="${item.archivo_nombre}">
+                            <i class="fa-solid fa-file-pdf text-red-500 text-sm"></i>
+                            <span class="truncate max-w-[180px]">${item.archivo_nombre}</span>
+                          </button>
+                        </td>
+                        <td class="p-4 text-slate-500 font-medium">${item.fecha}</td>
+                        <td class="p-4">
+                          ${item.estado === 'calificado'
+                            ? `<span class="px-2.5 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200/50">Nota: ${item.calificacion}</span>`
+                            : `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200/50">Pendiente</span>`
+                          }
+                        </td>
+                        <td class="p-4 text-right">
+                          <button class="btn-abrir-modal-calificar px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-all shadow-sm flex items-center gap-1.5 ml-auto cursor-pointer" 
+                            data-tp-id="${tp.id}"
+                            data-submission-id="${item.id}"
+                            data-alumno-id="${item.alumno_id}"
+                            data-alumno-nombre="${encodeURIComponent(item.alumno)}"
+                            data-curso="${encodeURIComponent(tp.curso)}"
+                            data-tp-titulo="${encodeURIComponent(tp.titulo)}"
+                            data-archivo-nombre="${encodeURIComponent(item.archivo_nombre)}"
+                            data-calificacion="${item.calificacion !== '--' ? item.calificacion : ''}"
+                            data-carpeta="${encodeURIComponent(item.carpeta || tp.carpeta)}">
+                            <i class="fa-solid fa-pen-to-square text-xs"></i>
+                            <span>${item.estado === 'calificado' ? 'Editar Nota' : 'Calificar'}</span>
+                          </button>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            `}
+          </div>
+        `;
+      }).join('');
+
+      conectarEventosDinamicos();
+    }
+
+    function conectarEventosDinamicos() {
+      // 1. Descargar resolución de estudiante
+      document.querySelectorAll('.btn-descargar-resolucion').forEach((btn) => {
+        btn.addEventListener('click', async (e) => {
+          e.preventDefault();
+          const id = btn.getAttribute('data-id');
+          const nombre = btn.getAttribute('data-nombre') || 'resolucion.pdf';
+          if (!id) return;
+          const original = btn.innerHTML;
+          try {
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-blue-600"></i> <span class="text-xs text-blue-600">Descargando...</span>';
+            await api.material.descargarArchivo(id, nombre);
+          } catch (err: any) {
+            console.error('Error al descargar:', err);
+            alert('Error al descargar el archivo: ' + err.message);
+          } finally {
+            btn.innerHTML = original;
+          }
+        });
+      });
+
+      // 2. Descargar consigna del profesor
+      document.querySelectorAll('.btn-descargar-consigna').forEach((btn) => {
+        btn.addEventListener('click', async (e) => {
+          e.preventDefault();
+          const id = btn.getAttribute('data-id');
+          const nombre = btn.getAttribute('data-nombre') || 'consigna.pdf';
+          if (!id) return;
+          const original = btn.innerHTML;
+          try {
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-blue-600"></i> <span>Descargando...</span>';
+            await api.material.descargarArchivo(id, nombre);
+          } catch (err: any) {
+            console.error('Error al descargar consigna:', err);
+            alert('Error al descargar la consigna: ' + err.message);
+          } finally {
+            btn.innerHTML = original;
+          }
+        });
+      });
+
+      // 3. Abrir modal de calificación
+      document.querySelectorAll('.btn-abrir-modal-calificar').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const submissionId = Number(btn.getAttribute('data-submission-id'));
+          const alumnoId = Number(btn.getAttribute('data-alumno-id'));
+          const alumno = decodeURIComponent(btn.getAttribute('data-alumno-nombre') || '');
+          const curso = decodeURIComponent(btn.getAttribute('data-curso') || '');
+          const tpTitulo = decodeURIComponent(btn.getAttribute('data-tp-titulo') || '');
+          const archivoNombre = decodeURIComponent(btn.getAttribute('data-archivo-nombre') || '');
+          const calificacion = btn.getAttribute('data-calificacion') || '';
+          const carpeta = decodeURIComponent(btn.getAttribute('data-carpeta') || '');
+
+          abrirModal({ submissionId, alumnoId, alumno, curso, tpTitulo, archivoNombre, calificacion, carpeta });
+        });
+      });
+
+      // 4. Abrir modal para eliminar TP histórico individual
+      document.querySelectorAll('.btn-eliminar-tp-indiv').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const id = Number(btn.getAttribute('data-id'));
+          const titulo = decodeURIComponent(btn.getAttribute('data-titulo') || 'Trabajo Práctico');
+          tpIdAEliminar = id;
+          const txtNombre = document.getElementById('txt-eliminar-tp-nombre');
+          if (txtNombre) {
+            txtNombre.textContent = `Se eliminará "${titulo}" y sus entregas asociadas del historial.`;
+          }
+          modalEliminarTP?.classList.remove('hidden');
+        });
+      });
+    }
+
+    function abrirModal(item: {
+      submissionId: number;
+      alumnoId: number;
+      alumno: string;
+      curso: string;
+      tpTitulo: string;
+      archivoNombre: string;
+      calificacion: string;
+      carpeta: string;
+    }) {
+      const sub = document.getElementById('modal-subtitulo');
+      const cur = document.getElementById('modal-curso');
+      const tp = document.getElementById('modal-tp');
+      const nota = document.getElementById('modal-nota') as HTMLInputElement;
+      const alumnoId = document.getElementById('modal-alumno-id') as HTMLInputElement;
+      const carpeta = document.getElementById('modal-carpeta') as HTMLInputElement;
+      const subId = document.getElementById('modal-submission-id') as HTMLInputElement;
+
+      if (sub) sub.textContent = `Estudiante: ${item.alumno}`;
+      if (cur) cur.textContent = item.curso;
+      if (tp) tp.textContent = item.tpTitulo;
+      if (nota) nota.value = item.calificacion;
+      if (alumnoId) alumnoId.value = String(item.alumnoId);
+      if (carpeta) carpeta.value = item.carpeta;
+      if (subId) subId.value = String(item.submissionId);
+
+      const modalDesc = document.getElementById('modal-descarga') as HTMLAnchorElement;
+      if (modalDesc) {
+        modalDesc.onclick = async (e) => {
+          e.preventDefault();
+          const original = modalDesc.innerHTML;
+          try {
+            modalDesc.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-blue-600"></i> <span>Descargando...</span>';
+            await api.material.descargarArchivo(item.submissionId, item.archivoNombre);
+          } catch (err: any) {
+            console.error('Error al descargar en modal:', err);
+            alert('Error al descargar resolución: ' + err.message);
+          } finally {
+            modalDesc.innerHTML = original;
+          }
+        };
+      }
+
+      modalCalificar?.classList.remove('hidden');
+    }
+
+    function cerrarModalCalificar() {
+      modalCalificar?.classList.add('hidden');
+    }
+
+    document.getElementById('btn-cerrar-modal')?.addEventListener('click', cerrarModalCalificar);
+    document.getElementById('btn-cancelar-modal')?.addEventListener('click', cerrarModalCalificar);
+
+    let calificacionPendiente: { alumnoId: number; carpeta: string; nota: string; submissionId: number } | null = null;
+
+    // Al enviar el formulario de calificación, abrir modal de confirmación
+    formCalificar?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const alumnoId = Number((document.getElementById('modal-alumno-id') as HTMLInputElement).value);
+      const carpeta = (document.getElementById('modal-carpeta') as HTMLInputElement).value;
+      const submissionId = Number((document.getElementById('modal-submission-id') as HTMLInputElement).value);
+      const nota = (document.getElementById('modal-nota') as HTMLInputElement).value;
+
+      const sub = document.getElementById('modal-subtitulo')?.textContent?.replace('Estudiante: ', '') || 'Estudiante';
+      const cur = document.getElementById('modal-curso')?.textContent || '--';
+      const tp = document.getElementById('modal-tp')?.textContent || '--';
+
+      const confAlumno = document.getElementById('conf-alumno');
+      const confCurso = document.getElementById('conf-curso');
+      const confTp = document.getElementById('conf-tp');
+      const confNota = document.getElementById('conf-nota');
+
+      if (confAlumno) confAlumno.textContent = sub;
+      if (confCurso) confCurso.textContent = cur;
+      if (confTp) confTp.textContent = tp;
+      if (confNota) confNota.textContent = `${nota} / 10`;
+
+      calificacionPendiente = { alumnoId, carpeta, nota, submissionId };
+      modalConfirmar?.classList.remove('hidden');
+    });
+
+    const btnCancelarConf = document.getElementById('btn-cancelar-conf');
+    const btnConfirmarGuardar = document.getElementById('btn-confirmar-guardar');
+    const btnCerrarExito = document.getElementById('btn-cerrar-exito');
+
+    btnCancelarConf?.addEventListener('click', () => {
+      modalConfirmar?.classList.add('hidden');
+    });
+
+    btnConfirmarGuardar?.addEventListener('click', async () => {
+      if (!calificacionPendiente) return;
+      const { alumnoId, carpeta, nota, submissionId } = calificacionPendiente;
+
+      if (btnConfirmarGuardar) {
+        btnConfirmarGuardar.setAttribute('disabled', 'true');
+        btnConfirmarGuardar.textContent = 'Guardando...';
+      }
+
+      try {
+        await api.material.calificar(alumnoId, nota, carpeta, submissionId);
+
+        // Actualizar estado local en memoria
+        for (const tp of tpsData) {
+          const target = tp.entregas.find(e => e.id === submissionId || (e.alumno_id === alumnoId && e.carpeta === carpeta));
+          if (target) {
+            target.calificacion = Number(nota).toFixed(2);
+            target.estado = 'calificado';
+            tp.pendientes = tp.entregas.filter(e => e.estado === 'pendiente').length;
+            tp.calificados = tp.entregas.filter(e => e.estado === 'calificado').length;
+            break;
+          }
+        }
+
+        modalConfirmar?.classList.add('hidden');
+        cerrarModalCalificar();
+        renderTabla();
+        modalExito?.classList.remove('hidden');
+
+        // Recargar desde el servidor para sincronización total con MySQL
+        await cargarDatos();
+      } catch (err: any) {
+        console.error('Error al calificar material:', err);
+        alert('Error al guardar la calificación: ' + (err.message || 'No se pudo registrar la nota'));
+      } finally {
+        if (btnConfirmarGuardar) {
+          btnConfirmarGuardar.removeAttribute('disabled');
+          btnConfirmarGuardar.innerHTML = '<i class="fa-solid fa-check"></i><span>Confirmar y Guardar</span>';
+        }
+      }
+    });
+
+    btnCerrarExito?.addEventListener('click', () => {
+      modalExito?.classList.add('hidden');
+    });
+
+    // -----------------------------------------------------------------
+    // Lógica para Vaciar Historial de Prácticos
+    // -----------------------------------------------------------------
+    const btnAbrirBorrarHistorial = document.getElementById('btn-abrir-borrar-historial');
+    const btnCancelarBorrarHistorial = document.getElementById('btn-cancelar-borrar-historial');
+    const btnConfirmarBorrarHistorial = document.getElementById('btn-confirmar-borrar-historial');
+
+    btnAbrirBorrarHistorial?.addEventListener('click', () => {
+      modalBorrarHistorial?.classList.remove('hidden');
+    });
+
+    btnCancelarBorrarHistorial?.addEventListener('click', () => {
+      modalBorrarHistorial?.classList.add('hidden');
+    });
+
+    btnConfirmarBorrarHistorial?.addEventListener('click', async () => {
+      if (!btnConfirmarBorrarHistorial) return;
+      const orig = btnConfirmarBorrarHistorial.innerHTML;
+      try {
+        btnConfirmarBorrarHistorial.setAttribute('disabled', 'true');
+        btnConfirmarBorrarHistorial.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Vaciando...</span>';
+
+        await api.material.limpiarHistorial();
+        modalBorrarHistorial?.classList.add('hidden');
+        await cargarDatos();
+      } catch (err: any) {
+        console.error('Error al vaciar historial:', err);
+        alert('Error al vaciar historial: ' + err.message);
+      } finally {
+        btnConfirmarBorrarHistorial.removeAttribute('disabled');
+        btnConfirmarBorrarHistorial.innerHTML = orig;
+      }
+    });
+
+    // -----------------------------------------------------------------
+    // Lógica para Eliminar TP Histórico Individual
+    // -----------------------------------------------------------------
+    const btnCancelarEliminarTP = document.getElementById('btn-cancelar-eliminar-tp');
+    const btnConfirmarEliminarTP = document.getElementById('btn-confirmar-eliminar-tp');
+
+    btnCancelarEliminarTP?.addEventListener('click', () => {
+      modalEliminarTP?.classList.add('hidden');
+      tpIdAEliminar = null;
+    });
+
+    btnConfirmarEliminarTP?.addEventListener('click', async () => {
+      if (!tpIdAEliminar || !btnConfirmarEliminarTP) return;
+      const orig = btnConfirmarEliminarTP.innerHTML;
+      try {
+        btnConfirmarEliminarTP.setAttribute('disabled', 'true');
+        btnConfirmarEliminarTP.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Eliminando...</span>';
+
+        await api.material.eliminarConsigna(tpIdAEliminar);
+        modalEliminarTP?.classList.add('hidden');
+        tpIdAEliminar = null;
+        await cargarDatos();
+      } catch (err: any) {
+        console.error('Error al eliminar TP:', err);
+        alert('Error al eliminar TP: ' + err.message);
+      } finally {
+        btnConfirmarEliminarTP.removeAttribute('disabled');
+        btnConfirmarEliminarTP.innerHTML = orig;
+      }
+    });
+
+    // Filtros
+    filtroCurso?.addEventListener('change', renderTabla);
+    filtroEstado?.addEventListener('change', renderTabla);
+    filtroBusqueda?.addEventListener('input', renderTabla);
+
+    // Inicializar
+    cargarDatos();
+  </script>
+</DashboardLayout>

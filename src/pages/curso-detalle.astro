@@ -1,0 +1,1830 @@
+---
+import MoodleLayout from '../layouts/Moodle-Layout.astro';
+---
+
+<MoodleLayout title="Detalle del Curso">
+  <div class="space-y-6">
+    <!-- Breadcrumbs y Cabecera del Curso -->
+    <div class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-sm">
+      <nav class="flex items-center space-x-2 text-xs font-semibold text-slate-400 mb-3">
+        <a href="/inicio" class="hover:text-blue-600 flex items-center gap-1">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Volver a Mis Cursos</span>
+        </a>
+        <span>/</span>
+        <span class="text-blue-600 font-bold" id="course-breadcrumb">Electricidad Industrial</span>
+      </nav>
+
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-blue-100 text-blue-800">CURSO REGULAR</span>
+            <span class="text-xs text-slate-400 font-medium">Ciclo 2024</span>
+          </div>
+          <h1 class="text-2xl md:text-3xl font-black text-slate-900" id="course-title">
+            Electricidad Industrial y Domiciliaria
+          </h1>
+          <div class="text-xs md:text-sm text-slate-500 mt-2 flex flex-wrap items-center gap-y-2 gap-x-5">
+            <span class="flex items-center gap-1.5">
+              <i class="fa-solid fa-user-tie text-blue-500"></i>
+              <span>Docente(s): <strong class="text-slate-800" id="course-profesor">Cargando...</strong></span>
+            </span>
+            <span class="flex items-center gap-1.5">
+              <i class="fa-solid fa-door-open text-emerald-500"></i>
+              <span>Aula Física: <strong class="text-slate-800" id="course-aula">Cargando...</strong></span>
+            </span>
+            <span class="flex items-center gap-1.5">
+              <i class="fa-regular fa-clock text-purple-500"></i>
+              <span>Días y Horarios: <strong class="text-slate-800" id="course-horario">Cargando...</strong></span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PESTAÑAS DESTACADAS Y ULTRA CLARAS (Prominent Segmented Navigation) -->
+    <div class="prominent-tab-container flex flex-wrap gap-2">
+      <button class="prominent-tab-btn active" data-tab="tab-temario">
+        <i class="fa-solid fa-book-bookmark text-base"></i>
+        <span>1. Temario y Materiales</span>
+        <span class="tab-badge-counter text-[11px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 font-bold" id="badge-temario">0</span>
+      </button>
+
+      <button class="prominent-tab-btn" data-tab="tab-calificaciones">
+        <i class="fa-solid fa-chart-line text-base"></i>
+        <span>2. Mis Calificaciones</span>
+      </button>
+
+      <button class="prominent-tab-btn" data-tab="tab-foro">
+        <i class="fa-solid fa-comments text-base"></i>
+        <span>3. Foro de Consultas</span>
+        <span class="tab-badge-counter text-[11px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 font-bold" id="badge-foro">0</span>
+      </button>
+    </div>
+
+    <!-- CONTENIDOS DE CADA PESTAÑA -->
+
+    <!-- PESTAÑA 1: TEMARIO Y MATERIALES -->
+    <div id="tab-temario" class="tab-content active space-y-6">
+      <div class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-sm space-y-6">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Unidades Curriculares y Documentos de Estudio</h2>
+          <p class="text-xs text-slate-500">Descarga los manuales, diapositivas y guías subidas por el docente.</p>
+        </div>
+
+        <div class="space-y-4" id="temario-container">
+          <p class="text-xs text-slate-400 p-8 text-center">Cargando unidades del curso...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 2: CALIFICACIONES -->
+    <div id="tab-calificaciones" class="tab-content space-y-6">
+      <div class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-sm space-y-6">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Boletín y Registro de Calificaciones</h2>
+          <p class="text-xs text-slate-500">Consulta tus notas de exámenes, trabajos prácticos y calificación de cursado.</p>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 uppercase font-bold tracking-wider border-b border-slate-200">
+              <tr>
+                <th class="p-3">Instancia de Evaluación</th>
+                <th class="p-3">Tipo</th>
+                <th class="p-3">Calificación</th>
+                <th class="p-3">Estado</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100" id="calificaciones-tbody">
+              <!-- Cargado dinámicamente -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 3: FORO DE CONSULTAS -->
+    <div id="tab-foro" class="tab-content space-y-6">
+      <!-- VISTA 1: LISTADO GENERAL DE TEMAS -->
+      <div id="foro-vista-lista" class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-sm space-y-6">
+        <!-- Cabecera del Foro -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-comments text-blue-600"></i>
+              <span>Foro de Dudas y Consultas</span>
+            </h2>
+            <p class="text-xs text-slate-500">Espacio de debate, preguntas pedagógicas y comunicación abierta entre alumnos y docentes.</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <!-- Buscador interno del foro -->
+            <div class="relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <input
+                type="text"
+                id="input-buscar-foro"
+                placeholder="Buscar temas o dudas..."
+                class="pl-8 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 text-slate-700 font-medium w-48 sm:w-56"
+              />
+            </div>
+
+            <!-- Botón Nuevo Tema -->
+            <button
+              type="button"
+              id="btn-nuevo-tema-foro"
+              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <i class="fa-solid fa-plus"></i>
+              <span>Nuevo Tema / Consulta</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Contenedor de Temas del Foro -->
+        <div id="foro-temas-container" class="space-y-3">
+          <p class="text-xs text-slate-400 p-8 text-center">
+            <i class="fa-solid fa-spinner fa-spin mr-1.5 text-blue-500"></i>
+            Cargando temas del foro...
+          </p>
+        </div>
+      </div>
+
+      <!-- VISTA 2: DETALLE DEL HILO Y RESPUESTAS (INICIALMENTE OCULTA) -->
+      <div id="foro-vista-detalle" class="hidden space-y-6">
+        <!-- Barra Superior de Navegación del Hilo -->
+        <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
+          <button
+            type="button"
+            id="btn-volver-foro-lista"
+            class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors flex items-center gap-2 cursor-pointer"
+          >
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Volver a la Lista de Temas</span>
+          </button>
+          <span class="text-xs font-bold text-slate-400" id="hilo-fecha-cabecera">--</span>
+        </div>
+
+        <!-- Tarjeta Principal del Tema -->
+        <div id="hilo-tema-principal" class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-sm space-y-4">
+          <!-- Renderizado dinámico del tema con autor, rol, contenido, imagen y enlace -->
+        </div>
+
+        <!-- Bloque de Respuestas e Hilos Anidados -->
+        <div class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-sm space-y-6">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-reply-all text-blue-600"></i>
+              <span>Respuestas del Debate</span>
+            </h3>
+            <span id="hilo-respuestas-count" class="text-xs font-bold bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-200">0 respuestas</span>
+          </div>
+
+          <!-- Árbol de Respuestas -->
+          <div id="hilo-respuestas-container" class="space-y-4">
+            <!-- Respuestas directas y anidadas -->
+          </div>
+
+          <!-- Formulario para Enviar Respuesta al Tema / Cita -->
+          <form id="form-responder-foro" class="space-y-3 pt-4 border-t border-slate-200">
+            <input type="hidden" id="responder-parent-id" value="" />
+
+            <!-- Aviso si se está citando/respondiendo a una respuesta específica -->
+            <div id="aviso-cita-respuesta" class="hidden bg-blue-50 border border-blue-200 p-3 rounded-2xl flex items-center justify-between text-xs">
+              <div class="flex items-center gap-2 text-blue-800">
+                <i class="fa-solid fa-quote-left text-blue-600"></i>
+                <span>Respondiendo a: <strong id="cita-autor-nombre">Usuario</strong></span>
+              </div>
+              <button type="button" id="btn-cancelar-cita" class="text-blue-600 hover:text-blue-800 font-bold text-xs flex items-center gap-1 cursor-pointer">
+                <i class="fa-solid fa-xmark"></i>
+                <span>Cancelar cita</span>
+              </button>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Escribir Respuesta o Aporte
+              </label>
+              <textarea
+                id="responder-contenido"
+                rows="3"
+                required
+                placeholder="Escriba su respuesta o consulta aquí..."
+                class="w-full p-3.5 text-xs bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 font-medium leading-relaxed"
+              ></textarea>
+            </div>
+
+            <!-- Adjuntos de la respuesta (Imagen o Enlace) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 mb-1">
+                  <i class="fa-solid fa-link text-slate-400 mr-1"></i> Enlace Web (Opcional)
+                </label>
+                <input
+                  type="url"
+                  id="responder-enlace"
+                  placeholder="https://ejemplo.com/material-util"
+                  class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600 font-medium"
+                />
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 mb-1">
+                  <i class="fa-regular fa-image text-slate-400 mr-1"></i> Imagen Adjunta (Opcional)
+                </label>
+                <input
+                  type="file"
+                  id="responder-imagen"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                />
+              </div>
+            </div>
+
+            <div class="flex justify-end pt-1">
+              <button
+                type="submit"
+                id="btn-submit-respuesta"
+                class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>Publicar Respuesta</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Entregar Trabajo Práctico -->
+  <div id="modal-entregar-tp" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-fadeIn">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">Entregar Trabajo Práctico</h3>
+          <p class="text-xs text-slate-500" id="modal-tp-subtitulo">Subir resolución para revisión docente</p>
+        </div>
+        <button id="btn-cerrar-modal-entrega" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="form-entregar-tp-modal" class="space-y-4">
+        <input type="hidden" id="entrega-unidad-id" value="" />
+        <input type="hidden" id="entrega-observacion" value="" />
+        <input type="hidden" id="entrega-carpeta" value="" />
+
+        <div class="bg-blue-50/60 p-4 rounded-2xl border border-blue-100 space-y-1">
+          <p class="text-[11px] font-bold text-blue-700 uppercase tracking-wider" id="modal-entrega-unidad">Unidad</p>
+          <p class="text-sm font-bold text-slate-900" id="modal-entrega-titulo">TP N° ...</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+            Archivo de Resolución (PDF, DOCX, ZIP)
+          </label>
+          <div id="modal-entrega-dropzone" class="border-2 border-dashed border-blue-300 hover:border-blue-500 bg-blue-50/40 hover:bg-blue-50/70 rounded-2xl p-5 text-center cursor-pointer transition-all group">
+            <input type="file" id="modal-entrega-file" accept=".pdf,.doc,.docx,.zip" class="hidden" />
+            <div id="modal-entrega-prompt" class="space-y-1.5">
+              <div class="w-11 h-11 mx-auto rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform shadow-2xs">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+              </div>
+              <p class="text-xs font-bold text-slate-800">Haz clic aquí para seleccionar tu resolución</p>
+              <p class="text-[11px] text-slate-400">o arrastra tu archivo PDF, DOCX o ZIP (Máx. 25MB)</p>
+            </div>
+            <div id="modal-entrega-selected" class="hidden flex items-center justify-between bg-white p-3 rounded-xl border border-blue-200 text-left shadow-2xs">
+              <div class="flex items-center gap-2.5 overflow-hidden">
+                <i class="fa-solid fa-file-pdf text-red-500 text-lg shrink-0"></i>
+                <div class="overflow-hidden">
+                  <p id="modal-entrega-filename" class="text-xs font-bold text-slate-800 truncate">resolucion.pdf</p>
+                  <p id="modal-entrega-filesize" class="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
+                    <i class="fa-solid fa-circle-check"></i> Listo para entregar
+                  </p>
+                </div>
+              </div>
+              <button type="button" id="btn-remover-entrega-file" class="text-xs text-blue-600 hover:text-blue-800 font-bold px-2.5 py-1 hover:bg-blue-50 rounded-lg transition-colors shrink-0">
+                Cambiar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button type="button" id="btn-cancelar-entrega" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
+          <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center gap-2">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <span>Confirmar Entrega</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Visor de Imagen en Moodle (Lightbox) -->
+  <div id="modal-visor-imagen-moodle" class="fixed inset-0 bg-slate-950/80 z-50 hidden flex items-center justify-center p-4 backdrop-blur-md">
+    <div class="max-w-4xl w-full bg-white rounded-3xl overflow-hidden shadow-2xl border border-slate-800 animate-fadeIn space-y-3">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/80">
+        <h4 id="visor-img-titulo-moodle" class="text-sm font-bold text-slate-900 truncate">Imagen Didáctica</h4>
+        <button id="btn-cerrar-visor-img-moodle" class="text-slate-400 hover:text-slate-700 p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+      <div class="p-4 flex items-center justify-center bg-slate-900/5 max-h-[75vh] overflow-auto">
+        <img id="visor-img-src-moodle" src="" alt="Imagen ampliada" class="max-h-[70vh] w-auto rounded-2xl shadow-md object-contain" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Crear / Editar Tema del Foro -->
+  <div id="modal-crear-tema-foro" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl border border-slate-100 space-y-5 animate-fadeIn">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <h3 class="text-base font-bold text-slate-900" id="modal-tema-titulo-txt">Nuevo Tema de Consulta</h3>
+          <p class="text-xs text-slate-500">Publica una duda o comparte información con el curso.</p>
+        </div>
+        <button id="btn-cerrar-modal-tema" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="form-crear-tema-foro" class="space-y-4">
+        <input type="hidden" id="modal-tema-id" value="" />
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Título del Tema</label>
+          <input
+            type="text"
+            id="modal-tema-input-titulo"
+            required
+            placeholder="Ej: Duda sobre cálculo de caída de tensión en el TP 2"
+            class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 font-bold text-slate-800"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Consulta o Descripción</label>
+          <textarea
+            id="modal-tema-input-contenido"
+            rows="5"
+            required
+            placeholder="Describa en detalle su consulta, ejercicio o aporte..."
+            class="w-full p-3.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 font-medium leading-relaxed"
+          ></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-500 mb-1">
+              <i class="fa-solid fa-link text-slate-400 mr-1"></i> Enlace Web (Opcional)
+            </label>
+            <input
+              type="url"
+              id="modal-tema-input-enlace"
+              placeholder="https://..."
+              class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600 font-medium"
+            />
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-500 mb-1">
+              <i class="fa-regular fa-image text-slate-400 mr-1"></i> Imagen Adjunta (Opcional)
+            </label>
+            <input
+              type="file"
+              id="modal-tema-input-imagen"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+            />
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" id="btn-cancelar-modal-tema" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors cursor-pointer">
+            Cancelar
+          </button>
+          <button type="submit" id="btn-submit-modal-tema" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span id="btn-submit-modal-tema-txt">Publicar Tema</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Editar Respuesta del Foro -->
+  <div id="modal-editar-respuesta-foro" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-fadeIn">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-base font-bold text-slate-900">Editar Mensaje</h3>
+        <button id="btn-cerrar-modal-editar-resp" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="form-editar-respuesta-foro" class="space-y-4">
+        <input type="hidden" id="modal-editar-resp-id" value="" />
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Contenido del Mensaje</label>
+          <textarea
+            id="modal-editar-resp-contenido"
+            rows="4"
+            required
+            class="w-full p-3.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 font-medium leading-relaxed"
+          ></textarea>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold text-slate-500 mb-1">
+            <i class="fa-solid fa-link text-slate-400 mr-1"></i> Enlace Web (Opcional)
+          </label>
+          <input
+            type="url"
+            id="modal-editar-resp-enlace"
+            placeholder="https://..."
+            class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-600 font-medium"
+          />
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button type="button" id="btn-cancelar-modal-editar-resp" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors cursor-pointer">
+            Cancelar
+          </button>
+          <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition-colors cursor-pointer">
+            Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Confirmar Eliminación del Foro -->
+  <div id="modal-confirmar-eliminar-foro" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center space-y-4 animate-fadeIn">
+      <div class="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mx-auto text-xl">
+        <i class="fa-solid fa-trash-can"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-slate-900" id="conf-eliminar-foro-titulo">¿Eliminar publicación?</h3>
+        <p class="text-xs text-slate-500 mt-1" id="conf-eliminar-foro-msg">Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="flex justify-center gap-2 pt-2">
+        <button type="button" id="btn-cancelar-conf-eliminar-foro" class="flex-1 py-2.5 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors cursor-pointer">
+          Cancelar
+        </button>
+        <button type="button" id="btn-aceptar-conf-eliminar-foro" class="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer">
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    import { api } from '../lib/api';
+    import { getCurrentUser } from '../lib/auth';
+
+    const user = getCurrentUser();
+    const urlParams = new URLSearchParams(window.location.search);
+    const cursoId = Number(urlParams.get('id')) || 1;
+
+    // Manejador de Pestañas Seguras y Prominentes
+    const tabBtns = document.querySelectorAll('.prominent-tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const targetTabId = btn.getAttribute('data-tab');
+        tabBtns.forEach((b) => b.classList.remove('active'));
+        tabContents.forEach((c) => c.classList.remove('active'));
+        btn.classList.add('active');
+        if (targetTabId) {
+          document.getElementById(targetTabId)?.classList.add('active');
+        }
+      });
+    });
+
+    function formatearNotaLetras(nota: number | string): string {
+      const num = Number(nota);
+      if (isNaN(num)) return String(nota);
+      const entero = Math.round(num);
+      const nombres: Record<number, string> = {
+        0: 'cero', 1: 'uno', 2: 'dos', 3: 'tres', 4: 'cuatro',
+        5: 'cinco', 6: 'seis', 7: 'siete', 8: 'ocho', 9: 'nueve', 10: 'diez'
+      };
+      const textoEntero = nombres[entero] || `${entero}`;
+      return `${entero}(${textoEntero})`;
+    }
+
+    async function cargarDetalleCurso() {
+      try {
+        // 1. Datos del curso, profesores y asignaciones físicas
+        const [cursoData, aulasInfo, unidades, materiales, examenes, notasCurso, misMateriales, profesoresData] = await Promise.all([
+          api.curso.uno(cursoId).catch(() => null),
+          api.aula.obtenerInfoCompleta().catch(() => []),
+          api.unidades.todos().catch(() => []),
+          api.material.porCurso(cursoId).catch(() => []),
+          api.examen.todos().catch(() => []),
+          api.curso.obtenerNotasPorCurso(cursoId).catch(() => []),
+          user?.id ? api.material.porAlumno(user.id).catch(() => []) : Promise.resolve([]),
+          api.curso.profesoresPorCurso(cursoId).catch(() => [])
+        ]);
+
+        const curso = Array.isArray(cursoData) ? cursoData[0] : cursoData;
+
+        if (curso) {
+          const breadcrumb = document.getElementById('course-breadcrumb');
+          const title = document.getElementById('course-title');
+          if (breadcrumb) breadcrumb.textContent = curso.nombre || 'Curso';
+          if (title) title.textContent = curso.nombre || 'Curso';
+        }
+
+        // Profesores a cargo del curso
+        const profEl = document.getElementById('course-profesor');
+        if (profEl) {
+          let nombresProfes = '';
+          if (Array.isArray(profesoresData) && profesoresData.length > 0) {
+            nombresProfes = profesoresData.map((p: any) => `${p.nombre} ${p.apellido}`).join(', ');
+          } else if (curso?.profesor) {
+            nombresProfes = curso.profesor;
+          }
+          profEl.textContent = nombresProfes || 'Sin docente asignado';
+        }
+
+        // Aulas físicas y Horarios del curso
+        const asignacionesCurso = (aulasInfo || []).filter((a: any) => Number(a.curso_id) === cursoId);
+
+        const aulaEl = document.getElementById('course-aula');
+        if (aulaEl) {
+          const aulasUnicas = Array.from(new Set(asignacionesCurso.map((a: any) => a.aula_nombre).filter(Boolean)));
+          aulaEl.textContent = aulasUnicas.length > 0 ? aulasUnicas.join(', ') : 'Sin aula asignada';
+        }
+
+        const horarioEl = document.getElementById('course-horario');
+        if (horarioEl) {
+          const horariosList = asignacionesCurso.map((a: any) => {
+            const inicio = a.hora_inicio ? a.hora_inicio.slice(0, 5) : '';
+            const fin = a.hora_fin ? a.hora_fin.slice(0, 5) : '';
+            const horas = inicio && fin ? `${inicio} a ${fin} hs` : '';
+            return `${a.dia || ''} ${horas}`.trim();
+          }).filter(Boolean);
+
+          const horariosUnicos = Array.from(new Set(horariosList));
+          horarioEl.textContent = horariosUnicos.length > 0 ? horariosUnicos.join(' | ') : 'A coordinar';
+        }
+
+        // 2. Temario y Materiales Integrados por Unidad
+        const unidadesCurso = (unidades || []).filter((u: any) => Number(u.curso_id) === cursoId);
+        const materialesCurso = materiales || [];
+
+        const badgeTemario = document.getElementById('badge-temario');
+        if (badgeTemario) badgeTemario.textContent = String(unidadesCurso.length);
+
+        const temarioCont = document.getElementById('temario-container');
+        if (temarioCont) {
+          if (unidadesCurso.length === 0) {
+            temarioCont.innerHTML = '<p class="text-xs text-slate-400 p-8 text-center">No hay unidades cargadas para este curso.</p>';
+          } else {
+            temarioCont.innerHTML = unidadesCurso.map((u: any, idx: number) => {
+              const imagenes = materialesCurso.filter((m: any) => Number(m.unidad_id) === Number(u.id) && m.tipo === 'imagen');
+              const docs = materialesCurso.filter((m: any) => Number(m.unidad_id) === Number(u.id) && m.tipo !== 'tp' && m.tipo !== 'imagen');
+              const tps = materialesCurso.filter((m: any) => Number(m.unidad_id) === Number(u.id) && m.tipo === 'tp' && m.estado === 'activo');
+              const examenesUnidad = (examenes || []).filter((e: any) => Number(e.curso_id) === cursoId && Number(e.unidad_id) === Number(u.id) && e.estado === 'activo');
+
+              let linksArray: any[] = [];
+              try {
+                if (u.links) {
+                  linksArray = typeof u.links === 'string' ? JSON.parse(u.links) : u.links;
+                  if (!Array.isArray(linksArray)) linksArray = [];
+                }
+              } catch {
+                linksArray = [];
+              }
+
+              const tieneContenidoDocente = u.contenido || linksArray.length > 0 || imagenes.length > 0;
+
+              return `
+                <div class="border border-slate-200 rounded-3xl p-6 bg-white space-y-6 shadow-xs hover:border-blue-200 transition-colors">
+                  <!-- Cabecera de la Unidad -->
+                  <div class="flex items-start gap-3.5 pb-4 border-b border-slate-100">
+                    <div class="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-md shadow-blue-500/20">
+                      U${idx + 1}
+                    </div>
+                    <div>
+                      <h3 class="text-base font-bold text-slate-900">${u.nombre}</h3>
+                      <p class="text-xs text-slate-500 leading-relaxed mt-0.5">${u.descripcion || 'Sin temario descriptivo.'}</p>
+                    </div>
+                  </div>
+
+                  <!-- ESTRUCTURA VERTICAL: CONTENIDO DOCENTE -> DOCUMENTOS -> TRABAJOS PRÁCTICOS -->
+                  <div class="space-y-5">
+                    <!-- CONTENIDO ESCRITO POR EL DOCENTE, ENLACES E IMÁGENES (SIN TÍTULO, MISMO CUERPO UNIFICADO) -->
+                    ${tieneContenidoDocente ? `
+                      <div class="bg-indigo-50/20 rounded-2xl p-5 border border-indigo-100/80 space-y-4 max-w-full overflow-hidden">
+                        <!-- Texto con soporte de salto de línea y desbordamiento (sin sangría espuria) -->
+                        ${u.contenido ? `<div class="text-xs sm:text-sm text-slate-700 whitespace-pre-wrap leading-relaxed break-words break-all [overflow-wrap:anywhere] max-w-full overflow-hidden">${u.contenido.trim()}</div>` : ''}
+
+                        <!-- Galería de Imágenes Didácticas en el mismo cuerpo -->
+                        ${imagenes.length > 0 ? `
+                          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 pt-1">
+                            ${imagenes.map((img: any) => {
+                              const imgUrl = 'http://localhost:4000/' + (img.archivo_scan ? img.archivo_scan.replace(/\\/g, '/') : '');
+                              return `
+                                <div class="group relative rounded-xl overflow-hidden border border-slate-200 bg-white shadow-2xs hover:shadow-md transition-all cursor-pointer btn-ampliar-img-moodle" data-img-src="${imgUrl}" data-img-titulo="${encodeURIComponent(img.observacion || 'Imagen Didáctica')}">
+                                  <div class="aspect-video w-full overflow-hidden bg-slate-100 flex items-center justify-center">
+                                    <img src="${imgUrl}" alt="${img.observacion || 'Imagen'}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                                  </div>
+                                  <div class="p-2 flex items-center justify-between gap-1 bg-white border-t border-slate-100 text-xs">
+                                    <span class="text-[11px] font-bold text-slate-800 truncate" title="${img.observacion || 'Imagen'}">${img.observacion || 'Imagen'}</span>
+                                    <span class="text-indigo-600 shrink-0 text-xs">
+                                      <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
+                                    </span>
+                                  </div>
+                                </div>
+                              `;
+                            }).join('')}
+                          </div>
+                        ` : ''}
+
+                        <!-- Enlaces en el mismo cuerpo -->
+                        ${linksArray.length > 0 ? `
+                          <div class="flex flex-wrap gap-2 pt-1">
+                            ${linksArray.map((l: any) => `
+                              <a href="${l.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3 py-2 bg-white hover:bg-indigo-50 border border-indigo-200/80 hover:border-indigo-300 rounded-xl text-xs font-semibold text-indigo-700 shadow-2xs transition-all max-w-full group">
+                                <i class="fa-solid fa-arrow-up-right-from-square text-indigo-500 group-hover:text-indigo-700 text-xs shrink-0"></i>
+                                <span class="truncate break-all">${l.titulo || l.url}</span>
+                              </a>
+                            `).join('')}
+                          </div>
+                        ` : ''}
+                      </div>
+                    ` : ''}
+
+                    <!-- DOCUMENTOS DE ESTUDIO -->
+                    <div class="bg-slate-50/70 rounded-2xl p-5 border border-slate-200/80 space-y-3">
+                      <div class="flex items-center justify-between border-b border-slate-200/60 pb-3">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                          <i class="fa-solid fa-file-pdf text-red-500"></i>
+                          <span>Documentos de Estudio</span>
+                        </h4>
+                        <span class="text-[11px] font-bold text-slate-500 bg-white px-2 py-0.5 rounded-full border border-slate-200">${docs.length}</span>
+                      </div>
+
+                      ${docs.length === 0
+                        ? `<p class="text-xs text-slate-400 p-3 text-center bg-white rounded-xl border border-dashed border-slate-200">No hay documentos cargados en esta unidad.</p>`
+                        : `<div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                             ${docs.map((d: any) => `
+                               <div class="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 text-xs shadow-2xs hover:border-blue-200 transition-colors">
+                                 <div class="flex items-center space-x-2.5 truncate mr-2">
+                                   <i class="fa-solid fa-file-lines text-slate-400 text-sm"></i>
+                                   <div class="truncate">
+                                     <p class="font-bold text-slate-800 truncate">${d.observacion || 'Documento'}</p>
+                                     <span class="text-[10px] text-slate-400">${d.fecha_subida ? new Date(d.fecha_subida).toLocaleDateString('es-AR') : 'Reciente'}</span>
+                                   </div>
+                                 </div>
+                                 <button type="button" class="btn-descargar-archivo px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-lg text-xs transition-colors flex items-center gap-1 shrink-0 cursor-pointer" data-id="${d.id}" data-nombre="${d.observacion || 'Documento'}">
+                                   <i class="fa-solid fa-download"></i> Descargar
+                                 </button>
+                                </div>
+                             `).join('')}
+                           </div>`
+                      }
+                    </div>
+
+                    <!-- TRABAJOS PRÁCTICOS DE LA UNIDAD -->
+                    <div class="bg-amber-50/30 rounded-2xl p-5 border border-amber-200/70 space-y-3">
+                      <div class="flex items-center justify-between border-b border-amber-200/60 pb-3">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-amber-900 flex items-center gap-2">
+                          <i class="fa-solid fa-file-signature text-amber-600"></i>
+                          <span>Trabajos Prácticos de la Unidad</span>
+                        </h4>
+                        <span class="text-[11px] font-bold text-amber-700 bg-white px-2 py-0.5 rounded-full border border-amber-200">${tps.length}</span>
+                      </div>
+
+                      ${tps.length === 0
+                        ? `<p class="text-xs text-slate-400 p-3 text-center bg-white rounded-xl border border-dashed border-amber-200">No hay trabajos prácticos asignados en esta unidad.</p>`
+                        : `<div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                              ${tps.map((tp: any) => {
+                               const miEntrega = (misMateriales || []).find((m: any) => m.observacion === tp.observacion || (m.carpeta && m.carpeta === tp.carpeta));
+                               const entregado = !!miEntrega;
+                               const calificado = miEntrega?.calificacion && miEntrega.calificacion !== '----';
+
+                               let vencido = false;
+                               let fechaLimiteTexto = '';
+                               if (tp.fecha_limite) {
+                                 const fLim = new Date(tp.fecha_limite);
+                                 if (!isNaN(fLim.getTime())) {
+                                   vencido = fLim < new Date();
+                                   const fDia = fLim.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                                   const fHora = fLim.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+                                   fechaLimiteTexto = `${fDia} a las ${fHora} hs`;
+                                 }
+                               }
+
+                               return `
+                                 <div class="p-3.5 rounded-xl bg-white border ${vencido ? 'border-red-200 bg-red-50/10' : 'border-amber-200/80'} text-xs shadow-2xs space-y-2.5">
+                                   <div class="flex items-start justify-between gap-2">
+                                     <div class="space-y-1">
+                                       <span class="font-bold text-slate-800 block">${tp.observacion || 'Trabajo Práctico'}</span>
+                                       ${fechaLimiteTexto ? `
+                                         <div class="text-[11px] font-medium flex items-center gap-1.5 ${vencido ? 'text-red-600 font-semibold' : 'text-slate-500'}">
+                                           <i class="fa-regular fa-clock text-[10px]"></i>
+                                           <span>Límite: ${fechaLimiteTexto}</span>
+                                         </div>
+                                       ` : ''}
+                                     </div>
+                                     <div class="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+                                       ${vencido ? `
+                                         <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-red-100 text-red-700 uppercase flex items-center gap-1">
+                                           <i class="fa-solid fa-clock-rotate-left"></i> Plazo Vencido
+                                         </span>
+                                       ` : ''}
+                                       <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${calificado ? 'bg-emerald-50 text-emerald-700' : entregado ? 'bg-blue-50 text-blue-700' : 'bg-amber-50 text-amber-700'}">
+                                         ${calificado ? `Nota: ${miEntrega.calificacion}` : entregado ? 'Entregado' : 'Pendiente'}
+                                       </span>
+                                     </div>
+                                   </div>
+
+                                   <div class="flex items-center justify-between pt-1 border-t border-slate-100 text-[11px]">
+                                     <button type="button" class="btn-descargar-archivo text-blue-600 hover:underline font-bold flex items-center gap-1 cursor-pointer" data-id="${tp.id}" data-nombre="${tp.observacion || 'Consigna_TP'}">
+                                       <i class="fa-solid fa-file-arrow-down"></i>
+                                       <span>Consigna</span>
+                                     </button>
+
+                                     ${vencido ? (
+                                       entregado ? `
+                                         <span class="px-3 py-1 bg-slate-100 text-slate-500 font-bold rounded-lg flex items-center gap-1 border border-slate-200">
+                                           <i class="fa-solid fa-lock text-[10px]"></i>
+                                           <span>Entrega Cerrada</span>
+                                         </span>
+                                       ` : `
+                                         <button disabled class="px-3 py-1 bg-slate-100 text-slate-400 font-bold rounded-lg flex items-center gap-1 border border-slate-200 cursor-not-allowed" title="El plazo para entregar este trabajo práctico ha finalizado">
+                                           <i class="fa-solid fa-ban text-[10px]"></i>
+                                           <span>Plazo Vencido</span>
+                                         </button>
+                                       `
+                                     ) : `
+                                       <button class="btn-abrir-entrega-modal px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors flex items-center gap-1 shadow-xs cursor-pointer" 
+                                         data-unidad-id="${u.id}" 
+                                         data-unidad-nombre="${encodeURIComponent(u.nombre)}" 
+                                         data-tp-titulo="${encodeURIComponent(tp.observacion || 'Trabajo Práctico')}"
+                                         data-tp-carpeta="${encodeURIComponent(tp.carpeta || '')}">
+                                         <i class="fa-solid fa-cloud-arrow-up"></i>
+                                         <span>${entregado ? 'Reentregar' : 'Entregar TP'}</span>
+                                       </button>
+                                     `}
+                                   </div>
+                                 </div>
+                               `;
+                              }).join('')}
+                            </div>`
+                      }
+                    </div>
+
+                    <!-- EVALUACIONES DE LA UNIDAD (SÓLO SI HAY EXÁMENES CARGADOS EN ESTA UNIDAD) -->
+                    ${examenesUnidad.length > 0 ? `
+                      <div class="bg-purple-50/30 rounded-2xl p-5 border border-purple-200/70 space-y-3">
+                        <div class="flex items-center justify-between border-b border-purple-200/60 pb-3">
+                          <h4 class="text-xs font-bold uppercase tracking-wider text-purple-900 flex items-center gap-2">
+                            <i class="fa-solid fa-pen-ruler text-purple-600"></i>
+                            <span>Evaluaciones de la Unidad</span>
+                          </h4>
+                          <span class="text-[11px] font-bold text-purple-700 bg-white px-2 py-0.5 rounded-full border border-purple-200">${examenesUnidad.length}</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                          ${examenesUnidad.map((ex: any) => {
+                            let cantPreguntas = 0;
+                            try {
+                              if (ex.preguntas) {
+                                const pArr = typeof ex.preguntas === 'string' ? JSON.parse(ex.preguntas) : ex.preguntas;
+                                if (Array.isArray(pArr)) cantPreguntas = pArr.length;
+                              }
+                            } catch {}
+
+                            // Ventana horaria de habilitación
+                            let fechaStr = '';
+                            if (ex.fecha) {
+                              fechaStr = typeof ex.fecha === 'string' ? ex.fecha.split('T')[0] : '';
+                            }
+                            const horaIniStr = ex.hora_inicio ? ex.hora_inicio.slice(0, 5) : '18:00';
+                            const horaFinStr = ex.hora_fin ? ex.hora_fin.slice(0, 5) : '20:00';
+
+                            let estadoAcceso: 'bloqueado_previo' | 'habilitado' | 'cerrado' = 'habilitado';
+                            let fechaTexto = 'Disponible';
+
+                            if (fechaStr) {
+                              const [y, m, d] = fechaStr.split('-').map(Number);
+                              const [hIni, mIni] = horaIniStr.split(':').map(Number);
+                              const [hFin, mFin] = horaFinStr.split(':').map(Number);
+
+                              const fechaInicio = new Date(y, m - 1, d, hIni, mIni, 0);
+                              const fechaFin = new Date(y, m - 1, d, hFin, mFin, 59);
+                              const ahora = new Date();
+
+                              const fLocal = new Date(y, m - 1, d).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                              fechaTexto = `${fLocal} • ${horaIniStr} a ${horaFinStr} hs`;
+
+                              if (ahora < fechaInicio) {
+                                estadoAcceso = 'bloqueado_previo';
+                              } else if (ahora > fechaFin) {
+                                estadoAcceso = 'cerrado';
+                              } else {
+                                estadoAcceso = 'habilitado';
+                              }
+                            }
+
+                            return `
+                              <div class="p-4 rounded-xl bg-white border ${estadoAcceso === 'habilitado' ? 'border-purple-300 shadow-sm' : 'border-slate-200'} text-xs shadow-2xs space-y-3 hover:border-purple-300 transition-colors">
+                                <div class="flex items-start justify-between gap-2">
+                                  <div class="space-y-1">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                      ${estadoAcceso === 'habilitado' ? `
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 uppercase flex items-center gap-1">
+                                          <i class="fa-solid fa-bolt"></i> Habilitado Ahora
+                                        </span>
+                                      ` : estadoAcceso === 'bloqueado_previo' ? `
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 uppercase flex items-center gap-1">
+                                          <i class="fa-solid fa-lock"></i> Bloqueado (Abre ${horaIniStr} hs)
+                                        </span>
+                                      ` : `
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-100 text-slate-600 uppercase flex items-center gap-1">
+                                          <i class="fa-solid fa-ban"></i> Acceso Cerrado
+                                        </span>
+                                      `}
+                                      <span class="text-[10px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
+                                        ${cantPreguntas} Pregunta(s)
+                                      </span>
+                                    </div>
+                                    <h4 class="font-bold text-slate-900 text-sm mt-1">${ex.descripcion || 'Evaluación de Unidad'}</h4>
+                                  </div>
+                                </div>
+
+                                <div class="flex items-center gap-3 text-slate-500 text-[11px] flex-wrap">
+                                  <span><i class="fa-regular fa-clock mr-1 text-purple-600"></i>Límite: ${ex.duracion_minutos || 45} min</span>
+                                  <span><i class="fa-regular fa-calendar mr-1 text-purple-600"></i>${fechaTexto}</span>
+                                </div>
+
+                                <div class="pt-2 border-t border-slate-100 flex justify-end">
+                                  ${estadoAcceso === 'habilitado' ? `
+                                    <a href="/examen-rendir?id=${ex.id}" class="w-full sm:w-auto text-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                                      <i class="fa-solid fa-pen-ruler"></i>
+                                      <span>Rendir Examen</span>
+                                    </a>
+                                  ` : estadoAcceso === 'bloqueado_previo' ? `
+                                    <button disabled class="w-full sm:w-auto text-center px-4 py-2 bg-slate-100 text-slate-400 font-bold text-xs rounded-xl cursor-not-allowed flex items-center justify-center gap-1.5 border border-slate-200" title="Disponible hoy a las ${horaIniStr} hs">
+                                      <i class="fa-solid fa-lock"></i>
+                                      <span>Habilita a las ${horaIniStr} hs</span>
+                                    </button>
+                                  ` : `
+                                    <button disabled class="w-full sm:w-auto text-center px-4 py-2 bg-slate-100 text-slate-400 font-bold text-xs rounded-xl cursor-not-allowed flex items-center justify-center gap-1.5 border border-slate-200" title="El periodo de evaluación finalizó">
+                                      <i class="fa-solid fa-ban"></i>
+                                      <span>Plazo Vencido</span>
+                                    </button>
+                                  `}
+                                </div>
+                              </div>
+                            `;
+                          }).join('')}
+                        </div>
+                      </div>
+                    ` : ''}
+                  </div>
+                </div>
+              `;
+            }).join('');
+
+            // Conectar ampliación de imágenes didácticas en Moodle
+            document.querySelectorAll('.btn-ampliar-img-moodle').forEach((btn) => {
+              btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const src = btn.getAttribute('data-img-src') || '';
+                const tit = decodeURIComponent(btn.getAttribute('data-img-titulo') || '');
+                abrirVisorImagenMoodle(src, tit);
+              });
+            });
+
+            // Conectar botones de entrega en las unidades
+            document.querySelectorAll('.btn-abrir-entrega-modal').forEach((btn) => {
+              btn.addEventListener('click', () => {
+                const uId = btn.getAttribute('data-unidad-id') || '';
+                const uNom = decodeURIComponent(btn.getAttribute('data-unidad-nombre') || '');
+                const tpTit = decodeURIComponent(btn.getAttribute('data-tp-titulo') || '');
+                const tpCarpeta = decodeURIComponent(btn.getAttribute('data-tp-carpeta') || '');
+                abrirModalEntrega(uId, uNom, tpTit, tpCarpeta);
+              });
+            });
+          }
+        }
+
+        // Trabajos Prácticos del Curso (utilizado para el resumen en pestaña Calificaciones)
+        const tpsCurso = materialesCurso.filter((m: any) => m.tipo === 'tp' && m.estado === 'activo');
+
+        // Conectar botones de descarga directa
+        document.querySelectorAll('.btn-descargar-archivo').forEach((btn) => {
+          btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const id = btn.getAttribute('data-id');
+            const nombre = btn.getAttribute('data-nombre') || 'documento.pdf';
+            if (!id) return;
+            const original = btn.innerHTML;
+            try {
+              btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-blue-600"></i> <span>Descargando...</span>';
+              await api.material.descargarArchivo(id, nombre);
+            } catch (err: any) {
+              console.error('Error al descargar archivo:', err);
+              alert('No se pudo descargar el archivo: ' + err.message);
+            } finally {
+              btn.innerHTML = original;
+            }
+          });
+        });
+
+        // 5. Calificaciones
+        const califTbody = document.getElementById('calificaciones-tbody');
+        if (califTbody) {
+          const miNotaCursado = (notasCurso || []).find((n: any) => n.id === user?.id || n.dni === user?.dni);
+          let rows = '';
+
+          if (miNotaCursado) {
+            rows += `
+              <tr>
+                <td class="p-3 font-bold text-slate-800">Calificación Final de Cursado</td>
+                <td class="p-3 text-slate-500">Materia</td>
+                <td class="p-3 font-black text-blue-600 text-sm">${miNotaCursado.nota !== null ? formatearNotaLetras(miNotaCursado.nota) : 'En Cursado'}</td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700">Activo</span></td>
+              </tr>
+            `;
+          }
+
+          tpsCurso.forEach((tp: any) => {
+            const miEntrega = (misMateriales || []).find((m: any) => m.observacion === tp.observacion || (m.carpeta && m.carpeta === tp.carpeta));
+            rows += `
+              <tr>
+                <td class="p-3 font-bold text-slate-800">${tp.observacion || tp.carpeta}</td>
+                <td class="p-3 text-slate-500">Trabajo Práctico</td>
+                <td class="p-3 font-black text-emerald-600 text-sm">${miEntrega?.calificacion || 'Pendiente'}</td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${miEntrega?.calificacion && miEntrega.calificacion !== '----' ? 'bg-emerald-50 text-emerald-700' : miEntrega ? 'bg-blue-50 text-blue-700' : 'bg-amber-50 text-amber-700'}">${miEntrega?.calificacion && miEntrega.calificacion !== '----' ? 'Calificado' : miEntrega ? 'Entregado' : 'Pendiente'}</span></td>
+              </tr>
+            `;
+          });
+
+          if (!rows) {
+            rows = `<tr><td colspan="4" class="p-6 text-center text-slate-400">No se registran calificaciones cargadas aún.</td></tr>`;
+          }
+
+          califTbody.innerHTML = rows;
+        }
+
+        // Cargar temas del foro del curso
+        await cargarForo();
+
+      } catch (err: any) {
+        console.error('Error al cargar detalle del curso:', err);
+      }
+    }
+
+    // Manejo de Modal de Entrega de TP con Dropzone
+    const modalEntrega = document.getElementById('modal-entregar-tp');
+    const inputEntregaUnidadId = document.getElementById('entrega-unidad-id') as HTMLInputElement;
+    const inputEntregaObs = document.getElementById('entrega-observacion') as HTMLInputElement;
+    const txtModalUnidad = document.getElementById('modal-entrega-unidad');
+    const txtModalTitulo = document.getElementById('modal-entrega-titulo');
+    const inputEntregaFile = document.getElementById('modal-entrega-file') as HTMLInputElement;
+    const dropzoneEntrega = document.getElementById('modal-entrega-dropzone');
+    const promptEntrega = document.getElementById('modal-entrega-prompt');
+    const selectedEntrega = document.getElementById('modal-entrega-selected');
+    const filenameEntrega = document.getElementById('modal-entrega-filename');
+    const filesizeEntrega = document.getElementById('modal-entrega-filesize');
+    const btnRemoverEntrega = document.getElementById('btn-remover-entrega-file');
+
+    if (dropzoneEntrega && inputEntregaFile) {
+      dropzoneEntrega.addEventListener('click', (e) => {
+        if (e.target === btnRemoverEntrega || (e.target as HTMLElement)?.closest('button') === btnRemoverEntrega) return;
+        inputEntregaFile.click();
+      });
+
+      inputEntregaFile.addEventListener('change', () => {
+        if (inputEntregaFile.files && inputEntregaFile.files.length > 0) {
+          const file = inputEntregaFile.files[0];
+          if (filenameEntrega) filenameEntrega.textContent = file.name;
+          if (filesizeEntrega) {
+            const kb = (file.size / 1024).toFixed(1);
+            const mb = (file.size / (1024 * 1024)).toFixed(2);
+            filesizeEntrega.textContent = file.size > 1024 * 1024 ? `${mb} MB` : `${kb} KB`;
+          }
+          promptEntrega?.classList.add('hidden');
+          selectedEntrega?.classList.remove('hidden');
+        }
+      });
+
+      btnRemoverEntrega?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        inputEntregaFile.value = '';
+        selectedEntrega?.classList.add('hidden');
+        promptEntrega?.classList.remove('hidden');
+      });
+
+      dropzoneEntrega.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzoneEntrega.classList.add('border-blue-500', 'bg-blue-100/50');
+      });
+      dropzoneEntrega.addEventListener('dragleave', () => {
+        dropzoneEntrega.classList.remove('border-blue-500', 'bg-blue-100/50');
+      });
+      dropzoneEntrega.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzoneEntrega.classList.remove('border-blue-500', 'bg-blue-100/50');
+        if (e.dataTransfer && e.dataTransfer.files.length > 0) {
+          inputEntregaFile.files = e.dataTransfer.files;
+          inputEntregaFile.dispatchEvent(new Event('change'));
+        }
+      });
+    }
+
+    function abrirModalEntrega(unidadId: string, unidadNombre: string, tpTitulo: string, tpCarpeta?: string) {
+      if (inputEntregaUnidadId) inputEntregaUnidadId.value = unidadId;
+      if (inputEntregaObs) inputEntregaObs.value = tpTitulo;
+      const inputCarpeta = document.getElementById('entrega-carpeta') as HTMLInputElement;
+      if (inputCarpeta) inputCarpeta.value = tpCarpeta || `unidad-${unidadId}-tp`;
+      if (txtModalUnidad) txtModalUnidad.textContent = unidadNombre || 'Unidad Temática';
+      if (txtModalTitulo) txtModalTitulo.textContent = tpTitulo;
+      if (inputEntregaFile) inputEntregaFile.value = '';
+      selectedEntrega?.classList.add('hidden');
+      promptEntrega?.classList.remove('hidden');
+      modalEntrega?.classList.remove('hidden');
+    }
+
+    const cerrarModalEntrega = () => modalEntrega?.classList.add('hidden');
+    document.getElementById('btn-cerrar-modal-entrega')?.addEventListener('click', cerrarModalEntrega);
+    document.getElementById('btn-cancelar-entrega')?.addEventListener('click', cerrarModalEntrega);
+
+    const formEntregaModal = document.getElementById('form-entregar-tp-modal') as HTMLFormElement;
+    formEntregaModal?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!inputEntregaFile.files || inputEntregaFile.files.length === 0) {
+        alert('Seleccione un archivo de resolución.');
+        return;
+      }
+
+      const btnSubmit = formEntregaModal.querySelector('button[type="submit"]') as HTMLButtonElement;
+      const originalText = btnSubmit ? btnSubmit.innerHTML : '';
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Subiendo resolución...</span>';
+      }
+
+      const carpetaVal = (document.getElementById('entrega-carpeta') as HTMLInputElement)?.value || `unidad-${inputEntregaUnidadId.value}-tp`;
+
+      const fd = new FormData();
+      fd.append('observacion', inputEntregaObs.value.trim());
+      fd.append('curso_id', String(cursoId));
+      fd.append('unidad_id', inputEntregaUnidadId.value);
+      fd.append('carpeta', carpetaVal);
+      fd.append('archivo', inputEntregaFile.files[0]);
+      if (user?.id) fd.append('alumno_id', String(user.id));
+
+      try {
+        await api.material.subirEntrega(fd);
+        cerrarModalEntrega();
+        alert('¡Trabajo práctico entregado con éxito!');
+        await cargarDetalleCurso();
+      } catch (err: any) {
+        console.error('Error al entregar TP:', err);
+        alert('Error al entregar trabajo práctico: ' + err.message);
+      } finally {
+        if (btnSubmit) {
+          btnSubmit.disabled = false;
+          btnSubmit.innerHTML = originalText;
+        }
+      }
+    });
+
+
+
+    // Lightbox de imágenes en Moodle
+    const modalVisorMoodle = document.getElementById('modal-visor-imagen-moodle');
+    const visorMoodleTitulo = document.getElementById('visor-img-titulo-moodle');
+    const visorMoodleSrc = document.getElementById('visor-img-src-moodle') as HTMLImageElement;
+    const btnCerrarVisorMoodle = document.getElementById('btn-cerrar-visor-img-moodle');
+
+    function abrirVisorImagenMoodle(src: string, titulo?: string) {
+      if (visorMoodleSrc) visorMoodleSrc.src = src;
+      if (visorMoodleTitulo) visorMoodleTitulo.textContent = titulo || 'Imagen Didáctica';
+      modalVisorMoodle?.classList.remove('hidden');
+    }
+
+    const cerrarVisorMoodle = () => {
+      modalVisorMoodle?.classList.add('hidden');
+      if (visorMoodleSrc) visorMoodleSrc.src = '';
+    };
+
+    btnCerrarVisorMoodle?.addEventListener('click', cerrarVisorMoodle);
+    modalVisorMoodle?.addEventListener('click', (e) => {
+      if (e.target === modalVisorMoodle) cerrarVisorMoodle();
+    });
+
+    // -----------------------------------------------------------------
+    // MÓDULO INTEGRAL DEL FORO DE CONSULTAS Y AVISOS
+    // -----------------------------------------------------------------
+    let temasForo: any[] = [];
+    let temaActualId: number | null = null;
+
+    const rolUsuario = user?.ocupacion ? String(user.ocupacion).toLowerCase() : '';
+    const esDocente = rolUsuario === 'profesor' || rolUsuario === 'docente' || rolUsuario === 'administrador' || rolUsuario === 'admin';
+    const currentUserId = user?.id ? Number(user.id) : 0;
+
+    const vistaForoLista = document.getElementById('foro-vista-lista');
+    const vistaForoDetalle = document.getElementById('foro-vista-detalle');
+    const temasContainer = document.getElementById('foro-temas-container');
+    const inputBuscarForo = document.getElementById('input-buscar-foro') as HTMLInputElement;
+    const btnNuevoTemaForo = document.getElementById('btn-nuevo-tema-foro');
+    const badgeForo = document.getElementById('badge-foro');
+    const btnVolverForoLista = document.getElementById('btn-volver-foro-lista');
+
+    // Modales Foro
+    const modalTema = document.getElementById('modal-crear-tema-foro');
+    const formTema = document.getElementById('form-crear-tema-foro') as HTMLFormElement;
+    const inputTemaId = document.getElementById('modal-tema-id') as HTMLInputElement;
+    const inputTemaTitulo = document.getElementById('modal-tema-input-titulo') as HTMLInputElement;
+    const inputTemaContenido = document.getElementById('modal-tema-input-contenido') as HTMLTextAreaElement;
+    const inputTemaEnlace = document.getElementById('modal-tema-input-enlace') as HTMLInputElement;
+    const inputTemaImagen = document.getElementById('modal-tema-input-imagen') as HTMLInputElement;
+    const txtModalTemaTitulo = document.getElementById('modal-tema-titulo-txt');
+    const txtBtnSubmitTema = document.getElementById('btn-submit-modal-tema-txt');
+    const btnCerrarModalTema = document.getElementById('btn-cerrar-modal-tema');
+    const btnCancelarModalTema = document.getElementById('btn-cancelar-modal-tema');
+
+    const modalEditarResp = document.getElementById('modal-editar-respuesta-foro');
+    const formEditarResp = document.getElementById('form-editar-respuesta-foro') as HTMLFormElement;
+    const inputEditRespId = document.getElementById('modal-editar-resp-id') as HTMLInputElement;
+    const inputEditRespContenido = document.getElementById('modal-editar-resp-contenido') as HTMLTextAreaElement;
+    const inputEditRespEnlace = document.getElementById('modal-editar-resp-enlace') as HTMLInputElement;
+    const btnCerrarModalEditarResp = document.getElementById('btn-cerrar-modal-editar-resp');
+    const btnCancelarModalEditarResp = document.getElementById('btn-cancelar-modal-editar-resp');
+
+    const modalConfEliminar = document.getElementById('modal-confirmar-eliminar-foro');
+    const txtConfTitulo = document.getElementById('conf-eliminar-foro-titulo');
+    const txtConfMsg = document.getElementById('conf-eliminar-foro-msg');
+    const btnAceptarConfEliminar = document.getElementById('btn-aceptar-conf-eliminar-foro');
+    const btnCancelarConfEliminar = document.getElementById('btn-cancelar-conf-eliminar-foro');
+    let accionEliminarCallback: (() => Promise<void>) | null = null;
+
+    function abrirModalConfirmacionForo(titulo: string, mensaje: string, accion: () => Promise<void>) {
+      if (txtConfTitulo) txtConfTitulo.textContent = titulo;
+      if (txtConfMsg) txtConfMsg.textContent = mensaje;
+      accionEliminarCallback = accion;
+      modalConfEliminar?.classList.remove('hidden');
+    }
+
+    const cerrarModalConfirmacionForo = () => {
+      modalConfEliminar?.classList.add('hidden');
+      accionEliminarCallback = null;
+    };
+
+    btnCancelarConfEliminar?.addEventListener('click', cerrarModalConfirmacionForo);
+    btnAceptarConfEliminar?.addEventListener('click', async () => {
+      if (accionEliminarCallback) {
+        const fn = accionEliminarCallback;
+        cerrarModalConfirmacionForo();
+        await fn();
+      }
+    });
+
+    function puedeEditarTema(t: any) {
+      if (esDocente) return true;
+      return t.alumno_id && Number(t.alumno_id) === currentUserId;
+    }
+
+    function puedeEditarRespuesta(r: any) {
+      if (esDocente) return true;
+      return r.alumno_id && Number(r.alumno_id) === currentUserId;
+    }
+
+    async function cargarForo() {
+      try {
+        const temas = await api.foro.porCurso(cursoId).catch(() => []);
+        temasForo = Array.isArray(temas) ? temas : [];
+        if (badgeForo) badgeForo.textContent = String(temasForo.length);
+        renderListaTemas();
+      } catch (err) {
+        console.error('Error al cargar temas del foro:', err);
+      }
+    }
+
+    function formatearFechaHora(fechaStr: string) {
+      if (!fechaStr) return 'Reciente';
+      const d = new Date(fechaStr);
+      if (isNaN(d.getTime())) return fechaStr;
+      return d.toLocaleDateString('es-AR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }) + ' hs';
+    }
+
+    function renderListaTemas() {
+      if (!temasContainer) return;
+
+      const query = inputBuscarForo?.value.trim().toLowerCase() || '';
+      const filtrados = temasForo.filter((t) => {
+        if (!query) return true;
+        const tit = (t.titulo || '').toLowerCase();
+        const con = (t.contenido || '').toLowerCase();
+        const aut = (t.autor_nombre || '').toLowerCase();
+        return tit.includes(query) || con.includes(query) || aut.includes(query);
+      });
+
+      if (filtrados.length === 0) {
+        temasContainer.innerHTML = `
+          <div class="p-10 text-center rounded-3xl border border-dashed border-slate-200 bg-slate-50/50 space-y-3">
+            <i class="fa-solid fa-comments text-4xl text-slate-300"></i>
+            <div class="space-y-1">
+              <h4 class="text-sm font-bold text-slate-700">${query ? 'No se encontraron temas coincidentes' : 'No hay temas de consulta publicados aún'}</h4>
+              <p class="text-xs text-slate-400">${query ? 'Intente con otros términos de búsqueda.' : 'Inicia una conversación para resolver dudas con el docente o tus compañeros.'}</p>
+            </div>
+            ${!query ? `
+              <button type="button" class="btn-abrir-crear-tema px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all inline-flex items-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-plus"></i>
+                <span>Publicar Primer Tema</span>
+              </button>
+            ` : ''}
+          </div>
+        `;
+        temasContainer.querySelector('.btn-abrir-crear-tema')?.addEventListener('click', abrirModalCrearTema);
+        return;
+      }
+
+      temasContainer.innerHTML = filtrados.map((t) => {
+        const esAutorDocente = (t.autor_rol || '').toLowerCase().includes('prof') || (t.autor_rol || '').toLowerCase().includes('docent') || (t.autor_rol || '').toLowerCase().includes('admin');
+        const permiteEditar = puedeEditarTema(t);
+
+        return `
+          <div class="p-5 rounded-3xl border border-slate-200 bg-white hover:border-blue-300 hover:shadow-sm transition-all space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="flex items-center gap-2.5 flex-wrap">
+                <div class="w-8 h-8 rounded-full ${esAutorDocente ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-700'} flex items-center justify-center text-xs font-black shrink-0">
+                  <i class="fa-solid ${esAutorDocente ? 'fa-user-tie' : 'fa-user-graduate'}"></i>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="font-bold text-slate-900 text-xs">${t.autor_nombre || 'Usuario'}</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${esAutorDocente ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-slate-100 text-slate-600'}">
+                      ${esAutorDocente ? 'Docente / Equipo' : 'Alumno'}
+                    </span>
+                    ${t.editado ? '<span class="text-[10px] text-slate-400 italic">(editado)</span>' : ''}
+                  </div>
+                  <span class="text-[11px] text-slate-400">${formatearFechaHora(t.fecha_creacion)}</span>
+                </div>
+              </div>
+
+              <!-- Acciones de autor / moderador -->
+              <div class="flex items-center gap-1.5 self-end sm:self-auto">
+                <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 flex items-center gap-1">
+                  <i class="fa-regular fa-comment-dots text-blue-600"></i>
+                  <span>${t.total_respuestas || 0}</span>
+                </span>
+                ${permiteEditar ? `
+                  <button type="button" class="btn-editar-tema-action p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer" data-id="${t.id}" title="Editar tema">
+                    <i class="fa-solid fa-pen-to-square text-xs"></i>
+                  </button>
+                  <button type="button" class="btn-eliminar-tema-action p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer" data-id="${t.id}" title="Eliminar tema">
+                    <i class="fa-solid fa-trash-can text-xs"></i>
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+
+            <!-- Título y contenido resumido -->
+            <div>
+              <h3 class="text-base font-bold text-slate-900 hover:text-blue-600 transition-colors cursor-pointer btn-abrir-hilo" data-id="${t.id}">
+                ${t.titulo}
+              </h3>
+              <p class="text-xs text-slate-600 mt-1 line-clamp-2 leading-relaxed">
+                ${t.contenido}
+              </p>
+            </div>
+
+            <!-- Badges de imagen / enlace y botón entrar al hilo -->
+            <div class="flex items-center justify-between pt-2 border-t border-slate-100 flex-wrap gap-2 text-xs">
+              <div class="flex items-center gap-2">
+                ${t.imagen_url ? `
+                  <span class="inline-flex items-center gap-1 text-[11px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-lg border border-purple-200">
+                    <i class="fa-regular fa-image"></i> Imagen adjunta
+                  </span>
+                ` : ''}
+                ${t.enlace_url ? `
+                  <a href="${t.enlace_url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-200 hover:underline">
+                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> Enlace
+                  </a>
+                ` : ''}
+              </div>
+
+              <button type="button" class="btn-abrir-hilo px-3.5 py-1.5 bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-700 font-bold rounded-xl transition-all flex items-center gap-1 cursor-pointer" data-id="${t.id}">
+                <span>Ver Debate / Responder</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Eventos de botones de temas
+      temasContainer.querySelectorAll('.btn-abrir-hilo').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const id = Number(btn.getAttribute('data-id'));
+          if (id) verHilo(id);
+        });
+      });
+
+      temasContainer.querySelectorAll('.btn-editar-tema-action').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = Number(btn.getAttribute('data-id'));
+          const t = temasForo.find((x) => Number(x.id) === id);
+          if (t) abrirModalEditarTema(t);
+        });
+      });
+
+      temasContainer.querySelectorAll('.btn-eliminar-tema-action').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = Number(btn.getAttribute('data-id'));
+          abrirModalConfirmacionForo(
+            '¿Eliminar este tema?',
+            'Se eliminará el tema y todas las respuestas asociadas. Esta acción no se puede deshacer.',
+            async () => {
+              try {
+                await api.foro.eliminarTema(id);
+                await cargarForo();
+              } catch (err: any) {
+                alert('Error al eliminar tema: ' + err.message);
+              }
+            }
+          );
+        });
+      });
+    }
+
+    async function verHilo(temaId: number) {
+      temaActualId = temaId;
+      try {
+        const datos = await api.foro.uno(temaId);
+        if (!datos || !datos.tema) {
+          alert('No se pudo cargar la conversación');
+          return;
+        }
+        const tema = datos.tema;
+        const respuestas = datos.respuestas || [];
+
+        // Cambiar vista
+        vistaForoLista?.classList.add('hidden');
+        vistaForoDetalle?.classList.remove('hidden');
+
+        // Encabezado de fecha
+        const fechaCab = document.getElementById('hilo-fecha-cabecera');
+        if (fechaCab) fechaCab.textContent = `Iniciado: ${formatearFechaHora(tema.fecha_creacion)}`;
+
+        // Tarjeta principal del tema
+        const princEl = document.getElementById('hilo-tema-principal');
+        if (princEl) {
+          const esAutorDocente = (tema.autor_rol || '').toLowerCase().includes('prof') || (tema.autor_rol || '').toLowerCase().includes('docent') || (tema.autor_rol || '').toLowerCase().includes('admin');
+          const imgUrl = tema.imagen_url ? ('http://localhost:4000/' + tema.imagen_url.replace(/\\/g, '/')) : '';
+          const permiteEditar = puedeEditarTema(tema);
+
+          princEl.innerHTML = `
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full ${esAutorDocente ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-700'} flex items-center justify-center text-sm font-black shrink-0">
+                  <i class="fa-solid ${esAutorDocente ? 'fa-user-tie' : 'fa-user-graduate'}"></i>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="font-bold text-slate-900 text-sm">${tema.autor_nombre || 'Usuario'}</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${esAutorDocente ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-slate-100 text-slate-600'}">
+                      ${esAutorDocente ? 'Docente / Equipo' : 'Alumno'}
+                    </span>
+                    ${tema.editado ? '<span class="text-[10px] text-slate-400 italic">(editado)</span>' : ''}
+                  </div>
+                  <span class="text-[11px] text-slate-400">${formatearFechaHora(tema.fecha_creacion)}</span>
+                </div>
+              </div>
+
+              ${permiteEditar ? `
+                <div class="flex items-center gap-2 self-end sm:self-auto">
+                  <button type="button" id="btn-hilo-editar-tema" class="px-3 py-1.5 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 font-bold text-xs rounded-xl transition-colors flex items-center gap-1 cursor-pointer">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <span>Editar Tema</span>
+                  </button>
+                  <button type="button" id="btn-hilo-eliminar-tema" class="px-3 py-1.5 bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-700 font-bold text-xs rounded-xl transition-colors flex items-center gap-1 cursor-pointer">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Eliminar</span>
+                  </button>
+                </div>
+              ` : ''}
+            </div>
+
+            <div>
+              <h2 class="text-xl font-black text-slate-900 mb-2">${tema.titulo}</h2>
+              <div class="text-xs md:text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">${tema.contenido}</div>
+            </div>
+
+            ${imgUrl ? `
+              <div class="pt-2">
+                <p class="text-[11px] font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Imagen Adjunta (Haz clic para ampliar)</p>
+                <div class="inline-block rounded-2xl overflow-hidden border border-slate-200 shadow-sm cursor-pointer group max-w-sm" id="btn-ampliar-img-tema">
+                  <img src="${imgUrl}" alt="Imagen del tema" class="max-h-56 w-auto object-cover group-hover:scale-102 transition-transform" />
+                </div>
+              </div>
+            ` : ''}
+
+            ${tema.enlace_url ? `
+              <div class="pt-2">
+                <a href="${tema.enlace_url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3.5 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 font-bold text-xs rounded-xl border border-blue-200 transition-colors">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                  <span>Abrir enlace de referencia: ${tema.enlace_url}</span>
+                </a>
+              </div>
+            ` : ''}
+          `;
+
+          // Eventos en tema principal
+          princEl.querySelector('#btn-ampliar-img-tema')?.addEventListener('click', () => {
+            if (imgUrl) abrirVisorImagenMoodle(imgUrl, tema.titulo);
+          });
+          princEl.querySelector('#btn-hilo-editar-tema')?.addEventListener('click', () => {
+            abrirModalEditarTema(tema);
+          });
+          princEl.querySelector('#btn-hilo-eliminar-tema')?.addEventListener('click', () => {
+            abrirModalConfirmacionForo(
+              '¿Eliminar este tema?',
+              'Se eliminará este tema y todas sus respuestas.',
+              async () => {
+                try {
+                  await api.foro.eliminarTema(tema.id);
+                  volverAListaForo();
+                } catch (err: any) {
+                  alert('Error al eliminar tema: ' + err.message);
+                }
+              }
+            );
+          });
+        }
+
+        // Contador de respuestas
+        const countResp = document.getElementById('hilo-respuestas-count');
+        if (countResp) countResp.textContent = `${respuestas.length} respuesta(s)`;
+
+        // Renderizado del árbol de respuestas
+        renderRespuestasArbol(respuestas);
+
+        // Reset cita y form
+        cancelarCitaRespuesta();
+      } catch (err) {
+        console.error('Error al ver hilo:', err);
+      }
+    }
+
+    function renderRespuestasArbol(respuestas: any[]) {
+      const cont = document.getElementById('hilo-respuestas-container');
+      if (!cont) return;
+
+      if (respuestas.length === 0) {
+        cont.innerHTML = `
+          <div class="p-8 text-center bg-slate-50/70 rounded-2xl border border-slate-200 space-y-1">
+            <p class="text-xs font-bold text-slate-700">No hay respuestas en este debate todavía.</p>
+            <p class="text-[11px] text-slate-400">Sé el primero en responder utilizando el formulario inferior.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Separar raíces e hijas
+      const raices = respuestas.filter((r) => !r.parent_id);
+      const hijasPorPadre = new Map<number, any[]>();
+      respuestas.filter((r) => r.parent_id).forEach((r) => {
+        const pId = Number(r.parent_id);
+        if (!hijasPorPadre.has(pId)) hijasPorPadre.set(pId, []);
+        hijasPorPadre.get(pId)!.push(r);
+      });
+
+      function renderizarRespuestaHTML(r: any, esHija = false): string {
+        const esAutorDocente = (r.autor_rol || '').toLowerCase().includes('prof') || (r.autor_rol || '').toLowerCase().includes('docent') || (r.autor_rol || '').toLowerCase().includes('admin');
+        const imgUrl = r.imagen_url ? ('http://localhost:4000/' + r.imagen_url.replace(/\\/g, '/')) : '';
+        const permiteEditar = puedeEditarRespuesta(r);
+
+        const hijas = hijasPorPadre.get(Number(r.id)) || [];
+
+        return `
+          <div class="${esHija ? 'ml-6 sm:ml-10 pl-3 sm:pl-4 border-l-2 border-blue-200/80 my-3' : 'bg-slate-50/70 p-4 sm:p-5 rounded-2xl border border-slate-200/80 space-y-3'}">
+            <div class="${esHija ? 'bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/60 shadow-2xs space-y-2.5' : 'space-y-2.5'}">
+              <div class="flex items-center justify-between gap-2 flex-wrap">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full ${esAutorDocente ? 'bg-blue-600 text-white' : 'bg-slate-300 text-slate-700'} flex items-center justify-center text-[10px] font-black shrink-0">
+                    <i class="fa-solid ${esAutorDocente ? 'fa-user-tie' : 'fa-user-graduate'}"></i>
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="font-bold text-slate-900 text-xs">${r.autor_nombre || 'Usuario'}</span>
+                      <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold ${esAutorDocente ? 'bg-blue-100 text-blue-800' : 'bg-slate-200 text-slate-700'}">
+                        ${esAutorDocente ? 'Docente' : 'Alumno'}
+                      </span>
+                      ${r.editado ? '<span class="text-[10px] text-slate-400 italic">(editado)</span>' : ''}
+                    </div>
+                    <span class="text-[10px] text-slate-400">${formatearFechaHora(r.fecha_creacion)}</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1.5">
+                  <button type="button" class="btn-responder-a-cita px-2.5 py-1 bg-white hover:bg-blue-50 text-blue-700 font-bold text-[11px] rounded-lg border border-slate-200 shadow-2xs transition-colors flex items-center gap-1 cursor-pointer" data-id="${r.id}" data-autor="${r.autor_nombre || 'Usuario'}">
+                    <i class="fa-solid fa-reply text-[10px]"></i>
+                    <span>Responder</span>
+                  </button>
+                  ${permiteEditar ? `
+                    <button type="button" class="btn-editar-respuesta-action p-1 text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg transition-colors cursor-pointer" data-id="${r.id}" title="Editar mensaje">
+                      <i class="fa-solid fa-pen-to-square text-xs"></i>
+                    </button>
+                    <button type="button" class="btn-eliminar-respuesta-action p-1 text-slate-400 hover:text-red-600 hover:bg-white rounded-lg transition-colors cursor-pointer" data-id="${r.id}" title="Eliminar mensaje">
+                      <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                  ` : ''}
+                </div>
+              </div>
+
+              <!-- Contenido de la respuesta -->
+              <div class="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap">${r.contenido}</div>
+
+              <!-- Adjuntos de la respuesta -->
+              ${imgUrl ? `
+                <div class="pt-1">
+                  <div class="inline-block rounded-xl overflow-hidden border border-slate-200 cursor-pointer group max-w-xs btn-ampliar-img-resp" data-src="${imgUrl}">
+                    <img src="${imgUrl}" alt="Adjunto" class="max-h-36 w-auto object-cover group-hover:scale-102 transition-transform" />
+                  </div>
+                </div>
+              ` : ''}
+
+              ${r.enlace_url ? `
+                <div class="pt-1">
+                  <a href="${r.enlace_url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[11px] font-bold text-blue-700 hover:underline">
+                    <i class="fa-solid fa-link text-[10px]"></i>
+                    <span class="truncate max-w-xs">${r.enlace_url}</span>
+                  </a>
+                </div>
+              ` : ''}
+            </div>
+
+            <!-- Respuestas anidadas hijas -->
+            ${hijas.length > 0 ? `
+              <div class="space-y-2 mt-2">
+                ${hijas.map((h) => renderizarRespuestaHTML(h, true)).join('')}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+
+      cont.innerHTML = raices.map((raiz) => renderizarRespuestaHTML(raiz, false)).join('');
+
+      // Conectar eventos en respuestas
+      cont.querySelectorAll('.btn-responder-a-cita').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-id');
+          const autor = btn.getAttribute('data-autor') || 'Usuario';
+          const inputParent = document.getElementById('responder-parent-id') as HTMLInputElement;
+          const avisoCita = document.getElementById('aviso-cita-respuesta');
+          const citaAutor = document.getElementById('cita-autor-nombre');
+          const textarea = document.getElementById('responder-contenido') as HTMLTextAreaElement;
+
+          if (inputParent) inputParent.value = String(id);
+          if (citaAutor) citaAutor.textContent = autor;
+          avisoCita?.classList.remove('hidden');
+          textarea?.focus();
+          textarea?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      });
+
+      cont.querySelectorAll('.btn-ampliar-img-resp').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const src = btn.getAttribute('data-src');
+          if (src) abrirVisorImagenMoodle(src, 'Imagen Adjunta');
+        });
+      });
+
+      cont.querySelectorAll('.btn-editar-respuesta-action').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const id = Number(btn.getAttribute('data-id'));
+          const r = respuestas.find((x) => Number(x.id) === id);
+          if (r) abrirModalEditarRespuesta(r);
+        });
+      });
+
+      cont.querySelectorAll('.btn-eliminar-respuesta-action').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const id = Number(btn.getAttribute('data-id'));
+          abrirModalConfirmacionForo(
+            '¿Eliminar este mensaje?',
+            'Se eliminará este mensaje del debate.',
+            async () => {
+              try {
+                await api.foro.eliminarRespuesta(id);
+                if (temaActualId) verHilo(temaActualId);
+              } catch (err: any) {
+                alert('Error al eliminar mensaje: ' + err.message);
+              }
+            }
+          );
+        });
+      });
+    }
+
+    function cancelarCitaRespuesta() {
+      const inputParent = document.getElementById('responder-parent-id') as HTMLInputElement;
+      const avisoCita = document.getElementById('aviso-cita-respuesta');
+      if (inputParent) inputParent.value = '';
+      avisoCita?.classList.add('hidden');
+    }
+
+    document.getElementById('btn-cancelar-cita')?.addEventListener('click', cancelarCitaRespuesta);
+
+    function volverAListaForo() {
+      temaActualId = null;
+      vistaForoDetalle?.classList.add('hidden');
+      vistaForoLista?.classList.remove('hidden');
+      cargarForo();
+    }
+
+    btnVolverForoLista?.addEventListener('click', volverAListaForo);
+
+    function abrirModalCrearTema() {
+      if (inputTemaId) inputTemaId.value = '';
+      if (inputTemaTitulo) inputTemaTitulo.value = '';
+      if (inputTemaContenido) inputTemaContenido.value = '';
+      if (inputTemaEnlace) inputTemaEnlace.value = '';
+      if (inputTemaImagen) inputTemaImagen.value = '';
+      if (txtModalTemaTitulo) txtModalTemaTitulo.textContent = 'Nuevo Tema de Consulta';
+      if (txtBtnSubmitTema) txtBtnSubmitTema.textContent = 'Publicar Tema';
+      modalTema?.classList.remove('hidden');
+    }
+
+    function abrirModalEditarTema(t: any) {
+      if (inputTemaId) inputTemaId.value = String(t.id);
+      if (inputTemaTitulo) inputTemaTitulo.value = t.titulo || '';
+      if (inputTemaContenido) inputTemaContenido.value = t.contenido || '';
+      if (inputTemaEnlace) inputTemaEnlace.value = t.enlace_url || '';
+      if (inputTemaImagen) inputTemaImagen.value = '';
+      if (txtModalTemaTitulo) txtModalTemaTitulo.textContent = 'Editar Tema de Consulta';
+      if (txtBtnSubmitTema) txtBtnSubmitTema.textContent = 'Guardar Cambios';
+      modalTema?.classList.remove('hidden');
+    }
+
+    const cerrarModalTema = () => modalTema?.classList.add('hidden');
+    btnNuevoTemaForo?.addEventListener('click', abrirModalCrearTema);
+    btnCerrarModalTema?.addEventListener('click', cerrarModalTema);
+    btnCancelarModalTema?.addEventListener('click', cerrarModalTema);
+
+    formTema?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const titulo = inputTemaTitulo?.value.trim();
+      const contenido = inputTemaContenido?.value.trim();
+      if (!titulo || !contenido) {
+        alert('Por favor, ingrese el título y contenido de la consulta');
+        return;
+      }
+
+      const fd = new FormData();
+      fd.append('curso_id', String(cursoId));
+      fd.append('titulo', titulo);
+      fd.append('contenido', contenido);
+      if (inputTemaEnlace?.value.trim()) {
+        fd.append('enlace_url', inputTemaEnlace.value.trim());
+      }
+      if (inputTemaImagen?.files && inputTemaImagen.files.length > 0) {
+        fd.append('imagen', inputTemaImagen.files[0]);
+      }
+      if (user?.id) {
+        if (esDocente) fd.append('personal_id', String(user.id));
+        else fd.append('alumno_id', String(user.id));
+      }
+
+      const idEdit = inputTemaId?.value;
+      const btnSubmit = document.getElementById('btn-submit-modal-tema') as HTMLButtonElement;
+      const originalText = btnSubmit?.innerHTML || '';
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
+      }
+
+      try {
+        if (idEdit) {
+          await api.foro.editarTema(idEdit, fd);
+        } else {
+          await api.foro.crearTema(fd);
+        }
+        cerrarModalTema();
+        if (temaActualId && Number(idEdit) === Number(temaActualId)) {
+          verHilo(temaActualId);
+        } else {
+          cargarForo();
+        }
+      } catch (err: any) {
+        alert('Error al guardar tema: ' + err.message);
+      } finally {
+        if (btnSubmit) {
+          btnSubmit.disabled = false;
+          btnSubmit.innerHTML = originalText;
+        }
+      }
+    });
+
+    // Formulario Enviar Respuesta
+    const formResponder = document.getElementById('form-responder-foro') as HTMLFormElement;
+    formResponder?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!temaActualId) return;
+
+      const txtContenido = document.getElementById('responder-contenido') as HTMLTextAreaElement;
+      const contenido = txtContenido?.value.trim();
+      if (!contenido) {
+        alert('Por favor, escriba el contenido de su respuesta');
+        return;
+      }
+
+      const inputParent = document.getElementById('responder-parent-id') as HTMLInputElement;
+      const inputEnlace = document.getElementById('responder-enlace') as HTMLInputElement;
+      const inputFile = document.getElementById('responder-imagen') as HTMLInputElement;
+
+      const fd = new FormData();
+      fd.append('contenido', contenido);
+      if (inputParent?.value) fd.append('parent_id', inputParent.value);
+      if (inputEnlace?.value.trim()) fd.append('enlace_url', inputEnlace.value.trim());
+      if (inputFile?.files && inputFile.files.length > 0) {
+        fd.append('imagen', inputFile.files[0]);
+      }
+      if (user?.id) {
+        if (esDocente) fd.append('personal_id', String(user.id));
+        else fd.append('alumno_id', String(user.id));
+      }
+
+      const btnSubmit = document.getElementById('btn-submit-respuesta') as HTMLButtonElement;
+      const originalText = btnSubmit?.innerHTML || '';
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Publicando...';
+      }
+
+      try {
+        await api.foro.crearRespuesta(temaActualId, fd);
+        formResponder.reset();
+        cancelarCitaRespuesta();
+        verHilo(temaActualId);
+      } catch (err: any) {
+        alert('Error al publicar respuesta: ' + err.message);
+      } finally {
+        if (btnSubmit) {
+          btnSubmit.disabled = false;
+          btnSubmit.innerHTML = originalText;
+        }
+      }
+    });
+
+    function abrirModalEditarRespuesta(r: any) {
+      if (inputEditRespId) inputEditRespId.value = String(r.id);
+      if (inputEditRespContenido) inputEditRespContenido.value = r.contenido || '';
+      if (inputEditRespEnlace) inputEditRespEnlace.value = r.enlace_url || '';
+      modalEditarResp?.classList.remove('hidden');
+    }
+
+    const cerrarModalEditarResp = () => modalEditarResp?.classList.add('hidden');
+    btnCerrarModalEditarResp?.addEventListener('click', cerrarModalEditarResp);
+    btnCancelarModalEditarResp?.addEventListener('click', cerrarModalEditarResp);
+
+    formEditarResp?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = inputEditRespId?.value;
+      const contenido = inputEditRespContenido?.value.trim();
+      if (!id || !contenido) return;
+
+      const fd = new FormData();
+      fd.append('contenido', contenido);
+      if (inputEditRespEnlace?.value.trim()) {
+        fd.append('enlace_url', inputEditRespEnlace.value.trim());
+      }
+
+      try {
+        await api.foro.editarRespuesta(id, fd);
+        cerrarModalEditarResp();
+        if (temaActualId) verHilo(temaActualId);
+      } catch (err: any) {
+        alert('Error al editar respuesta: ' + err.message);
+      }
+    });
+
+    inputBuscarForo?.addEventListener('input', renderListaTemas);
+
+    cargarDetalleCurso();
+  </script>
+</MoodleLayout>
