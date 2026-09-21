@@ -1,7 +1,26 @@
 // src/lib/api.ts
 import { getToken, clearSession } from './auth';
 
-export const API_BASE_URL = (import.meta.env.PUBLIC_API_URL || 'http://localhost:4000/api').replace(/\/$/, '');
+function resolveApiUrl(): string {
+  let url = (import.meta.env.PUBLIC_API_URL || '').trim();
+
+  // Si no se configuró la variable de entorno, usar valor por defecto
+  if (!url) {
+    return 'http://localhost:4000/api';
+  }
+
+  // Quitar barras finales
+  url = url.replace(/\/+$/, '');
+
+  // Si no termina en /api, agregárselo automáticamente
+  if (!url.endsWith('/api')) {
+    url = `${url}/api`;
+  }
+
+  return url;
+}
+
+export const API_BASE_URL = resolveApiUrl();
 export const SERVER_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, '');
 
 export function getFileUrl(path: string | null | undefined): string {
