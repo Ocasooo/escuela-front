@@ -1,0 +1,131 @@
+---
+// src/components/DemoBanner.astro
+---
+
+<!-- Barra Superior Flotante / Fija de Modo Demo -->
+<div id="demo-banner" class="bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 text-white border-b border-amber-500/30 px-4 py-2 text-xs flex flex-wrap items-center justify-between gap-3 shadow-md relative z-40">
+  <div class="flex items-center gap-3 flex-wrap">
+    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 font-black text-[10px] tracking-wider uppercase shadow-xs">
+      <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+      MODO DEMO
+    </span>
+    <span class="text-slate-300 text-[11px] sm:text-xs">
+      Entorno interactivo: Los datos se restauran automáticamente cada 60 min. Puedes crear, modificar y calificar libremente sin alterar la base de datos permanente.
+    </span>
+  </div>
+
+  <div class="flex items-center gap-2.5 ml-auto">
+    <span id="demo-contador-texto" class="hidden sm:inline-block text-[11px] text-slate-400 font-mono">
+      <!-- Se puebla dinámicamente con minutos restantes -->
+    </span>
+
+    <button
+      type="button"
+      id="btn-abrir-modal-reset-demo"
+      class="px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11px] rounded-lg shadow-sm transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer"
+      title="Restaurar base de datos y archivos al estado inicial"
+    >
+      <i class="fa-solid fa-rotate-left text-xs"></i>
+      <span>Reiniciar Demo</span>
+    </button>
+  </div>
+</div>
+
+<!-- Modal de Confirmación para Reiniciar Demo -->
+<div id="modal-confirmar-reset-demo" class="fixed inset-0 bg-slate-950/70 z-50 hidden flex items-center justify-center p-4 backdrop-blur-xs">
+  <div class="bg-white rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl border border-slate-200 animate-fadeIn text-center space-y-5">
+    <div class="w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mx-auto text-2xl border border-amber-100 shadow-inner">
+      <i class="fa-solid fa-rotate-left"></i>
+    </div>
+    
+    <div class="space-y-2">
+      <h3 class="text-lg font-black text-slate-900">¿Restablecer datos de la Demo?</h3>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        Esta acción limpiará todas las modificaciones temporales realizadas y devolverá la base de datos y archivos a su estado original (alumnos, cursos, notas y cuentas iniciales de prueba).
+      </p>
+      <p class="text-[11px] text-amber-700 bg-amber-50 rounded-xl p-2 font-medium border border-amber-200/60">
+        💡 Se cerrará la sesión actual y volverás al inicio con las contraseñas de fábrica.
+      </p>
+    </div>
+
+    <div class="flex items-center justify-center gap-3 pt-2">
+      <button
+        type="button"
+        id="btn-cancelar-reset-demo"
+        class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition-all"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="button"
+        id="btn-ejecutar-reset-demo"
+        class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
+      >
+        <span>Restablecer Ahora</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { api } from '../lib/api';
+  import { clearSession } from '../lib/auth';
+
+  const btnAbrirModal = document.getElementById('btn-abrir-modal-reset-demo');
+  const btnCancelar = document.getElementById('btn-cancelar-reset-demo');
+  const btnEjecutar = document.getElementById('btn-ejecutar-reset-demo') as HTMLButtonElement | null;
+  const modal = document.getElementById('modal-confirmar-reset-demo');
+  const contadorTexto = document.getElementById('demo-contador-texto');
+
+  // Abrir / Cerrar Modal
+  btnAbrirModal?.addEventListener('click', () => {
+    modal?.classList.remove('hidden');
+  });
+
+  btnCancelar?.addEventListener('click', () => {
+    modal?.classList.add('hidden');
+  });
+
+  // Consultar estado periódico de la demo
+  async function consultarEstadoDemo() {
+    try {
+      const resp = await api.demo.estado();
+      if (resp && resp.minutosRestantesAutoReset !== undefined && contadorTexto) {
+        contadorTexto.textContent = `Auto-reset en ~${resp.minutosRestantesAutoReset} min`;
+      }
+    } catch (_) {
+      // Ignorar si el backend no está disponible
+    }
+  }
+
+  consultarEstadoDemo();
+  setInterval(consultarEstadoDemo, 60000);
+
+  // Ejecutar el reinicio manual
+  btnEjecutar?.addEventListener('click', async () => {
+    if (!btnEjecutar) return;
+    const textoOriginal = btnEjecutar.innerHTML;
+
+    try {
+      btnEjecutar.disabled = true;
+      btnEjecutar.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-slate-950 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg> Restaurando...`;
+
+      const resultado = await api.demo.reset();
+
+      // Limpiar sesión local y redirigir al login
+      clearSession();
+      alert(resultado.body || '¡Demo restaurada exitosamente!');
+      window.location.href = '/';
+    } catch (err: any) {
+      console.error('Error al resetear demo:', err);
+      alert(err.message || 'No se pudo restablecer la demo en este momento. Inténtalo de nuevo.');
+      if (modal) modal.classList.add('hidden');
+    } finally {
+      if (btnEjecutar) {
+        btnEjecutar.disabled = false;
+        btnEjecutar.innerHTML = textoOriginal;
+      }
+    }
+  });
+</script>

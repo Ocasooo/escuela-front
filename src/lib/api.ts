@@ -473,5 +473,19 @@ export const api = {
         method: 'DELETE',
       }),
   },
+
+  demo: {
+    estado: () =>
+      request<{
+        modoDemo: boolean;
+        minutosRestantesAutoReset: number;
+        segundosCooldownManual: number;
+        ultimoReset: string;
+      }>('/demo/estado'),
+    reset: () =>
+      request<any>('/demo/reset', {
+        method: 'POST',
+      }),
+  },
   getFileUrl,
 };

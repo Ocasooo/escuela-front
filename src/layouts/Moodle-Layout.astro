@@ -5,6 +5,7 @@ interface Props {
 
 const { title } = Astro.props;
 import '../css/style.css';
+import DemoBanner from '../components/DemoBanner.astro';
 ---
 
 <!doctype html>
@@ -20,6 +21,9 @@ import '../css/style.css';
     <title>{title} | Aula Virtual EFP N°31</title>
   </head>
   <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans">
+    <!-- Banner Modo Demo -->
+    <DemoBanner />
+
     <!-- Navbar -->
     <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">

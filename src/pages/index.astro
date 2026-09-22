@@ -1,5 +1,6 @@
 ---
 import '../css/style.css';
+import DemoBanner from '../components/DemoBanner.astro';
 ---
 
 <!doctype html>
@@ -12,8 +13,11 @@ import '../css/style.css';
     <script src="https://kit.fontawesome.com/aef010b255.js" is:inline crossorigin="anonymous"></script>
     <title>Iniciar Sesión | Aula Virtual EFP N°31</title>
   </head>
-  <body class="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 min-h-screen flex items-center justify-center p-4 font-sans text-slate-800">
-    <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100 animate-fadeIn">
+  <body class="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 min-h-screen flex flex-col font-sans text-slate-800">
+    <DemoBanner />
+
+    <div class="flex-1 flex items-center justify-center p-4 py-8">
+      <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl border border-slate-100 animate-fadeIn">
       <!-- Header de bienvenida -->
       <div class="bg-gradient-to-r from-blue-700 to-indigo-800 p-8 text-white text-center relative">
         <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-3 backdrop-blur-md shadow-inner border border-white/20">
@@ -78,13 +82,53 @@ import '../css/style.css';
           </button>
         </form>
 
-        <div class="mt-6 text-center">
-          <p class="text-xs text-slate-400">
+        <!-- Accesos Rápidos de Demo -->
+        <div class="mt-6 pt-5 border-t border-slate-100">
+          <p class="text-[10px] font-black uppercase text-slate-400 tracking-wider text-center mb-2.5">
+            ⚡ Accesos Rápidos de Prueba (Demo)
+          </p>
+          <div class="grid grid-cols-3 gap-2">
+            <button
+              type="button"
+              class="btn-demo-quick-login p-2 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-xl text-center transition-all cursor-pointer group"
+              data-correo="admin@admin.com"
+              data-pwd="admin"
+              title="Iniciar como Administrador"
+            >
+              <span class="block text-xs font-bold text-slate-700 group-hover:text-blue-700">Admin</span>
+              <span class="block text-[10px] text-slate-400">Directivo</span>
+            </button>
+            <button
+              type="button"
+              class="btn-demo-quick-login p-2 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-xl text-center transition-all cursor-pointer group"
+              data-correo="profesor@escuela.edu.ar"
+              data-pwd="123456"
+              title="Iniciar como Profesor"
+            >
+              <span class="block text-xs font-bold text-slate-700 group-hover:text-blue-700">Profesor</span>
+              <span class="block text-[10px] text-slate-400">Docente</span>
+            </button>
+            <button
+              type="button"
+              class="btn-demo-quick-login p-2 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-xl text-center transition-all cursor-pointer group"
+              data-correo="alumno@escuela.edu.ar"
+              data-pwd="123456"
+              title="Iniciar como Alumno"
+            >
+              <span class="block text-xs font-bold text-slate-700 group-hover:text-blue-700">Alumno</span>
+              <span class="block text-[10px] text-slate-400">Estudiante</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-4 text-center">
+          <p class="text-[11px] text-slate-400">
             ¿Problemas de acceso? Solicite asistencia en Secretaría.
           </p>
         </div>
       </div>
     </div>
+  </div>
 
     <!-- Script de autenticación -->
     <script>
@@ -97,6 +141,19 @@ import '../css/style.css';
       const errorAlert = document.getElementById('error-alert') as HTMLDivElement;
       const errorMsg = document.getElementById('error-message') as HTMLSpanElement;
       const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+
+      // Cuentas rápidas de demostración
+      document.querySelectorAll<HTMLButtonElement>('.btn-demo-quick-login').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const correo = btn.getAttribute('data-correo');
+          const pwd = btn.getAttribute('data-pwd');
+          if (correo && pwd) {
+            correoInput.value = correo;
+            passInput.value = pwd;
+            form.requestSubmit();
+          }
+        });
+      });
 
       // Toggle contraseña
       document.getElementById('toggle-pwd')?.addEventListener('click', function() {
