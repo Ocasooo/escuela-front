@@ -977,13 +977,27 @@ import MoodleLayout from '../layouts/Moodle-Layout.astro';
           const miNotaCursado = (notasCurso || []).find((n: any) => n.id === user?.id || n.dni === user?.dni);
           let rows = '';
 
-          if (miNotaCursado) {
+          // Sólo debe aparecer cuando se haya calificado y registrado la nota final del cursado (no mientras esté cursando)
+          const tieneNotaFinal = miNotaCursado &&
+            miNotaCursado.nota !== null &&
+            miNotaCursado.nota !== undefined &&
+            miNotaCursado.nota !== '' &&
+            String(miNotaCursado.nota).trim() !== '----' &&
+            miNotaCursado.estado_terminacion !== 'cursando' &&
+            miNotaCursado.estado !== 'cursando';
+
+          if (tieneNotaFinal) {
+            const notaNum = Number(miNotaCursado.nota);
+            const aprobado = (!isNaN(notaNum) && notaNum >= 6) || miNotaCursado.estado_terminacion === 'aprobado' || miNotaCursado.estado_terminacion === 'egresado';
+            const estadoTexto = aprobado ? 'Aprobado' : 'Desaprobado';
+            const badgeClass = aprobado ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700';
+
             rows += `
               <tr>
                 <td class="p-3 font-bold text-slate-800">Calificación Final de Cursado</td>
                 <td class="p-3 text-slate-500">Materia</td>
-                <td class="p-3 font-black text-blue-600 text-sm">${miNotaCursado.nota !== null ? formatearNotaLetras(miNotaCursado.nota) : 'En Cursado'}</td>
-                <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700">Activo</span></td>
+                <td class="p-3 font-black ${aprobado ? 'text-emerald-600' : 'text-red-600'} text-sm">${formatearNotaLetras(miNotaCursado.nota)}</td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}">${estadoTexto}</span></td>
               </tr>
             `;
           }
