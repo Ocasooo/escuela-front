@@ -4,9 +4,10 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 
 <DashboardLayout title="Notas de Cursado" path="desempeno" pageTitle="Registro de Calificaciones Finales y Cursado">
   <div class="space-y-6">
-    <!-- Barra de Selección y Búsqueda (Requisito Explícito del Usuario) -->
-    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <!-- Barra de Selección, Modo y Búsqueda -->
+    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col xl:flex-row xl:items-center justify-between gap-4">
       <div class="flex flex-wrap items-center gap-4">
+        <!-- Materia / Comisión -->
         <div>
           <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Materia / Comisión</label>
           <select id="select-materia" class="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 outline-none focus:ring-2 focus:ring-blue-100">
@@ -14,8 +15,16 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
           </select>
         </div>
 
-        <!-- BUSCADOR POR NOMBRE, APELLIDO O DNI -->
-        <div class="w-full sm:w-72">
+        <!-- Selector de Año (Visible en modo edición de historial) -->
+        <div id="container-select-anio" class="hidden">
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Año de Cursado</label>
+          <select id="select-anio" class="px-3 py-2 text-xs bg-amber-50 border border-amber-200 rounded-xl font-bold text-amber-900 outline-none focus:ring-2 focus:ring-amber-100">
+            <!-- Opciones dinámicas de años -->
+          </select>
+        </div>
+
+        <!-- Buscador de Estudiantes -->
+        <div class="w-full sm:w-64">
           <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Buscar Estudiante</label>
           <div class="relative">
             <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-slate-400 text-xs"></i>
@@ -29,12 +38,41 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
         </div>
       </div>
 
-      <div class="flex items-center gap-3">
-        <button id="btn-guardar-todas" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2">
-          <i class="fa-solid fa-floppy-disk"></i>
-          <span>Guardar Cambios</span>
+      <!-- Botones de Acción -->
+      <div class="flex flex-wrap items-center gap-3">
+        <!-- Botón para alternar a Historial / Editar Notas -->
+        <button
+          type="button"
+          id="btn-toggle-modo"
+          class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition-all flex items-center gap-2 shadow-2xs"
+        >
+          <i id="icono-toggle-modo" class="fa-solid fa-clock-rotate-left"></i>
+          <span id="texto-toggle-modo">Editar Notas Registradas</span>
+        </button>
+
+        <!-- Botón Principal: Cargar Cursado o Guardar Cambios según el modo -->
+        <button
+          type="button"
+          id="btn-accion-principal"
+          class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2"
+        >
+          <i id="icono-accion-principal" class="fa-solid fa-check-circle"></i>
+          <span id="texto-accion-principal">Registrar notas del cursado</span>
         </button>
       </div>
+    </div>
+
+    <!-- Banner explicativo del Modo Actual -->
+    <div id="banner-modo" class="p-3 px-5 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-between text-xs text-blue-800">
+      <div class="flex items-center gap-2.5">
+        <i id="banner-icono" class="fa-solid fa-circle-info text-blue-600"></i>
+        <span id="banner-texto" class="font-semibold">
+          Mostrando estudiantes actualmente <strong>cursando</strong> en el ciclo actual. Ingrese sus calificaciones finales y presione <strong>"Registrar notas del cursado"</strong>.
+        </span>
+      </div>
+      <span id="banner-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-blue-200/70 text-blue-900 uppercase tracking-wide">
+        Modo Carga
+      </span>
     </div>
 
     <!-- Tabla de Calificaciones de Cursado -->
@@ -45,6 +83,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
             <tr>
               <th class="p-4">DNI</th>
               <th class="p-4">Estudiante</th>
+              <th class="p-4 text-center">Año Cursado</th>
               <th class="p-4 text-center">Promedio TPs</th>
               <th class="p-4 text-center">Parcial Teórico</th>
               <th class="p-4 text-center">Asistencia %</th>
@@ -68,8 +107,10 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
       </div>
       
       <div class="space-y-1">
-        <h3 class="text-lg font-black text-slate-900">¡Notas Actualizadas!</h3>
-        <p class="text-xs text-slate-500">Todas las notas de cursado se guardaron correctamente en la base de datos.</p>
+        <h3 id="modal-exito-titulo" class="text-lg font-black text-slate-900">¡Notas Registradas!</h3>
+        <p id="modal-exito-mensaje" class="text-xs text-slate-500">
+          Las notas de cursado fueron guardadas exitosamente. Los alumnos calificados ahora están aprobados o desaprobados.
+        </p>
       </div>
 
       <button type="button" id="btn-cerrar-exito-notas" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition-all">
@@ -87,15 +128,39 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
       dni: string;
       nombre: string;
       apellido: string;
+      anio: number;
+      estado_terminacion: string;
       promedio_tp: number;
       nota_parcial: number;
       asistencia: number;
-      nota_final: number;
+      nota_final: number | null;
+      nota_ingresada: string;
     }
 
-    let alumnosData: AlumnoCursado[] = [];
+    // Estado de la pantalla
+    let modoActual: 'carga' | 'edicion' = 'carga';
+    let anioActual = new Date().getFullYear();
+    let anioSeleccionado = anioActual;
+    let alumnosTodos: AlumnoCursado[] = [];
+
     const selectMateria = document.getElementById('select-materia') as HTMLSelectElement;
+    const selectAnio = document.getElementById('select-anio') as HTMLSelectElement;
+    const containerSelectAnio = document.getElementById('container-select-anio');
+    const inputBuscar = document.getElementById('input-buscar-alumno') as HTMLInputElement;
+    const tbody = document.getElementById('alumnos-cursado-body');
+    const btnToggleModo = document.getElementById('btn-toggle-modo');
+    const iconoToggleModo = document.getElementById('icono-toggle-modo');
+    const textoToggleModo = document.getElementById('texto-toggle-modo');
+    const btnAccionPrincipal = document.getElementById('btn-accion-principal') as HTMLButtonElement;
+    const iconoAccionPrincipal = document.getElementById('icono-accion-principal');
+    const textoAccionPrincipal = document.getElementById('texto-accion-principal');
+    const bannerModo = document.getElementById('banner-modo');
+    const bannerIcono = document.getElementById('banner-icono');
+    const bannerTexto = document.getElementById('banner-texto');
+    const bannerBadge = document.getElementById('banner-badge');
     const modalExito = document.getElementById('modal-exito-notas');
+    const modalExitoTitulo = document.getElementById('modal-exito-titulo');
+    const modalExitoMensaje = document.getElementById('modal-exito-mensaje');
 
     async function inicializarMaterias() {
       try {
@@ -115,7 +180,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
             await cargarAlumnos();
           } else {
             selectMateria.innerHTML = '<option value="">No tienes materias asignadas</option>';
-            alumnosData = [];
+            alumnosTodos = [];
             renderTabla();
           }
         }
@@ -127,7 +192,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
     async function cargarAlumnos() {
       const cursoId = selectMateria?.value;
       if (!cursoId) {
-        alumnosData = [];
+        alumnosTodos = [];
         renderTabla();
         return;
       }
@@ -135,52 +200,165 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
       try {
         const rows = await api.curso.obtenerNotasPorCurso(cursoId);
         if (rows && Array.isArray(rows)) {
-          alumnosData = rows.map((r: any) => ({
-            id: r.id || r.alumno_id,
-            dni: String(r.dni || '---'),
-            nombre: r.nombre || '',
-            apellido: r.apellido || '',
-            promedio_tp: r.promedio_tp ? Number(r.promedio_tp) : 8.0,
-            nota_parcial: r.nota_parcial ? Number(r.nota_parcial) : 8.0,
-            asistencia: r.asistencia ? Number(r.asistencia) : 90,
-            nota_final: (r.nota !== null && r.nota !== undefined && r.nota !== '') ? Math.round(Number(r.nota)) : 7
-          }));
+          alumnosTodos = rows.map((r: any) => {
+            const notaVal = (r.nota !== null && r.nota !== undefined && r.nota !== '') ? Math.round(Number(r.nota)) : null;
+            return {
+              id: r.id || r.alumno_id,
+              dni: String(r.dni || '---'),
+              nombre: r.nombre || '',
+              apellido: r.apellido || '',
+              anio: Number(r.anio) || anioActual,
+              estado_terminacion: (r.estado_terminacion || 'cursando').toLowerCase(),
+              promedio_tp: r.promedio_tp ? Number(r.promedio_tp) : 8.0,
+              nota_parcial: r.nota_parcial ? Number(r.nota_parcial) : 8.0,
+              asistencia: r.asistencia ? Number(r.asistencia) : 90,
+              nota_final: notaVal,
+              nota_ingresada: ''
+            };
+          });
+
+          actualizarSelectorAnios();
         } else {
-          alumnosData = [];
+          alumnosTodos = [];
         }
       } catch (err) {
         console.error('Error al cargar notas de cursado:', err);
-        alumnosData = [];
+        alumnosTodos = [];
       }
       renderTabla();
     }
 
-    const tbody = document.getElementById('alumnos-cursado-body');
-    const inputBuscar = document.getElementById('input-buscar-alumno') as HTMLInputElement;
+    function actualizarSelectorAnios() {
+      if (!selectAnio) return;
+      const aniosSet = new Set<number>();
+      aniosSet.add(anioActual);
+      alumnosTodos.forEach((a) => {
+        if (a.anio) aniosSet.add(Number(a.anio));
+      });
+      const listaAnios = Array.from(aniosSet).sort((a, b) => b - a);
+      
+      selectAnio.innerHTML = listaAnios.map((anio) => 
+        `<option value="${anio}" ${anio === anioSeleccionado ? 'selected' : ''}>Ciclo ${anio}</option>`
+      ).join('');
+    }
 
     function renderTabla() {
       if (!tbody) return;
 
       const termino = inputBuscar?.value.toLowerCase().trim() || '';
 
-      const filtrados = alumnosData.filter((a) => {
-        const matchNombre = `${a.nombre} ${a.apellido}`.toLowerCase().includes(termino);
-        const matchDni = a.dni.includes(termino);
-        return matchNombre || matchDni;
-      });
+      // Filtrar según el modo activo
+      let listaFiltrada: AlumnoCursado[] = [];
 
-      if (filtrados.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">No se encontraron estudiantes para la materia seleccionada.</td></tr>`;
+      if (modoActual === 'carga') {
+        // Modo Carga: Solo inscriptos al ciclo actual que sigan en 'cursando'
+        listaFiltrada = alumnosTodos.filter((a) => {
+          const esAnioActual = a.anio === anioActual;
+          const estaCursando = a.estado_terminacion === 'cursando';
+          return esAnioActual && estaCursando;
+        });
+      } else {
+        // Modo Edición: Todos los estudiantes del año seleccionado (aprobados, desaprobados o cursando)
+        listaFiltrada = alumnosTodos.filter((a) => a.anio === anioSeleccionado);
+      }
+
+      // Filtro de búsqueda por texto o DNI
+      if (termino) {
+        listaFiltrada = listaFiltrada.filter((a) => {
+          const matchNombre = `${a.nombre} ${a.apellido}`.toLowerCase().includes(termino);
+          const matchDni = a.dni.includes(termino);
+          return matchNombre || matchDni;
+        });
+      }
+
+      // Caso de lista vacía
+      if (listaFiltrada.length === 0) {
+        if (modoActual === 'carga') {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="8" class="p-12 text-center">
+                <div class="max-w-md mx-auto space-y-3">
+                  <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto text-xl shadow-xs">
+                    <i class="fa-solid fa-circle-check"></i>
+                  </div>
+                  <h4 class="text-sm font-bold text-slate-800">¡No hay estudiantes pendientes de calificar!</h4>
+                  <p class="text-xs text-slate-500 leading-relaxed">
+                    Todos los alumnos inscriptos al ciclo ${anioActual} ya tienen sus notas de cursado registradas (están aprobados o desaprobados).
+                  </p>
+                  <button type="button" id="btn-ir-a-editar" class="mt-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition-all inline-flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <span>Ver o editar notas registradas</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+          document.getElementById('btn-ir-a-editar')?.addEventListener('click', alternarModo);
+        } else {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="8" class="p-8 text-center text-slate-400">
+                No se encontraron registros de estudiantes para el ciclo ${anioSeleccionado}.
+              </td>
+            </tr>
+          `;
+        }
         return;
       }
 
-      tbody.innerHTML = filtrados.map((a) => {
-        const notaEntera = Math.round(Number(a.nota_final) || 0);
-        const aprobado = notaEntera >= 6;
+      // Renderizar filas
+      tbody.innerHTML = listaFiltrada.map((a) => {
+        let valorInput = '';
+        let estadoBadge = '';
+
+        if (modoActual === 'carga') {
+          // En modo carga: el input aparece vacío por defecto para que el profesor ingrese la nota
+          valorInput = a.nota_ingresada !== '' ? a.nota_ingresada : '';
+          if (valorInput !== '') {
+            const notaNum = Number(valorInput);
+            const aprobado = notaNum >= 6;
+            estadoBadge = `
+              <span class="px-2.5 py-1 rounded-full text-xs font-extrabold ${aprobado ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}">
+                ${aprobado ? 'Aprobado' : 'Desaprobado'}
+              </span>
+            `;
+          } else {
+            estadoBadge = `
+              <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-400">
+                Pendiente
+              </span>
+            `;
+          }
+        } else {
+          // En modo edición: el input muestra la nota guardada (o la editada)
+          const notaGuardada = a.nota_ingresada !== '' ? a.nota_ingresada : (a.nota_final !== null ? String(a.nota_final) : '');
+          valorInput = notaGuardada;
+          if (valorInput !== '') {
+            const notaNum = Number(valorInput);
+            const aprobado = notaNum >= 6;
+            estadoBadge = `
+              <span class="px-2.5 py-1 rounded-full text-xs font-extrabold ${aprobado ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}">
+                ${aprobado ? 'Aprobado' : 'Desaprobado'}
+              </span>
+            `;
+          } else {
+            const aprobado = a.estado_terminacion === 'aprobado' || a.estado_terminacion === 'egresado';
+            const desaprobado = a.estado_terminacion === 'desaprobado';
+            if (aprobado) {
+              estadoBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-emerald-50 text-emerald-700">Aprobado</span>`;
+            } else if (desaprobado) {
+              estadoBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-red-50 text-red-700">Desaprobado</span>`;
+            } else {
+              estadoBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-500">Cursando</span>`;
+            }
+          }
+        }
+
         return `
           <tr class="hover:bg-slate-50 transition-colors">
             <td class="p-4 font-mono text-slate-500 font-semibold">${a.dni}</td>
             <td class="p-4 font-bold text-slate-900">${a.apellido}, ${a.nombre}</td>
+            <td class="p-4 text-center font-bold text-slate-600">${a.anio}</td>
             <td class="p-4 text-center font-semibold text-slate-700">${a.promedio_tp.toFixed(1)}</td>
             <td class="p-4 text-center font-semibold text-slate-700">${a.nota_parcial.toFixed(1)}</td>
             <td class="p-4 text-center font-semibold text-slate-600">${a.asistencia}%</td>
@@ -190,91 +368,193 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
                 inputmode="numeric"
                 pattern="[0-9]*"
                 maxlength="2"
-                value="${notaEntera}"
+                value="${valorInput}"
                 data-id="${a.id}"
-                placeholder="1-10"
-                class="input-nota-cursado w-14 text-center font-black text-slate-900 bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2 outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all shadow-2xs"
+                placeholder="${modoActual === 'carga' ? 'Ej: 8' : '1-10'}"
+                class="input-nota-cursado w-14 text-center font-black text-slate-900 bg-white border border-slate-300 rounded-lg py-1.5 px-2 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all shadow-2xs"
               />
             </td>
-            <td class="p-4 text-center">
-              <span class="px-2.5 py-1 rounded-full text-xs font-extrabold ${
-                aprobado ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
-              }">
-                ${aprobado ? 'Aprobado' : 'Desaprobado'}
-              </span>
+            <td class="p-4 text-center" id="condicion-alumno-${a.id}">
+              ${estadoBadge}
             </td>
           </tr>
         `;
       }).join('');
 
-      // Escuchar cambios de notas para actualizar condición inmediatamente
-      document.querySelectorAll('.input-nota-cursado').forEach((input) => {
-        // Permitir solo ingresar números enteros
+      // Eventos para validar números y actualizar condición en tiempo real
+      document.querySelectorAll('.input-nota-cursado').forEach((inp) => {
+        const input = inp as HTMLInputElement;
+
         input.addEventListener('input', (e) => {
           const target = e.target as HTMLInputElement;
           target.value = target.value.replace(/[^0-9]/g, '');
           if (target.value !== '' && Number(target.value) > 10) {
             target.value = '10';
           }
+          actualizarFilaCondicion(Number(target.getAttribute('data-id')), target.value);
         });
 
         input.addEventListener('change', (e) => {
           const target = e.target as HTMLInputElement;
           const id = Number(target.getAttribute('data-id'));
-          let nuevaNota = parseInt(target.value, 10);
-          if (isNaN(nuevaNota) || nuevaNota < 1) nuevaNota = 1;
-          if (nuevaNota > 10) nuevaNota = 10;
-          target.value = String(nuevaNota);
-          const alumno = alumnosData.find((a) => a.id === id);
-          if (alumno) {
-            alumno.nota_final = nuevaNota;
-            renderTabla();
+          let val = target.value.trim();
+          if (val !== '') {
+            let num = parseInt(val, 10);
+            if (isNaN(num) || num < 1) num = 1;
+            if (num > 10) num = 10;
+            target.value = String(num);
+            val = String(num);
           }
+          actualizarFilaCondicion(id, val);
         });
       });
     }
 
-    inputBuscar?.addEventListener('input', renderTabla);
+    function actualizarFilaCondicion(id: number, valor: string) {
+      const alumno = alumnosTodos.find((a) => a.id === id);
+      if (alumno) {
+        alumno.nota_ingresada = valor;
+      }
+      const tdCondicion = document.getElementById(`condicion-alumno-${id}`);
+      if (!tdCondicion) return;
 
-    document.getElementById('btn-guardar-todas')?.addEventListener('click', async () => {
-      const cursoId = Number(selectMateria?.value) || 1;
-      const btnGuardar = document.getElementById('btn-guardar-todas') as HTMLButtonElement | null;
-      const textoOriginal = btnGuardar?.innerHTML || 'Guardar Cambios';
+      if (valor !== '') {
+        const nota = Number(valor);
+        const aprobado = nota >= 6;
+        tdCondicion.innerHTML = `
+          <span class="px-2.5 py-1 rounded-full text-xs font-extrabold ${aprobado ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}">
+            ${aprobado ? 'Aprobado' : 'Desaprobado'}
+          </span>
+        `;
+      } else {
+        if (modoActual === 'carga') {
+          tdCondicion.innerHTML = `
+            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-400">
+              Pendiente
+            </span>
+          `;
+        } else {
+          tdCondicion.innerHTML = `
+            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-500">
+              Sin Nota
+            </span>
+          `;
+        }
+      }
+    }
 
-      // Sincronizar cualquier valor activo en los inputs antes de enviar
+    function alternarModo() {
+      if (modoActual === 'carga') {
+        modoActual = 'edicion';
+        containerSelectAnio?.classList.remove('hidden');
+
+        if (textoToggleModo) textoToggleModo.textContent = 'Cargar Cursado Actual';
+        if (iconoToggleModo) iconoToggleModo.className = 'fa-solid fa-arrow-left';
+
+        if (textoAccionPrincipal) textoAccionPrincipal.textContent = 'Guardar Cambios';
+        if (iconoAccionPrincipal) iconoAccionPrincipal.className = 'fa-solid fa-floppy-disk';
+        btnAccionPrincipal.className = 'px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2';
+
+        if (bannerModo) bannerModo.className = 'p-3 px-5 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-between text-xs text-amber-900';
+        if (bannerIcono) bannerIcono.className = 'fa-solid fa-pen-to-square text-amber-600';
+        if (bannerTexto) bannerTexto.innerHTML = 'Mostrando <strong>todos los estudiantes</strong> del ciclo seleccionado. Puede modificar y corregir las notas registradas.';
+        if (bannerBadge) {
+          bannerBadge.textContent = 'Modo Edición';
+          bannerBadge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-black bg-amber-200/70 text-amber-900 uppercase tracking-wide';
+        }
+      } else {
+        modoActual = 'carga';
+        containerSelectAnio?.classList.add('hidden');
+
+        if (textoToggleModo) textoToggleModo.textContent = 'Editar Notas Registradas';
+        if (iconoToggleModo) iconoToggleModo.className = 'fa-solid fa-clock-rotate-left';
+
+        if (textoAccionPrincipal) textoAccionPrincipal.textContent = 'Registrar notas del cursado';
+        if (iconoAccionPrincipal) iconoAccionPrincipal.className = 'fa-solid fa-check-circle';
+        btnAccionPrincipal.className = 'px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2';
+
+        if (bannerModo) bannerModo.className = 'p-3 px-5 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-between text-xs text-blue-800';
+        if (bannerIcono) bannerIcono.className = 'fa-solid fa-circle-info text-blue-600';
+        if (bannerTexto) bannerTexto.innerHTML = 'Mostrando estudiantes actualmente <strong>cursando</strong> en el ciclo actual. Ingrese sus calificaciones finales y presione <strong>"Registrar notas del cursado"</strong>.';
+        if (bannerBadge) {
+          bannerBadge.textContent = 'Modo Carga';
+          bannerBadge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-black bg-blue-200/70 text-blue-900 uppercase tracking-wide';
+        }
+      }
+
+      renderTabla();
+    }
+
+    btnToggleModo?.addEventListener('click', alternarModo);
+
+    selectAnio?.addEventListener('change', () => {
+      anioSeleccionado = Number(selectAnio.value) || anioActual;
+      renderTabla();
+    });
+
+    // Acción del botón principal (Registrar notas de cursado / Guardar cambios)
+    btnAccionPrincipal?.addEventListener('click', async () => {
+      const cursoId = Number(selectMateria?.value);
+      if (!cursoId) {
+        alert('Seleccione una materia válida.');
+        return;
+      }
+
+      // Recolectar notas escritas
+      const notasAEnviar: { alumnoId: number; nota: number; cursoId: number; anio: number }[] = [];
+
       document.querySelectorAll('.input-nota-cursado').forEach((inp) => {
         const target = inp as HTMLInputElement;
         const id = Number(target.getAttribute('data-id'));
-        let val = parseInt(target.value, 10);
-        if (!isNaN(val)) {
-          if (val < 1) val = 1;
-          if (val > 10) val = 10;
-          const a = alumnosData.find((item) => item.id === id);
-          if (a) a.nota_final = val;
+        const val = target.value.trim();
+
+        if (val !== '') {
+          let num = parseInt(val, 10);
+          if (!isNaN(num)) {
+            if (num < 1) num = 1;
+            if (num > 10) num = 10;
+            const alu = alumnosTodos.find((a) => a.id === id);
+            const anioNota = alu ? alu.anio : (modoActual === 'carga' ? anioActual : anioSeleccionado);
+            notasAEnviar.push({
+              alumnoId: id,
+              nota: num,
+              cursoId,
+              anio: anioNota
+            });
+          }
         }
       });
 
-      try {
-        if (btnGuardar) {
-          btnGuardar.disabled = true;
-          btnGuardar.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg> Guardando...`;
-        }
+      if (notasAEnviar.length === 0) {
+        alert(modoActual === 'carga' 
+          ? 'Por favor, ingresa la calificación de al menos un estudiante antes de registrar las notas del cursado.' 
+          : 'No hay notas ingresadas o modificadas para guardar.'
+        );
+        return;
+      }
 
-        // Guardar todas las notas en lote al backend
+      const textoOriginal = btnAccionPrincipal.innerHTML;
+      try {
+        btnAccionPrincipal.disabled = true;
+        btnAccionPrincipal.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg> Guardando...`;
+
+        // Enviar lote al backend
         await api.curso.cargarNotaCursado({
           cursoId,
-          id_curso: cursoId,
-          notas: alumnosData.map((a) => ({
-            alumnoId: a.id,
-            id_alumno: a.id,
-            nota: a.nota_final,
-            calificacion: a.nota_final,
-            cursoId,
-            id_curso: cursoId,
-          }))
+          notas: notasAEnviar
         });
 
-        // Refrescar desde la base de datos para asegurar persistencia
+        // Configurar mensaje de éxito en modal
+        if (modalExitoTitulo) {
+          modalExitoTitulo.textContent = modoActual === 'carga' ? '¡Notas de Cursado Registradas!' : '¡Notas Actualizadas!';
+        }
+        if (modalExitoMensaje) {
+          modalExitoMensaje.textContent = modoActual === 'carga'
+            ? 'Los estudiantes calificados han sido registrados exitosamente como aprobados o desaprobados y ya no figuran como cursando.'
+            : 'Las calificaciones del ciclo lectivo seleccionado se actualizaron correctamente en la base de datos.';
+        }
+
+        // Recargar datos desde la base de datos
         await cargarAlumnos();
 
         modalExito?.classList.remove('hidden');
@@ -282,10 +562,8 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
         console.error('Error al guardar notas de cursado:', err);
         alert('Ocurrió un error al guardar las notas: ' + (err.message || 'Error del servidor'));
       } finally {
-        if (btnGuardar) {
-          btnGuardar.disabled = false;
-          btnGuardar.innerHTML = textoOriginal;
-        }
+        btnAccionPrincipal.disabled = false;
+        btnAccionPrincipal.innerHTML = textoOriginal;
       }
     });
 
@@ -293,6 +571,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
       modalExito?.classList.add('hidden');
     });
 
+    inputBuscar?.addEventListener('input', renderTabla);
     selectMateria?.addEventListener('change', cargarAlumnos);
     inicializarMaterias();
   </script>

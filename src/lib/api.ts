@@ -216,8 +216,8 @@ export const api = {
     cursosDesaprobadosPorAlumno: (id: number | string) => request<any[]>(`/curso/alumno/${id}/cursos-desaprobados`),
     cursosPorPersonal: (id: number | string) => request<any[]>(`/curso/personal/${id}/cursos`),
     alumnosPorCurso: (id: number | string) => request<any[]>(`/curso/${id}/alumnos-simples`),
-    alumnosPorCursoConEstado: (id: number | string) => request<any[]>(`/curso/${id}/alumnos`),
-    obtenerNotasPorCurso: (id: number | string) => request<any[]>(`/curso/${id}/notasDelCurso`),
+    obtenerNotasPorCurso: (id: number | string, anio?: number | string) =>
+      request<any[]>(`/curso/${id}/notasDelCurso${anio ? `?anio=${anio}` : ''}`),
     cargarNotaCursado: (datos: any) =>
       request<any>('/curso/cargarNotaCursado', {
         method: 'PATCH',
