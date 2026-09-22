@@ -88,13 +88,23 @@ import MoodleLayout from '../layouts/Moodle-Layout.astro';
     function formatearNotaLetras(nota: number | string): string {
       const num = Number(nota);
       if (isNaN(num)) return String(nota);
-      const entero = Math.round(num);
       const nombres: Record<number, string> = {
         0: 'cero', 1: 'uno', 2: 'dos', 3: 'tres', 4: 'cuatro',
         5: 'cinco', 6: 'seis', 7: 'siete', 8: 'ocho', 9: 'nueve', 10: 'diez'
       };
-      const textoEntero = nombres[entero] || `${entero}`;
-      return `${entero}(${textoEntero})`;
+      const esEntero = Number.isInteger(num) || num % 1 === 0;
+      if (esEntero) {
+        const entero = Math.round(num);
+        const textoEntero = nombres[entero] || `${entero}`;
+        return `${entero}(${textoEntero})`;
+      }
+
+      const parteEntera = Math.floor(num);
+      const decimal = Math.round((num - parteEntera) * 10);
+      const textoEntero = nombres[parteEntera] || `${parteEntera}`;
+      const textoDecimal = nombres[decimal] || `${decimal}`;
+      const notaFmt = num.toFixed(1);
+      return `${notaFmt}(${textoEntero} con ${textoDecimal})`;
     }
 
     async function cargarCursosDesaprobados() {

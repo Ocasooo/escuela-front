@@ -134,16 +134,16 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 
         <div>
           <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-            Nota Numérica (1 al 10)
+            Nota Numérica (0 al 10)
           </label>
           <input
             type="number"
             id="modal-nota"
-            min="1"
+            min="0"
             max="10"
-            step="0.5"
+            step="0.1"
             required
-            placeholder="Ej: 8.5"
+            placeholder="Ej: 8.7"
             class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none font-bold text-slate-800"
           />
         </div>
@@ -811,7 +811,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
         for (const tp of tpsData) {
           const target = tp.entregas.find(e => e.id === submissionId || (e.alumno_id === alumnoId && e.carpeta === carpeta));
           if (target) {
-            target.calificacion = Number(nota).toFixed(2);
+            target.calificacion = Number(nota).toFixed(1);
             target.estado = 'calificado';
             tp.pendientes = tp.entregas.filter(e => e.estado === 'pendiente').length;
             tp.calificados = tp.entregas.filter(e => e.estado === 'calificado').length;

@@ -162,13 +162,23 @@ import MoodleLayout from '../layouts/Moodle-Layout.astro';
     function formatearNotaLetras(notaNum: number | string): string {
       const num = Number(notaNum);
       if (isNaN(num)) return String(notaNum);
-      const entero = Math.round(num);
       const notasLetras: Record<number, string> = {
         0: 'cero', 1: 'uno', 2: 'dos', 3: 'tres', 4: 'cuatro', 5: 'cinco',
         6: 'seis', 7: 'siete', 8: 'ocho', 9: 'nueve', 10: 'diez'
       };
-      const enLetra = notasLetras[entero] || `${entero}`;
-      return `${entero}(${enLetra})`;
+      const esEntero = Number.isInteger(num) || num % 1 === 0;
+      if (esEntero) {
+        const entero = Math.round(num);
+        const enLetra = notasLetras[entero] || `${entero}`;
+        return `${entero}(${enLetra})`;
+      }
+
+      const parteEntera = Math.floor(num);
+      const decimal = Math.round((num - parteEntera) * 10);
+      const textoEntero = notasLetras[parteEntera] || `${parteEntera}`;
+      const textoDecimal = notasLetras[decimal] || `${decimal}`;
+      const notaFmt = num.toFixed(1);
+      return `${notaFmt}(${textoEntero} con ${textoDecimal})`;
     }
 
     async function cargarCursosAprobados() {
