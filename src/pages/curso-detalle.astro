@@ -311,14 +311,43 @@ import MoodleLayout from '../layouts/Moodle-Layout.astro';
           </div>
         </div>
 
+        <div id="entrega-error-msg" class="hidden p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600 font-semibold flex items-center gap-2">
+          <i class="fa-solid fa-circle-exclamation text-red-500 shrink-0"></i>
+          <span id="entrega-error-txt">Debe seleccionar un archivo.</span>
+        </div>
+
         <div class="flex items-center justify-end gap-2 pt-2">
-          <button type="button" id="btn-cancelar-entrega" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
-          <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center gap-2">
+          <button type="button" id="btn-cancelar-entrega" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-colors cursor-pointer">Cancelar</button>
+          <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center gap-2 cursor-pointer">
             <i class="fa-solid fa-cloud-arrow-up"></i>
             <span>Confirmar Entrega</span>
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Modal Éxito al Entregar Trabajo Práctico -->
+  <div id="modal-exito-entrega-tp" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 md:p-8 shadow-2xl border border-slate-100 animate-fadeIn text-center space-y-5">
+      <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-emerald-100 shadow-inner">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      
+      <div class="space-y-1.5">
+        <h3 class="text-lg font-black text-slate-900">¡Trabajo Práctico Entregado!</h3>
+        <p class="text-xs text-slate-500 leading-relaxed">
+          Tu archivo de resolución se subió exitosamente y quedó registrado para la revisión y calificación del docente.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        id="btn-cerrar-exito-entrega-tp"
+        class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/20 transition-all cursor-pointer"
+      >
+        Aceptar
+      </button>
     </div>
   </div>
 
@@ -1044,6 +1073,20 @@ import MoodleLayout from '../layouts/Moodle-Layout.astro';
       });
     }
 
+    const modalExitoEntrega = document.getElementById('modal-exito-entrega-tp');
+    const btnCerrarExitoEntrega = document.getElementById('btn-cerrar-exito-entrega-tp');
+    const entregaErrorMsg = document.getElementById('entrega-error-msg');
+    const entregaErrorTxt = document.getElementById('entrega-error-txt');
+
+    btnCerrarExitoEntrega?.addEventListener('click', () => {
+      modalExitoEntrega?.classList.add('hidden');
+    });
+    modalExitoEntrega?.addEventListener('click', (e) => {
+      if (e.target === modalExitoEntrega) {
+        modalExitoEntrega.classList.add('hidden');
+      }
+    });
+
     function abrirModalEntrega(unidadId: string, unidadNombre: string, tpTitulo: string, tpCarpeta?: string) {
       if (inputEntregaUnidadId) inputEntregaUnidadId.value = unidadId;
       if (inputEntregaObs) inputEntregaObs.value = tpTitulo;
@@ -1052,6 +1095,7 @@ import MoodleLayout from '../layouts/Moodle-Layout.astro';
       if (txtModalUnidad) txtModalUnidad.textContent = unidadNombre || 'Unidad Temática';
       if (txtModalTitulo) txtModalTitulo.textContent = tpTitulo;
       if (inputEntregaFile) inputEntregaFile.value = '';
+      entregaErrorMsg?.classList.add('hidden');
       selectedEntrega?.classList.add('hidden');
       promptEntrega?.classList.remove('hidden');
       modalEntrega?.classList.remove('hidden');
@@ -1065,9 +1109,13 @@ import MoodleLayout from '../layouts/Moodle-Layout.astro';
     formEntregaModal?.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!inputEntregaFile.files || inputEntregaFile.files.length === 0) {
-        alert('Seleccione un archivo de resolución.');
+        if (entregaErrorMsg && entregaErrorTxt) {
+          entregaErrorTxt.textContent = 'Por favor, seleccione un archivo de resolución.';
+          entregaErrorMsg.classList.remove('hidden');
+        }
         return;
       }
+      entregaErrorMsg?.classList.add('hidden');
 
       const btnSubmit = formEntregaModal.querySelector('button[type="submit"]') as HTMLButtonElement;
       const originalText = btnSubmit ? btnSubmit.innerHTML : '';
@@ -1089,11 +1137,14 @@ import MoodleLayout from '../layouts/Moodle-Layout.astro';
       try {
         await api.material.subirEntrega(fd);
         cerrarModalEntrega();
-        alert('¡Trabajo práctico entregado con éxito!');
+        modalExitoEntrega?.classList.remove('hidden');
         await cargarDetalleCurso();
       } catch (err: any) {
         console.error('Error al entregar TP:', err);
-        alert('Error al entregar trabajo práctico: ' + err.message);
+        if (entregaErrorMsg && entregaErrorTxt) {
+          entregaErrorTxt.textContent = 'Error al entregar trabajo práctico: ' + err.message;
+          entregaErrorMsg.classList.remove('hidden');
+        }
       } finally {
         if (btnSubmit) {
           btnSubmit.disabled = false;
