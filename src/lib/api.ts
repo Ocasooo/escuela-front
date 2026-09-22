@@ -2,7 +2,27 @@
 import { getToken, clearSession } from './auth';
 
 function resolveApiUrl(): string {
-  let url = (import.meta.env.PUBLIC_API_URL || '').trim();
+  // 1. Permitir override manual en localStorage (muy útil para depurar sin esperar un nuevo build)
+  if (typeof window !== 'undefined') {
+    try {
+      const localOverride = localStorage.getItem('API_URL') || localStorage.getItem('PUBLIC_API_URL');
+      if (localOverride) {
+        let clean = localOverride.trim().replace(/\/+$/, '');
+        if (!clean.endsWith('/api')) clean = `${clean}/api`;
+        return clean;
+      }
+    } catch (_) {}
+  }
+
+  // 2. Leer cualquier nombre de variable disponible (API_URL, BACKEND_URL, VITE_API_URL, etc.)
+  let url = (
+    import.meta.env.API_URL ||
+    import.meta.env.BACKEND_URL ||
+    import.meta.env.VITE_API_URL ||
+    import.meta.env.NEXT_PUBLIC_API_URL ||
+    import.meta.env.PUBLIC_API_URL ||
+    ''
+  ).trim();
 
   // Si no se configuró la variable de entorno, usar valor por defecto
   if (!url) {
