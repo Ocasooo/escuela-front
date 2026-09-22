@@ -343,8 +343,10 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 
         // Cargar cursos en el filtro
         if (filtroCurso && cursos) {
+          const valorPrevio = filtroCurso.value;
           filtroCurso.innerHTML = '<option value="todos">Todos los cursos</option>' +
             cursos.map((c: any) => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
+          if (valorPrevio) filtroCurso.value = valorPrevio;
         }
 
         // Mostrar alumnos egresados o con cursada finalizada / aprobada (>= 6)
@@ -364,20 +366,22 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
         egresadosData = graduados.map((item: any) => ({
           id_alumno: item.id_alumno,
           id_curso: item.id_curso,
-          dni: item.dni || 'S/D',
+          dni: String(item.dni || 'S/D'),
           nombre: item.nombre || '',
           apellido: item.apellido || '',
           curso: item.curso_nombre || 'Especialidad Técnica',
           anio: item.anio || new Date().getFullYear(),
-          nota: item.nota !== null ? Math.round(Number(item.nota)) : 7,
+          nota: item.nota !== null ? parseFloat(Number(item.nota).toFixed(1)) : 7,
           titulado: item.estado_terminacion === 'egresado' || item.estado === 'egresado'
         }));
 
         // Cargar años únicos en el filtro de año
         if (filtroAnio) {
+          const valorPrevio = filtroAnio.value;
           const aniosUnicos = Array.from(new Set(egresadosData.map((e) => e.anio))).sort((a, b) => b - a);
           filtroAnio.innerHTML = '<option value="todos">Todos los ciclos</option>' +
             aniosUnicos.map((a) => `<option value="${a}">${a}</option>`).join('');
+          if (valorPrevio) filtroAnio.value = valorPrevio;
         }
 
         actualizarContadores();
@@ -404,20 +408,33 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
       if (!tbody) return;
 
       const termino = inputBuscar?.value.toLowerCase().trim() || '';
-      const cursoSel = filtroCurso?.value || 'todos';
+      const cursoSel = (filtroCurso?.value || 'todos').toLowerCase().trim();
       const estadoSel = filtroEstado?.value || 'todos';
       const anioSel = filtroAnio?.value || 'todos';
 
       const filtrados = egresadosData.filter((e) => {
+        const dniStr = String(e.dni || '');
+        const apeNom = `${e.apellido || ''} ${e.nombre || ''}`.toLowerCase();
+        const nomApe = `${e.nombre || ''} ${e.apellido || ''}`.toLowerCase();
+        const curStr = (e.curso || '').toLowerCase();
+
         const matchTermino =
-          `${e.nombre} ${e.apellido}`.toLowerCase().includes(termino) ||
-          e.dni.includes(termino) ||
-          e.curso.toLowerCase().includes(termino);
-        const matchCurso = cursoSel === 'todos' || e.curso.toLowerCase().includes(cursoSel.toLowerCase());
+          !termino ||
+          apeNom.includes(termino) ||
+          nomApe.includes(termino) ||
+          dniStr.includes(termino) ||
+          curStr.includes(termino);
+
+        const matchCurso =
+          cursoSel === 'todos' ||
+          curStr === cursoSel ||
+          curStr.includes(cursoSel);
+
         const matchEstado =
           estadoSel === 'todos' ||
           (estadoSel === 'emitido' && e.titulado) ||
           (estadoSel === 'pendiente' && !e.titulado);
+
         const matchAnio = anioSel === 'todos' || String(e.anio) === anioSel;
 
         return matchTermino && matchCurso && matchEstado && matchAnio;
