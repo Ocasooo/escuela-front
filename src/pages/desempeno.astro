@@ -113,8 +113,32 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
         </p>
       </div>
 
-      <button type="button" id="btn-cerrar-exito-notas" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition-all">
+      <button type="button" id="btn-cerrar-exito-notas" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer">
         Aceptar
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal de Advertencia / Información de Desempeño -->
+  <div id="modal-alerta-desempeno" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 md:p-8 shadow-2xl border border-slate-100 animate-fadeIn text-center space-y-5">
+      <div id="modal-alerta-icono-wrap" class="w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-100 shadow-inner">
+        <i id="modal-alerta-icono" class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      
+      <div class="space-y-1.5">
+        <h3 id="modal-alerta-titulo" class="text-lg font-black text-slate-900">Atención</h3>
+        <p id="modal-alerta-mensaje" class="text-xs text-slate-500 leading-relaxed">
+          Mensaje de advertencia
+        </p>
+      </div>
+
+      <button
+        type="button"
+        id="btn-cerrar-alerta-desempeno"
+        class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all cursor-pointer"
+      >
+        Entendido
       </button>
     </div>
   </div>
@@ -161,6 +185,46 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
     const modalExito = document.getElementById('modal-exito-notas');
     const modalExitoTitulo = document.getElementById('modal-exito-titulo');
     const modalExitoMensaje = document.getElementById('modal-exito-mensaje');
+
+    const modalAlerta = document.getElementById('modal-alerta-desempeno');
+    const modalAlertaTitulo = document.getElementById('modal-alerta-titulo');
+    const modalAlertaMensaje = document.getElementById('modal-alerta-mensaje');
+    const modalAlertaIcono = document.getElementById('modal-alerta-icono');
+    const modalAlertaIconoWrap = document.getElementById('modal-alerta-icono-wrap');
+    const btnCerrarAlerta = document.getElementById('btn-cerrar-alerta-desempeno');
+
+    function mostrarAlerta(titulo: string, mensaje: string, tipo: 'warning' | 'error' = 'warning') {
+      if (modalAlertaTitulo) modalAlertaTitulo.textContent = titulo;
+      if (modalAlertaMensaje) modalAlertaMensaje.textContent = mensaje;
+
+      if (tipo === 'error') {
+        if (modalAlertaIconoWrap) modalAlertaIconoWrap.className = 'w-16 h-16 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-rose-100 shadow-inner';
+        if (modalAlertaIcono) modalAlertaIcono.className = 'fa-solid fa-circle-xmark';
+        if (btnCerrarAlerta) btnCerrarAlerta.className = 'w-full py-3 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer';
+      } else {
+        if (modalAlertaIconoWrap) modalAlertaIconoWrap.className = 'w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-amber-100 shadow-inner';
+        if (modalAlertaIcono) modalAlertaIcono.className = 'fa-solid fa-triangle-exclamation';
+        if (btnCerrarAlerta) btnCerrarAlerta.className = 'w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all cursor-pointer';
+      }
+
+      modalAlerta?.classList.remove('hidden');
+    }
+
+    btnCerrarAlerta?.addEventListener('click', () => {
+      modalAlerta?.classList.add('hidden');
+    });
+
+    modalAlerta?.addEventListener('click', (e) => {
+      if (e.target === modalAlerta) {
+        modalAlerta.classList.add('hidden');
+      }
+    });
+
+    modalExito?.addEventListener('click', (e) => {
+      if (e.target === modalExito) {
+        modalExito.classList.add('hidden');
+      }
+    });
 
     async function inicializarMaterias() {
       try {
@@ -508,7 +572,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
     btnAccionPrincipal?.addEventListener('click', async () => {
       const cursoId = Number(selectMateria?.value);
       if (!cursoId) {
-        alert('Seleccione una materia válida.');
+        mostrarAlerta('Materia Requerida', 'Por favor, seleccione una materia o comisión válida antes de continuar.');
         return;
       }
 
@@ -521,10 +585,11 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
         const val = target.value.trim();
 
         if (val !== '') {
-          let num = parseInt(val, 10);
+          let num = parseFloat(val);
           if (!isNaN(num)) {
-            if (num < 1) num = 1;
+            if (num < 0) num = 0;
             if (num > 10) num = 10;
+            num = parseFloat(num.toFixed(1));
             const alu = alumnosTodos.find((a) => a.id === id);
             const anioNota = alu ? alu.anio : (modoActual === 'carga' ? anioActual : anioSeleccionado);
             notasAEnviar.push({
@@ -538,9 +603,11 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
       });
 
       if (notasAEnviar.length === 0) {
-        alert(modoActual === 'carga' 
-          ? 'Por favor, ingresa la calificación de al menos un estudiante antes de registrar las notas del cursado.' 
-          : 'No hay notas ingresadas o modificadas para guardar.'
+        mostrarAlerta(
+          'Sin notas para guardar',
+          modoActual === 'carga'
+            ? 'Por favor, ingresa la calificación de al menos un estudiante antes de registrar las notas del cursado.'
+            : 'No hay notas ingresadas o modificadas para guardar en este ciclo lectivo.'
         );
         return;
       }
@@ -572,7 +639,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
         modalExito?.classList.remove('hidden');
       } catch (err: any) {
         console.error('Error al guardar notas de cursado:', err);
-        alert('Ocurrió un error al guardar las notas: ' + (err.message || 'Error del servidor'));
+        mostrarAlerta('Error al guardar', 'Ocurrió un error al guardar las notas: ' + (err.message || 'Error del servidor'), 'error');
       } finally {
         btnAccionPrincipal.disabled = false;
         btnAccionPrincipal.innerHTML = textoOriginal;
