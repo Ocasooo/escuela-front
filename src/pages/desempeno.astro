@@ -85,8 +85,6 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
               <th class="p-4">Estudiante</th>
               <th class="p-4 text-center">Año Cursado</th>
               <th class="p-4 text-center">Promedio TPs</th>
-              <th class="p-4 text-center">Parcial Teórico</th>
-              <th class="p-4 text-center">Asistencia %</th>
               <th class="p-4 text-center">Nota Cursado</th>
               <th class="p-4 text-center">Condición Final</th>
             </tr>
@@ -346,7 +344,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
         if (modoActual === 'carga') {
           tbody.innerHTML = `
             <tr>
-              <td colspan="8" class="p-12 text-center">
+              <td colspan="6" class="p-12 text-center">
                 <div class="max-w-md mx-auto space-y-3">
                   <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto text-xl shadow-xs">
                     <i class="fa-solid fa-circle-check"></i>
@@ -367,7 +365,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
         } else {
           tbody.innerHTML = `
             <tr>
-              <td colspan="8" class="p-8 text-center text-slate-400">
+              <td colspan="6" class="p-8 text-center text-slate-400">
                 No se encontraron registros de estudiantes para el ciclo ${anioSeleccionado}.
               </td>
             </tr>
@@ -430,8 +428,6 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
             <td class="p-4 font-bold text-slate-900">${a.apellido}, ${a.nombre}</td>
             <td class="p-4 text-center font-bold text-slate-600">${a.anio}</td>
             <td class="p-4 text-center font-semibold text-slate-700">${a.promedio_tp.toFixed(1)}</td>
-            <td class="p-4 text-center font-semibold text-slate-700">${a.nota_parcial.toFixed(1)}</td>
-            <td class="p-4 text-center font-semibold text-slate-600">${a.asistencia}%</td>
             <td class="p-4 text-center">
               <input
                 type="text"
